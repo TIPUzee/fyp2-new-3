@@ -16,21 +16,25 @@ import {
     AgLineSeriesOptions,
 } from 'ag-charts-community';
 import { UtilFuncService } from '../../../services/util-func.service';
-import { DoctorProfile } from "../../../interfaces/interfaces";
+import { DoctorProfile, DoctorReviews } from "../../../interfaces/interfaces";
 import { HTTPService } from "../../../services/http.service";
-import { GetDoctorDetailsResponse } from "../../../interfaces/api-response-interfaces";
+import { GetDoctorDetailsResponse, GetDoctorReviewsResponse } from "../../../interfaces/api-response-interfaces";
 import { toast } from "ngx-sonner";
 import { LocalImageFileComponent } from "../../../utils/components/local-image-file/local-image-file.component";
 import { AvailabilityTimePipe } from "../../../pipes/availability-time.pipe";
 import { MonthYearPipe } from "../../../pipes/month-year.pipe";
 import { WeekdayShortPipe } from "../../../pipes/weekday-short.pipe";
+import { InViewportModule } from 'ng-in-viewport';
+import { InViewportDirective } from 'ng-in-viewport';
+import { DatetimePipe } from "../../../pipes/datetime.pipe";
 
 @Component({
     selector: 'app-doctor-details',
     standalone: true,
     imports: [
         CommonModule, RatingStarsComponent, RouterLink, FontAwesomeModule, AgChartsAngularModule,
-        NgOptimizedImage, LocalImageFileComponent, AvailabilityTimePipe, MonthYearPipe, WeekdayShortPipe
+        NgOptimizedImage, LocalImageFileComponent, AvailabilityTimePipe, MonthYearPipe, WeekdayShortPipe,
+        InViewportModule, InViewportDirective, DatetimePipe
     ],
     templateUrl: './doctor-details.component.html',
     styleUrl: './doctor-details.component.scss',
@@ -58,6 +62,73 @@ export class DoctorDetailsComponent implements AfterViewInit, OnChanges {
     chartAllTimeRatingOptions!: AgChartOptions;
     chartLast3WeekRatingOptions!: AgChartOptions;
     //
+    // Forms
+    //
+    // Load Patient Reviews
+    patientReviews = {
+        list: [] as DoctorReviews[],
+        nextOffset: 0,
+        limitPerLoad: 0,
+        loadMoreTriggerIndex: 0,
+        noMore: false,
+        loading: false,
+        loadMore: async ({ visible }: { visible: boolean }) => {
+            console.info('Load more reviews', visible, this.patientReviews.noMore);
+            if (!visible || this.patientReviews.noMore || this.doctorId === -1) {
+                return;
+            }
+            
+            if (this.patientReviews.loading) {
+                return;
+            }
+            
+            this.patientReviews.loading = true;
+
+            let res = await this.http.sendRequest({
+                method: 'GET',
+                url: `/doctor/${ this.doctorId }/reviews/${ this.patientReviews.nextOffset }`,
+            }) as GetDoctorReviewsResponse | false;
+            
+            this.patientReviews.loading = false;
+            
+            if (res === false) {
+                return;
+            }
+            
+            // loop through the res.list and transform the data
+            res.list = res.list.map((review) => {
+                return {
+                    ...review,
+                    timeTo: new Date(review.timeTo),
+                };
+            });
+            
+            this.patientReviews.nextOffset = res.nextOffset;
+            this.patientReviews.limitPerLoad = res.limitPerLoad;
+            
+            let newReviewsLength = res.list.length;
+            
+            let newList = this.patientReviews.list;
+
+            newList.push(...res.list);
+            
+            // Remove duplicates from newList
+            newList = newList.filter((review, index, self) => self.findIndex((r) => r.patientReview === review.patientReview) === index);
+            
+            if (newReviewsLength < res.limitPerLoad) {
+                this.patientReviews.noMore = true;
+            }
+            
+            let triggerIndex = this.patientReviews.list.length - 2;
+            if (triggerIndex < 0) {
+                triggerIndex = 0;
+            }
+            this.patientReviews.loadMoreTriggerIndex = triggerIndex;
+            this.patientReviews.list = newList;
+            console.info('Loaded more reviews', this.patientReviews.list);
+        }
+    }
+    //
     // Constructor
     constructor(
         protected common: CommonService,
@@ -70,15 +141,22 @@ export class DoctorDetailsComponent implements AfterViewInit, OnChanges {
     }
     
     
-    ngAfterViewInit() {
-        this.loadDoctorDetails();
+    async ngAfterViewInit() {
+        await this.loadDoctorDetails();
         this.html.initTailwindElements();
         this.initAgChartsColors();
+        await this.patientReviews.loadMore({ visible: true });
     }
     
     
-    ngOnChanges() {
-        this.loadDoctorDetails();
+    async ngOnChanges() {
+        await this.loadDoctorDetails();
+        await this.patientReviews.loadMore({ visible: true });
+    }
+    
+    
+    inView({ target, visible }: { target: Element; visible: boolean }, index: number) {
+        console.log('Inview', target, visible);
     }
     
     
@@ -138,31 +216,33 @@ export class DoctorDetailsComponent implements AfterViewInit, OnChanges {
     
     
     initAgChartsColors(): void {
-        AgCharts.updateDelta(this.chartThreeMonthsAppointments.chart!, {
-            background: {
-                fill: '#edf7fe',
-            },
-        });
-        AgCharts.updateDelta(this.chartLast3WeekRating.chart!, {
-            background: {
-                fill: '#edf7fe',
-            },
-        });
+        try {
+            AgCharts.updateDelta(this.chartThreeMonthsAppointments?.chart!, {
+                background: {
+                    fill: '#edf7fe',
+                },
+            });
+            AgCharts.updateDelta(this.chartLast3WeekRating?.chart!, {
+                background: {
+                    fill: '#edf7fe',
+                },
+            });
+        } catch (e) {
+        
+        }
     }
     
     
     async loadDoctorDetails() {
-        console.log('Loading doctor details');
-        
         if (this.doctorId === -1) {
             return false;
         }
-
+        
         let res = await this.http.sendRequest({
             method: 'GET',
             url: `/doctor/${ this.doctorId }`,
         }) as GetDoctorDetailsResponse | false;
-
+        
         if (res === false) {
             toast.error('Failed to load doctor details', {
                 description: 'Please try again later',
@@ -170,7 +250,7 @@ export class DoctorDetailsComponent implements AfterViewInit, OnChanges {
             this.location.back();
             return false;
         }
-
+        
         if (res.doctorNotFound) {
             toast.error('Doctor does not exist', {
                 description: 'Please try again later',
@@ -178,11 +258,10 @@ export class DoctorDetailsComponent implements AfterViewInit, OnChanges {
             this.location.back();
             return false;
         }
-
+        
         this.doctor = res.doctor;
         this.doctor.coverPicFilename = this.utils.makeOwnServerUrl(`/api/file/${ this.doctor.coverPicFilename }`);
         this.doctor.profilePicFilename = this.utils.makeOwnServerUrl(`/api/file/${ this.doctor.profilePicFilename }`);
-        console.log(this.doctor);
         return true;
     }
 }

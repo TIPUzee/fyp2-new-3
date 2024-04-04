@@ -1,6 +1,8 @@
 from utils import App, SavedFile, Validator as Vld, Func, UploadedFiles, SavedFilesZip
-from src import (Doctor, AvailabilityDuration, SpecializationCategory, MixedUserUtil,
-                 DoctorLanguage, DoctorExperience, ApprovalDocument, Language)
+from src import (
+    Appointment, Doctor, AvailabilityDuration, SpecializationCategory, MixedUserUtil,
+    DoctorLanguage, DoctorExperience, ApprovalDocument, Language,
+)
 
 
 @App.api_route('/d/profile', method='PUT', access_control=[Doctor.Login])
@@ -340,3 +342,33 @@ def _(user: None, doctor_id: int) -> dict:
 
     response['doctor'] = doctor_dict
     return App.Res.ok(**response)
+
+
+@App.api_route(
+    '/doctor/<doctor_id>/reviews/<offset>', 'GET',
+    path_params_pre_conversion={'doctor_id': int, 'offset': int},
+    path_params_validators={'doctor_id': Vld.Int(), 'offset': Vld.Int()},
+    access_control='All'
+)
+def _(user: None, doctor_id: int, offset: int) -> None:
+    request_response = {
+        'list': False,
+        'next_offset': 0,
+        'limit_per_load': 1
+    }
+
+    a = Appointment()
+    a.turn_off_validation()
+    a.m_doctor_id = doctor_id
+    a.m_id = offset
+    reviews = a.select(
+        select_cols=['m_patient_review', 'm_rating', 'm_id', 'm_time_to'],
+        where_greater_than=['m_id'],
+        _limit=request_response['limit_per_load'],
+        _order_by='m_id'
+    )
+
+    request_response['list'] = reviews
+    request_response['next_offset'] = reviews[-1]['m_id'] if reviews else offset
+
+    return App.Res.ok(**request_response)

@@ -27,6 +27,7 @@
     "ag-charts-angular": "^9.2.0",
     "animejs": "^3.2.2",
     "i": "^0.3.7",
+    "ng-in-viewport": "^16.1.0",
     "ngx-cookie-service": "^17.1.0",
     "ngx-extended-pdf-viewer": "^19.5.1",
     "ngx-sonner": "^0.3.4",

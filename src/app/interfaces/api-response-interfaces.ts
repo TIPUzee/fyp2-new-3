@@ -1,6 +1,6 @@
 import {
     Appointment,
-    DoctorProfile,
+    DoctorProfile, DoctorReviews,
     Language,
     PatientProfileInterface,
     RegistrableUserType,
@@ -141,4 +141,10 @@ export interface PatientNotJoinedAppointmentResponse {
 export interface GetDoctorDetailsResponse {
     doctorNotFound: boolean,
     doctor: DoctorProfile,
+}
+
+export interface GetDoctorReviewsResponse {
+    list: DoctorReviews[],
+    nextOffset: number,
+    limitPerLoad: number,
 }

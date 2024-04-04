@@ -109,3 +109,10 @@ export interface Appointment {
         dob: Date,
     }
 }
+
+export interface DoctorReviews {
+    patientReview: string,
+    rating: number,
+    id: number,
+    timeTo: Date,
+}

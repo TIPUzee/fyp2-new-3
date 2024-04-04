@@ -137,13 +137,21 @@
                         <div class="text-xl text-dark font-semibold">{{ exp.title }}</div>
                      </div>
                      <div class="flex gap-x-3 text-dark text-opacity-60">
-                        <div>{{ exp.dateFrom }}</div>
+                        <div>{{ exp.dateFrom | monthYear }}</div>
                         <div>-</div>
-                        <div> June 2012</div>
+                        <div>
+                           <ng-container *ngIf="exp.dateTo">{{ exp.dateTo | monthYear }}</ng-container>
+                           <ng-container *ngIf="!exp.dateTo">Present</ng-container>
+                        </div>
                      </div>
                      <div class="mt-2">
                         <div>{{ exp.description }}</div>
                      </div>
+                  </div>
+               </ng-container>
+               <ng-container *ngIf="doctor.experiences.length === 0">
+                  <div class="shadow-lg rounded-lg bg-primary-100 bg-opacity-90 p-6">
+                     <div class="text-center text-sm text-dark text-opacity-60">No experience yet</div>
                   </div>
                </ng-container>
             </div>
@@ -177,28 +185,32 @@
             <div class="mt-3 bg-primary-100 bg-opacity-90 p-6 rounded-lg shadow-lg">
                <div class="font-semibold text-dark text-2xl mb-1">Patient Reviews</div>
                <div class="flex flex-col gap-y-3">
-                  <ng-container *ngFor="let i of common.range(0, 4)">
+                  <ng-container *ngFor="let review of patientReviews.list; let reviewIndex = index;">
                      <div class="border border-dark border-opacity-50 rounded-lg p-4">
-                        <div>
-                           Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto quaerat soluta sint id
-                           delectus atque expedita cumque, perferendis
-                           blanditiis! Corrupti quam, veritatis, minus quas quaerat ea debitis, provident vitae alias
-                           aliquid qui! Labore mollitia quasi fuga optio,
-                           ducimus ratione cum doloribus ipsam provident vitae animi dignissimos, deserunt accusamus
-                           delectus accusantium quibusdam quas? Quod facere
-                           maxime quia, neque quas cumque sequi dolor laboriosam quo aspernatur aliquid alias itaque
-                           fugit
-                           expedita repellendus eaque! Nisi nobis
-                           nihil cum ratione quisquam pariatur sed dolorum minus aut voluptas suscipit, in assumenda
-                           iusto
-                           voluptatibus velit quo, tenetur
-                           praesentium fuga. Ad, voluptatum. Obcaecati nesciunt dolores esse quas.
-                        </div>
+                        <ng-container
+                           *ngIf="reviewIndex === patientReviews.list.length - 2 || reviewIndex === 0 ||reviewIndex === 1">
+                           <div  inViewport (inViewportAction)="patientReviews.loadMore($event)"></div>
+                        </ng-container>
+                        <div>{{ review.patientReview }}</div>
                         <div class="flex justify-end">
-                           <div class="text-sm text-dark text-opacity-50 -mb-1">08:53PM - 01/01/2000</div>
+                           <div class="text-sm text-dark text-opacity-50 -mb-1">{{ review.timeTo | datetime  }}</div>
                         </div>
                      </div>
                   </ng-container>
+                  <div class="text-center text-sm text-dark text-opacity-60">
+                     <ng-container *ngIf="patientReviews.list.length > 0 && patientReviews.loading">
+                        <div class="mt-3">Loading more reviews...</div>
+                     </ng-container>
+                     <ng-container *ngIf="patientReviews.list.length === 0 && patientReviews.loading">
+                        <div class="mt-3">Loading reviews...</div>
+                     </ng-container>
+                     <ng-container *ngIf="patientReviews.list.length > 0 && patientReviews.noMore">
+                        <div class="mt-3">No more reviews</div>
+                     </ng-container>
+                     <ng-container *ngIf="patientReviews.list.length === 0 && patientReviews.noMore">
+                        <div class="mt-3">No reviews</div>
+                     </ng-container>
+                  </div>
                </div>
             </div>
          </div>

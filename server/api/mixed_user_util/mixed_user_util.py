@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from src import Patient, Doctor, MixedUserUtil, AvailabilityDuration, DoctorLanguage, DoctorExperience
-from utils import App
+from src import Patient, Doctor, MixedUserUtil, AvailabilityDuration, DoctorLanguage, DoctorExperience, \
+    Appointment
+from utils import App, Validator as Vld
 
 
 @App.api_route('/email-exists/<email_address>', 'GET',
