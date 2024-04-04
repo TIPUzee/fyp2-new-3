@@ -1,0 +1,17 @@
+<div>
+
+   <!---Errors--->
+   <div [attr.data-command]="updateError()">
+      <div
+         [ngClass]="{'!grid-rows-[1fr] !opacity-100': currentError !== ''}"
+         class="form---error"
+      >
+         <div
+         >
+            {{ currentError }}
+         </div>
+      </div>
+   </div>
+   <!---Errors--->
+
+</div>

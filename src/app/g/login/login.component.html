@@ -1,0 +1,132 @@
+<div class="mb-20">
+   <div class="container mx-auto">
+      <!-- Login Form -->
+      <div>
+         <div>
+            <div class="bg-primary-100 bg-opacity-90 rounded-lg shadow-xl">
+               <div class="grid grid-cols-12 rounded-[inherit]">
+                  <div
+                     style="background: linear-gradient(90deg, rgba(0, 58, 255, 1) 0%, rgba(43, 165, 247, 1) 100%)"
+                     class="col-span-6 text-primary-100 rounded-l-[inherit]"
+                  >
+                     <div class="h-full p-8 flex flex-col items-center justify-center">
+                        <div>
+                           <div
+                              class="text-2xl font-semibold mb-3 text-primary-100"
+                           >
+                              We are more than just an organization
+                           </div>
+                           <div
+                              class="max-w-sm text-primary-100 text-opacity-90"
+                           >
+                              Welcome to our healthcare hub. Securely log in to explore personalized services -
+                              predictive disease analysis, brain tumor detection, appointment scheduling, and virtual
+                              consultations. We're more than a company; we're your partners in prioritizing your
+                              wellness journey.
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="col-span-6 py-6">
+                     <div class="p-12 text-dark text-opacity-90">
+                        <form
+                           (submit)="$event.preventDefault(); loginForm.submit()"
+                           [formGroup]="loginForm.fg"
+                           class="mx-auto max-w-sm"
+                        >
+                           <div class="flex justify-center mb-4">
+                              <div class="h-16">
+                                 <img
+                                    alt=""
+                                    height="64"
+                                    ngSrc="assets/img/logo.png"
+                                    width="64"
+                                    class="max-w-full max-h-full"
+                                 />
+                              </div>
+                           </div>
+                           <div class="flex justify-center mb-7">
+                              <div
+                                 class="text-lg font-semibold text-dark text-opacity-90"
+                              >
+                                 Beyond Company: Your Health's Portal
+                              </div>
+                           </div>
+                           <div class="mb-4">
+                              <div>Please login to your account</div>
+                           </div>
+                           <div class="mb-4">
+                              <form-input
+                                 [errors]="loginForm.errors.email"
+                                 controlName="email"
+                                 label="Email"
+                                 type="text"
+                              >
+                              </form-input>
+                           </div>
+                           <div class="mb-4">
+                              <form-input
+                                 [errors]="loginForm.errors.password"
+                                 controlName="password"
+                                 label="Password"
+                                 type="password"
+                              >
+                              </form-input>
+                           </div>
+                           <div class="mb-2">
+                              <form-submit-button
+                                 [waiting]="loginForm.waiting"
+                                 label="Login"
+                              >
+                              </form-submit-button>
+                           </div>
+                           <div class="flex justify-end mb-5">
+                              <a
+                                 routerLink="/reset"
+                                 class="block ms-auto text-dark text-opacity-70 hover:text-opacity-90 transition-colors duration-200 text-sm"
+                              >Forgot Password?
+                              </a>
+                           </div>
+                           <div class="mb-2">
+                              <div class="text-sm text-dark text-opacity-70">Do not have an Account?</div>
+                           </div>
+                           <div>
+                              <div>
+                                 <a
+                                    role="button"
+                                    routerLink="/regis"
+                                    class="text-center block w-full rounded border-2 border-blue-500 text-blue-500 hover:border-blue-600 hover:bg-blue-400 hover:bg-opacity-10 hover:text-blue-600 focus:border-blue-700 focus:text-blue-700 active:border-blue-800 active:text-blue-800 dark:border-blue-300 dark:text-blue-300 dark:hover:hover:bg-blue-300 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal transition duration-150 ease-in-out focus:outline-none focus:ring-0"
+                                 >Register
+                                 </a>
+                              </div>
+                           </div>
+                        </form>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <!-- Login Form -->
+
+      <div class="hidden justify-between">
+         <div class="w-[45%]">
+            <div class="bg-primary-100 bg-opacity-90 relative rounded-lg p-6">
+               <div>
+                  <div class="text-2xl font-semibold mb-1">Login to AI-Disease Predictor</div>
+                  <div class="text-dark text-opacity-70 mb-2">Access Your Personal Health Hub</div>
+                  <div>As you step into the login portal of our AI-Disease Predictor, you're greeted with the key to
+                       your personalized healthcare experience. Your journey towards optimal health begins here,
+                       ensuring every step is intuitive, secure, and tailored to your unique needs.
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="w-[45%]">
+            <div class="bg-primary-100 bg-opacity-90 relative rounded-lg p-6">
+               <form></form>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>

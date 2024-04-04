@@ -1,0 +1,50 @@
+<div [formGroup]="formGroup">
+
+   <!---TE-Input--->
+   <div>
+      <div
+         #timePickerEle
+         (click)="markAsTouched()"
+         [ngClass]="{'form-input---invalid': toShowError()}"
+         data-te-increment="true"
+         data-te-input-wrapper-init data-te-timepicker-init
+         class="relative"
+      >
+         <input
+            #timePickerInputEle
+            [attr.data-command-1]="
+               !!defaultValue ? timePickerInputEle.setAttribute('data-te-input-state-active', 'true') : null
+            "
+            [formControlName]="controlName"
+            [id]="controlName + uuid"
+            [ngClass]="{ 'opacity-50 pointer-events-none': disabled }"
+            [placeholder]="placeholder"
+            type="text"
+            class="peer form-date-picker---input"
+         />
+         <label
+            [for]="controlName + uuid"
+            style="margin-left: 0;"
+            class="form-date-picker---label"
+         >
+            {{ label }}
+         </label>
+      </div>
+   </div>
+   <!---TE-Input--->
+
+   <!---Errors--->
+   <div>
+      <div
+         [ngClass]="{'': updateError(),  '!grid-rows-[1fr] !opacity-100': currentError !== ''}"
+         class="form---error"
+      >
+         <div
+         >
+            {{ currentError }}
+         </div>
+      </div>
+   </div>
+   <!---Errors--->
+
+</div>

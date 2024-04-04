@@ -1,0 +1,662 @@
+<form
+   #profileUpdateFormEle
+   (submit)="$event.preventDefault(); profileUpdateForm.submit()"
+   [formGroup]="profileUpdateForm.fg"
+   class="main workspace"
+>
+   <div class="inner-container mx-auto">
+      <div class="rounded-lg shadow-lg h-[300px]">
+         <div class="relative w-full h-full rounded-[inherit]">
+            <label
+               for="dropzone-file-cover-pic"
+               (filesChangeEmitter)="changePic.coverPicByDragNDrop($event)"
+               data-te-ripple-color="light"
+               data-te-ripple-init
+               fileDragDrop
+               class="relative h-full w-full rounded-[inherit] flex flex-col items-center justify-center border-2 border-gray-300 border-dashed cursor-pointer bg-primary-100 hover:bg-primary-200 hover:text-white transition-colors duration-500"
+            >
+               <div class="flex flex-col items-center justify-center text-center pt-5 pb-6">
+                  <svg
+                     aria-hidden="true"
+                     fill="none"
+                     viewBox="0 0 20 16"
+                     xmlns="http://www.w3.org/2000/svg"
+                     class="w-16 h-16 mb-0"
+                  >
+                     <path
+                        d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                     />
+                  </svg>
+                  <p class="text-xs mb-6 max-w-[70px]">Your Cover Picture</p>
+               </div>
+               <input
+                  id="dropzone-file-cover-pic"
+                  (change)="changePic.coverPicByClick($event)"
+                  accept=".jpg, .jpeg, .png, .gif"
+                  name="coverPic"
+                  type="file"
+                  class="absolute top-0 left-0 w-full h-full rounded-[inherit] opacity-0 cursor-pointer"
+               />
+               <dynamic-image-file
+                  #coverPicImage
+                  class="w-full h-full rounded-[inherit] absolute top-0 left-0 object-cover"
+               ></dynamic-image-file>
+            </label>
+         </div>
+      </div>
+      <div class="profile-img pointer-events-none">
+         <div class="flex items-center flex-col gap-y-2 -mt-24 pointer-events-none">
+            <div class="w-[180px] object-cover aspect-square rounded-full shadow-lg pointer-events-auto">
+               <div class="relative w-full h-full rounded-[inherit]">
+                  <label
+                     for="dropzone-file-profile-pic"
+                     (filesChangeEmitter)="changePic.profilePicByDragNDrop($event)"
+                     data-te-ripple-color="light"
+                     data-te-ripple-init
+                     fileDragDrop
+                     class="relative h-full w-full rounded-[inherit] flex flex-col items-center justify-center border-2 border-gray-300 border-dashed cursor-pointer bg-primary-100 hover:bg-primary-200 hover:text-white transition-colors duration-500"
+                  >
+                     <div class="flex flex-col items-center justify-center text-center pt-5 pb-6">
+                        <svg
+                           aria-hidden="true"
+                           fill="none"
+                           viewBox="0 0 20 16"
+                           xmlns="http://www.w3.org/2000/svg"
+                           class="mt-2 w-10 h-10 mb-1"
+                        >
+                           <path
+                              d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+                              stroke="currentColor"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                           />
+                        </svg>
+                        <p class="text-xs max-w-[70px]">Your Profile Picture</p>
+                     </div>
+                     <input
+                        id="dropzone-file-profile-pic"
+                        (change)="changePic.profilePicByClick($event)"
+                        accept=".jpg, .jpeg, .png, .gif"
+                        name="profilePic"
+                        type="file"
+                        class="absolute top-0 left-0 w-full h-full rounded-[inherit] opacity-0 cursor-pointer"
+                     />
+                     <dynamic-image-file
+                        #profilePicImage
+                        class="w-full h-full rounded-[inherit] absolute top-0 left-0 object-cover"
+                     ></dynamic-image-file>
+                  </label>
+               </div>
+            </div>
+            <div class="text-black font-semibold text-2xl">{{ profileUpdateForm.fg.controls.name.value }}</div>
+         </div>
+      </div>
+   </div>
+
+   <!-- Account Status and Approval Request -->
+   <div class="inner-container mx-auto mt-8 mb-3">
+      <div class="flex justify-end">
+         <div class="flex flex-col gap-y-0.5">
+            <div class="text-center">
+               Account Status:
+               <span
+                  [ngClass]="{
+                     'text-danger-600': accountStatus == 'NEW_ACCOUNT' || accountStatus ==
+                     'APPROVAL_REJECTED',
+                     'text-success-600': accountStatus == 'ACCOUNT_APPROVED',
+                     'text-warning-600': accountStatus == 'APPROVAL_REQUESTED',
+                  }"
+                  class="font-semibold"
+               >
+                  <span *ngIf="accountStatus == 'NEW_ACCOUNT'">Not Approved</span>
+                  <span *ngIf="accountStatus == 'ACCOUNT_APPROVED'">Approved</span>
+                  <span *ngIf="accountStatus == 'APPROVAL_REJECTED'">Approval Rejected</span>
+                  <span *ngIf="accountStatus == 'APPROVAL_REQUESTED'">Approval Requested</span>
+                  <fa-icon
+                     (click)="accountStatusDescModal.open()"
+                     [icon]="faCircleQuestion"
+                     class="ms-1 text-lg cursor-pointer"
+                  ></fa-icon>
+               </span>
+            </div>
+            <form
+               (submit)="$event.preventDefault(); accountApprovalRequestModal.open()"
+               [ngClass]="{'hidden': accountStatus == 'ACCOUNT_APPROVED'}"
+               class="flex justify-end gap-x-2"
+            >
+               <form-submit-button
+                  label="Request Approval"
+               ></form-submit-button>
+            </form>
+         </div>
+      </div>
+      <!-- Account Status and Approval Request -->
+   </div>
+
+   <!-- Profile Details -->
+   <div class="inner-container mx-auto mt-2">
+      <div class="bg-primary-100 bg-opacity-90 p-6 rounded-lg shadow-lg">
+         <div class="mb-3 flex justify-between items-end">
+            <div class="text-black font-semibold text-lg">Your Profile Details</div>
+            <div class="">
+               <div
+                  class="grid grid-rows-[1fr] transition-all duration-500 opacity-100"
+               >
+                  <div class="overflow-hidden">
+                     <div class="flex gap-x-1">
+
+                        <form (submit)="$event.preventDefault(); reloadProfile()">
+                           <form-submit-button
+                              [disabled]="profileUpdateForm.waiting || profileRefreshForm.waiting"
+                              [waiting]="profileRefreshForm.waiting"
+                              btnStyle="btn-primary-100"
+                              label="Reload"
+                           ></form-submit-button>
+                        </form>
+
+                        <form-submit-button
+                           [disabled]="profileUpdateForm.waiting"
+                           [waiting]="profileUpdateForm.waiting"
+                           label="Update"
+                        ></form-submit-button>
+
+                     </div>
+                     <div class="h-3"></div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="grid grid-cols-12 gap-x-4 gap-y-5">
+
+            <div class="col-span-4">
+               <form-input
+                  [errors]="profileUpdateForm.errors.name"
+                  controlName="name"
+                  defaultValue=""
+                  label="Full Name"
+                  type="text"
+               ></form-input>
+            </div>
+
+            <div class="col-span-4">
+               <form-date-picker
+                  [defaultValue]="''"
+                  [disableFuture]="true"
+                  [errors]="profileUpdateForm.errors.dob"
+                  controlName="dob"
+                  defaultView="days"
+                  label="Date of Birth"
+               ></form-date-picker>
+            </div>
+
+            <div class="col-span-4">
+               <form-input
+                  [errors]="profileUpdateForm.errors.whatsappNumber"
+                  controlName="whatsappNumber"
+                  defaultValue=""
+                  label="WhatsApp Number"
+                  type="text"
+               ></form-input>
+            </div>
+
+            <div class="col-span-4">
+               <form-input
+                  [errors]="profileUpdateForm.errors.email"
+                  controlName="email"
+                  defaultValue=""
+                  label="Email"
+                  type="email"
+               ></form-input>
+            </div>
+
+            <div class="col-span-4">
+               <form-select
+                  [errors]="profileUpdateForm.errors.specializationCategoryId"
+                  [options]="specCatOptions"
+                  controlName="specializationCategoryId"
+                  label="Specialization Category"
+               >
+               </form-select>
+            </div>
+
+            <div class="col-span-4">
+               <form-input
+                  [errors]="profileUpdateForm.errors.specialization"
+                  controlName="specialization"
+                  defaultValue=""
+                  label="Specialization"
+                  type="text"
+               ></form-input>
+            </div>
+
+            <div class="col-span-4">
+               <form-input
+                  [errors]="profileUpdateForm.errors.appointmentCharges"
+                  controlName="appointmentCharges"
+                  label="Charges Per Appointment (Rupees)"
+                  type="number"
+               ></form-input>
+            </div>
+
+            <div class="col-span-4">
+               <form-input
+                  [errors]="profileUpdateForm.errors.maxMeetingDuration"
+                  controlName="maxMeetingDuration"
+                  label="Max Meeting Duration (Minutes)"
+                  type="number"
+               ></form-input>
+            </div>
+
+            <div class="col-span-4"></div>
+
+            <div class="col-span-4">
+               <form-input
+                  [errors]="profileUpdateForm.errors.password"
+                  controlName="password"
+                  label="New Password"
+                  type="password"
+               ></form-input>
+            </div>
+
+            <div class="col-span-4">
+               <form-input
+                  [errors]="profileUpdateForm.errors.confirmPassword"
+                  controlName="confirmPassword"
+                  label="Confirm Password"
+                  type="password"
+               ></form-input>
+            </div>
+
+            <div class="col-span-4"></div>
+            <div class="col-span-4"></div>
+
+            <!-- Weekly Availability Durations -->
+            <div class="col-span-12 -mb-3">Your Availability Time</div>
+            <ng-container
+               *ngFor="let day of ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']; let i = index;"
+            >
+               <div
+                  [formGroup]="profileUpdateForm.fg.controls.availabilityDurations.controls[i]"
+                  class="col-span-4 -mb-2"
+               >
+                  <div class="flex gap-x-3">
+                     <div class="mb-[0.125rem] block min-h-[1.5rem] pl-[1.5rem]">
+                        <input
+                           id="weekdayInputBox{{ day }}"
+                           #weekdayCheckBox
+                           (click)="showProfileAvailabilityStatusConditionally()"
+                           formControlName="enabled"
+                           type="checkbox"
+                           class="relative float-left -ml-[1.5rem] mr-[6px] h-[1.125rem] w-[1.125rem] appearance-none rounded-[0.25rem] border-[0.125rem] border-solid border-neutral-300 outline-none before:pointer-events-none before:absolute before:h-[0.875rem] before:w-[0.875rem] before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-[0px_0px_0px_13px_transparent] before:content-[''] checked:border-primary checked:bg-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:-mt-px checked:after:ml-[0.25rem] checked:after:block checked:after:h-[0.8125rem] checked:after:w-[0.375rem] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:shadow-none focus:transition-[border-color_0.2s] focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-[0.875rem] focus:after:w-[0.875rem] focus:after:rounded-[0.125rem] focus:after:content-[''] checked:focus:before:scale-100 checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:after:-mt-px checked:focus:after:ml-[0.25rem] checked:focus:after:h-[0.8125rem] checked:focus:after:w-[0.375rem] checked:focus:after:rotate-45 checked:focus:after:rounded-none checked:focus:after:border-[0.125rem] checked:focus:after:border-l-0 checked:focus:after:border-t-0 checked:focus:after:border-solid checked:focus:after:border-white checked:focus:after:bg-transparent dark:border-neutral-600 dark:checked:border-primary dark:checked:bg-primary dark:focus:before:shadow-[0px_0px_0px_13px_rgba(255,255,255,0.4)] dark:checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca]"
+                        />
+                        <label
+                           for="weekdayInputBox{{ day }}"
+                           class="inline-block pl-[0.15rem] hover:cursor-pointer text-dark text-opacity-75 mb-1 select-none"
+                        >
+                           {{ day }}
+                        </label>
+                     </div>
+                  </div>
+                  <div
+                     [ngClass]="{'opacity-30': !weekdayCheckBox.checked}"
+                     class="grid grid-cols-2 gap-x-2"
+                  >
+                     <div class="">
+                        <form-time-picker
+                           [errors]="profileUpdateForm.errors.availabilityDurations.from"
+                           controlName="from"
+                           label="From"
+                        ></form-time-picker>
+                     </div>
+
+                     <div class="">
+                        <form-time-picker
+                           [errors]="profileUpdateForm.errors.availabilityDurations.to"
+                           controlName="to"
+                           label="To"
+                        ></form-time-picker>
+                     </div>
+                  </div>
+               </div>
+            </ng-container>
+            <!-- Weekly Availability Durations -->
+
+            <!-- Languages -->
+            <div class="cursor-default col-span-12">
+               <div class="mb-1">Your Languages</div>
+               <div
+                  [ngClass]="{'text-red-600': profileUpdateForm.fg.controls.languages.invalid &&
+                  profileUpdateForm.fg.controls.languages.touched}"
+                  class="border border-current border-opacity-70 rounded-md p-2 cursor-default flex flex-wrap items-center gap-x-2 gap-y-2 [&_input]:opacity-0 [&_input]:pointer-events-none shadow-none outline-none transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]"
+               >
+                  <ng-container
+                     *ngFor="let languageId of profileUpdateForm.fg.controls.languages.controls;
+                     let languageIndex = index;"
+                  >
+                     <ng-container *ngIf="languages.has({ id: utils.toNumber(languageId.value) })">
+                        <div
+                           class="transition-colors duration-500 select-none cursor-default hover:bg-gray-200 [&:hover_.icon]:text-opacity-40 text-sm w-fit border border-current border-opacity-50 pe-1 ps-4 pt-1.5 pb-1 rounded-full flex justify-between"
+                        >
+                           <span> {{ languages.get({ id: utils.toNumber(languageId.value) })?.title }}</span>
+                           <span
+                              class="icon text-dark text-opacity-0 transition-colors duration-200 cursor-pointer hover:!text-opacity-80 px-2.5"
+                           >
+                              <fa-icon (click)="removeLanguageFromProfile(languageIndex)" [icon]="faXmark"></fa-icon>
+                           </span>
+                        </div>
+                     </ng-container>
+                  </ng-container>
+                  <ng-container *ngIf="profileUpdateForm.fg.controls.languages.controls.length == 0">
+                     <div
+                        [ngClass]="{'text-red-600': profileUpdateForm.fg.invalid && profileUpdateForm.fg.touched}"
+                        class="text-dark opacity-50"
+                     >
+                        No language selected...
+                     </div>
+                  </ng-container>
+               </div>
+               <div>
+                  <form-error-box
+                     [errors]="profileUpdateForm.errors.languages"
+                     controlName="languages"
+                  ></form-error-box>
+               </div>
+            </div>
+            <div class="col-span-4 -mt-2">
+               <div>
+                  <select
+                     (change)="addNewLanguage($event)" data-te-select-init
+                  >
+                     <option value="-1">Add New Language</option>
+                     <ng-container *ngFor="let language of languages.getAll()">
+                        <option
+                           [disabled]="profileUpdateForm.fg.controls.languages.value.indexOf(language.id) > -1"
+                           [value]="language.id"
+                        >
+                           {{ language.title }}
+                        </option>
+                     </ng-container>
+                  </select>
+               </div>
+            </div>
+            <!-- Languages -->
+
+            <div class="col-span-4"></div>
+            <div class="col-span-4"></div>
+
+            <!-- Experiences -->
+            <div class="text-black font-semibold text-lg col-span-12 -mb-3">Your Education or Work Experiences</div>
+            <div class="flex flex-col gap-y-4 col-span-12">
+               <ng-container *ngIf="profileUpdateForm.fg.controls.experiences.length === 0">
+                  <div class="text-dark text-opacity-60 text-center">
+                     No experience added...
+                  </div>
+               </ng-container>
+               <ng-container *ngFor="let exp of profileUpdateForm.fg.controls.experiences.controls; let expIndex = index;">
+                  <div
+                     [formGroup]="exp"
+                     class="relative rounded-lg bg-primary-100 border border-dark border-opacity-75 bg-opacity-90 p-6 [&:hover_.icons-wrapper]:opacity-100"
+                  >
+                     <div class="flex gap-x-3 absolute right-7 text-lg icons-wrapper opacity-0 transition-opacity duration-300">
+                        <fa-icon
+                           (click)="removeExperienceFromProfile(expIndex)"
+                           [icon]="faTrash"
+                           class="text-danger-600 cursor-pointer"
+                        ></fa-icon>
+                     </div>
+                     <div>
+                        <div class="text-dark max-w-md">
+                           <form-input
+                              [errors]="profileUpdateForm.errors.experiences.title"
+                              controlName="title"
+                              label="Title"
+                              type="text"
+                           ></form-input>
+                        </div>
+                     </div>
+                     <div class="mt-5 flex items-start gap-x-3 text-dark">
+                        <div>
+                           <form-date-picker
+                              [disableFuture]="true"
+                              [errors]="profileUpdateForm.errors.experiences.dateFrom"
+                              controlName="dateFrom"
+                              label="From"
+                              placeholder="Select a start date"
+                           ></form-date-picker>
+                        </div>
+                        <div class="font-semibold pt-1">-</div>
+                        <div>
+                           <form-date-picker
+                              [disableFuture]="true"
+                              [errors]="profileUpdateForm.errors.experiences.dateTo"
+                              controlName="dateTo"
+                              defaultView="years"
+                              label="To"
+                              placeholder="Leave empty if ongoing.."
+                           ></form-date-picker>
+                        </div>
+                     </div>
+                     <div class="mt-5">
+                        <div>
+                           <form-textarea
+                              [errors]="profileUpdateForm.errors.experiences.description"
+                              controlName="description"
+                              label="Description"
+                           ></form-textarea>
+                        </div>
+                     </div>
+                  </div>
+               </ng-container>
+            </div>
+            <div class="flex justify-end items-center gap-x-4 col-span-12">
+               <fa-icon
+                  (click)="addNewExperience()"
+                  [icon]="faCirclePlus"
+                  data-te-ripple-color="dark"
+                  data-te-ripple-init
+                  class="text-3xl w-[30px] h-[30px] flex justify-center items-center cursor-pointer text-dark text-opacity-70 hover:text-opacity-90 transition-colors duration-300 rounded-full"
+               ></fa-icon>
+            </div>
+            <!-- Experiences -->
+         </div>
+      </div>
+   </div>
+   <!-- Profile Details -->
+</form>
+
+<!-- Old password requirement form Modal -->
+<app-modal #oldPasswordRequirementModal>
+   <div title>Old Password Required</div>
+   <div body>
+      <div class="text-dark text-opacity-75">
+         To update your profile, you must provide your old password. This is a security measure to ensure that only
+         authorized users can make changes to their profile.
+      </div>
+      <div class="mb-3"></div>
+      <div [formGroup]="profileUpdateForm.fg">
+         <form-input
+            [errors]="profileUpdateForm.errors.oldPassword"
+            controlName="oldPassword"
+            label="Old Password"
+            type="password"
+         ></form-input>
+      </div>
+   </div>
+   <div bottom>
+      <div [formGroup]="profileUpdateForm.fg">
+         <div class="flex justify-end gap-x-1">
+            <button
+               (click)="oldPasswordRequirementModal.close()"
+               data-te-ripple-color="light" data-te-ripple-init type="button"
+               class="btn btn-primary-100"
+            >
+               Close
+            </button>
+            <form-submit-button
+               (click)="profileUpdateForm.submit()"
+               [waiting]="profileUpdateForm.waiting"
+               label="Update"
+            ></form-submit-button>
+         </div>
+      </div>
+   </div>
+</app-modal>
+<!-- Old password requirement form Modal -->
+
+<!-- Update Profile Validation Failed Modal -->
+<app-modal #profileUpdateValidationFailedModal>
+   <div title>Profile Update Failed</div>
+   <div body>
+      <div class="text-dark text-opacity-75">
+         Please properly fill in the required fields to update your profile. The red fields indicate the
+         errors in the form.
+      </div>
+   </div>
+   <div bottom>
+      <div class="flex justify-end gap-x-1">
+         <button
+            data-te-modal-dismiss data-te-ripple-color="light" data-te-ripple-init type="button"
+            class="btn btn-red"
+         > Close
+         </button>
+      </div>
+   </div>
+</app-modal>
+<!-- Update Profile Validation Failed Modal -->
+
+<!-- Account Status Description Modal -->
+<app-modal #accountStatusDescModal>
+   <div title>Account Status</div>
+   <div body>
+      <div class="text-dark text-opacity-75">
+         <div *ngIf="accountStatus == 'NEW_ACCOUNT'">
+            Your account has been created successfully. However, please note that it is currently marked as pending
+            approval by our administration. Until your account is approved, you will be unable to schedule appointments
+            with patients.
+            <br>
+            To initiate the approval process, please ensure that all required information about you is accurately
+            provided. Once completed, kindly submit the approval request through the designated channel.
+            <br>
+            If you have any questions or need assistance with the approval process, our support team is available to
+            help. Feel free to reach out at any time.
+            <br>
+            Thank you for choosing our platform.
+         </div>
+         <span *ngIf="accountStatus == 'APPROVAL_REJECTED'">
+            We regret to inform you that your account approval request has been rejected by the administration. To
+            resolve this issue, we kindly ask you to retry sending the approval request by ensuring that all required
+            information is accurate and up-to-date.
+            <br>
+            If you have any questions or concerns, please contact our
+            support team for assistance. We apologize for any inconvenience and appreciate your cooperation in getting
+            your account
+            approved.
+            <br>
+            Thank you for choosing our platform.
+         </span>
+         <span *ngIf="accountStatus == 'APPROVAL_REQUESTED'">
+            Your request for account approval has been submitted successfully. Our administration team will review the
+            information provided, and you will be notified once your account status has been updated.
+            <br>
+            During this time, you will be unable to schedule appointments with patients. We appreciate your patience and
+            cooperation throughout the approval process.
+            <br>
+            If you have any urgent concerns or need further assistance, please don't hesitate to contact our support
+            team. We're here to help.
+            <br>
+            Thank you for choosing our platform.
+         </span>
+         <span *ngIf="accountStatus == 'ACCOUNT_APPROVED'">
+            Congratulations! Your account has been successfully approved by our administration. You can now proceed to
+            schedule appointments with patients and utilize all the features of our platform.
+            <br>
+            Thank you for your cooperation throughout the approval process. If you have any questions or need
+            assistance, feel free to reach out to our support team. We're here to help ensure your experience with our
+            platform is seamless.
+            <br>
+            We appreciate your trust in our services and look forward to serving you.
+         </span>
+      </div>
+   </div>
+   <div bottom>
+      <div class="flex justify-end gap-x-1">
+         <a
+            (click)="accountStatusDescModal.close()"
+            *ngIf="
+               accountStatus == 'ACCOUNT_APPROVED' || accountStatus == 'APPROVAL_REJECTED' ||
+               accountStatus == 'APPROVAL_REQUESTED'
+            "
+            [href]="utils.serverURL + '/api/d/account/get-documents' + '?t=' + http.tempLoginToken"
+            data-te-ripple-color="light"
+            data-te-ripple-init target="_blank" type="button"
+            class="btn btn-primary-100"
+         >
+            Download Your Documents
+         </a>
+         <button
+            (click)="accountStatusDescModal.close()"
+            data-te-ripple-color="light" data-te-ripple-init type="button"
+            class="btn btn-blue"
+         >
+            OK, I understand.
+         </button>
+      </div>
+   </div>
+</app-modal>
+<!-- Account Status Description Modal -->
+
+<!-- Account Approval Request Submission Confirmation Modal -->
+<app-modal #accountApprovalRequestModal>
+   <div title>Account Approval Request</div>
+   <div body>
+      <div class="text-dark text-opacity-75">
+         <div>
+            To expedite the approval process for your account, please upload PDF copies of your degree and other
+            relevant
+            certificates. You can upload a maximum of 5 PDFs, and each PDF should not exceed 5 MB in size.
+         </div>
+         <div>
+            Ensure that the documents are clear, legible, and contain all necessary information for verification. This
+            step is crucial for our administration to review and approve your account promptly.
+         </div>
+         <div>
+            Please note that providing accurate and complete information will help streamline the approval process. If
+            you encounter any difficulties or have questions, feel free to reach out to our support team for assistance.
+         </div>
+         <div>
+            Thank you for your cooperation, and we appreciate your commitment to ensuring a smooth onboarding process.
+         </div>
+      </div>
+      <div class="mt-2">
+         <div [formGroup]="accountApprovalRequestForm.fg">
+            <form-file-input
+               [errors]="accountApprovalRequestForm.errors.pdfs"
+               [multiple]="true"
+               accept=".pdf"
+               controlName="pdfs"
+               label="Select Your PDF Files"
+            ></form-file-input>
+         </div>
+      </div>
+   </div>
+   <div bottom>
+      <div class="flex justify-end gap-x-1">
+         <form
+            id="accountApprovalRequestForm"
+            (submit)="$event.preventDefault(); accountApprovalRequestForm.submit()"
+            [formGroup]="accountApprovalRequestForm.fg"
+         >
+            <form-submit-button
+               [waiting]="accountApprovalRequestForm.waiting"
+               label="Submit Request"
+            ></form-submit-button>
+         </form>
+      </div>
+   </div>
+</app-modal>
+<!-- Account Approval Request Submission Confirmation Modal -->

@@ -1,0 +1,403 @@
+<div class="main workspace">
+   <div class="h-full">
+      <div class="h-full">
+         <div
+            class="text-dark text-2xl font-semibold mb-4 flex justify-between items-end"
+         >
+            Paid & Pending Appointments
+            <div class="text-dark text-opacity-70 font-normal text-base pe-4">{{ appointments.length }} in total</div>
+         </div>
+         <div class="h-full">
+            <div class="h-full">
+               <ng-container *ngIf="appointments.length === 0">
+                  <div
+                     class="no-appointment-text -mt-12 text-center h-full flex items-center justify-center text-dark text-opacity-80"
+                  >
+                     No pending appointments
+                  </div>
+               </ng-container>
+               <ng-container *ngFor="let appoint of appointments;">
+                  <div class="appointment-card bg-primary-100 bg-opacity-90 rounded-lg shadow-xl p-6 mb-8 mt-6">
+                     <div class="relative">
+                        <div class="absolute -top-[38px] left-0 bg-green-500 text-white px-3 pt-1 pb-0.5 rounded shadow text-sm">
+                           Today
+                        </div>
+                        <div class="profile-img mb-2">
+                           <div class="flex ps-0">
+                              <div class="flex items-start flex-col justify-center gap-y-0">
+                                 <div class="text-dark font-semibold text-xl flex justify-center">
+                                    {{ appoint.patient?.name }}
+                                 </div>
+                                 <div>WhatsApp Contact:
+                                    <a
+                                       href="https://wa.me/{{ appoint.patient?.whatsappNumber }}"
+                                       target="_blank"
+                                       class="underline"
+                                    >
+                                       {{ appoint.patient?.whatsappNumber }}
+                                    </a>
+                                 </div>
+                                 <div>Age: {{ appoint.patient?.dob | dob }}</div>
+                              </div>
+                           </div>
+                        </div>
+                        <div class="sm:absolute right-0 top-0 text-dark text-opacity-40">
+                           Appointment Number: {{ appoint.id }}
+                        </div>
+                        <div>
+                           Requested Date: {{ appoint.paymentTime | datetime }}
+                        </div>
+                        <div>
+                           Meeting Time: {{ [appoint.timeFrom, appoint.timeTo] | appointmentDuration }}
+                        </div>
+                        <!-- <div>Status: Accepted</div> -->
+                        <div class="sm:absolute right-0 bottom-0">
+                           <div #cardCollapseToggleBtn>
+                              <form-submit-button
+                                 (click)="expandable.classList.add('!grid-rows-[1fr]'); cardCollapseToggleBtn.classList.add('hidden')"
+                                 btnStyle="btn-blue"
+                                 label="More Details"
+                              ></form-submit-button>
+                           </div>
+                        </div>
+                        <div #expandable class="grid grid-rows-[0fr] transition-all duration-500 ease-in-out">
+                           <div class="overflow-hidden pb-3">
+                              <div class="mt-2">
+                                 <div class="">Patient's Symptom Description:</div>
+                                 <div data-te-input-wrapper-init class="relative mb-3">
+                                    <textarea
+                                       [rows]="6"
+                                       placeholder="Patient' Symptom Description"
+                                       readonly
+                                       rows="3"
+                                       class="peer form-input---input"
+                                    >{{ appoint.symptomDescription }}</textarea>
+                                 </div>
+                              </div>
+                              <div class="flex justify-end items-center gap-x-3">
+                                 <form-submit-button
+                                    (click)="
+                                       expandable.classList.remove('!grid-rows-[1fr]');
+                                       cardCollapseToggleBtn.classList.remove('hidden');
+                                    "
+                                    btnStyle="btn-primary-100"
+                                    label="Less Details"
+                                 ></form-submit-button>
+                                 <form-submit-button
+                                    (click)="
+                                       $event.preventDefault();
+                                       selectAppointment(appoint.id);
+                                       cancelAppointmentConfirmationModal.open();
+                                    "
+                                    [shadow]="true"
+                                    btnStyle="btn-red"
+                                    label="Cancel Appointment"
+                                 ></form-submit-button>
+                                 <form-submit-button
+                                    (click)="
+                                       $event.preventDefault();
+                                       selectAppointment(appoint.id);
+                                       patientDidntJoinSubmitModal.open();
+                                    "
+                                    [shadow]="true"
+                                    btnStyle="btn-lime"
+                                    label="Patient Didn't Join"
+                                 ></form-submit-button>
+                                 <form-submit-button
+                                    (click)="
+                                       $event.preventDefault();
+                                       selectAppointment(appoint.id);
+                                       doctorCouldNotJoinConfirmationModal.open()
+                                    "
+                                    [shadow]="true"
+                                    btnStyle="btn-orange"
+                                    label="I Could Not Join"
+                                 ></form-submit-button>
+                                 <form-submit-button
+                                    (click)="
+                                       $event.preventDefault();
+                                       selectAppointment(appoint.id);
+                                       appoint.delayCountByDoc >= 2 ?
+                                       delayAppointmentMaxReachedModal.open() :
+                                       appointmentDelayConfirmationModal.open()
+                                    "
+                                    [shadow]="true"
+                                    btnStyle="btn-yellow"
+                                    label="Ask To Delay"
+                                 ></form-submit-button>
+                                 <form-submit-button
+                                    (click)="
+                                       $event.preventDefault();
+                                       selectAppointment(appoint.id);
+                                       markAppointmentAsCompletedModal.open();
+                                    "
+                                    btnStyle="btn-blue"
+                                    label="Mark As Completed"
+                                 ></form-submit-button>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </ng-container>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+
+<!-- Mark Appointment As Completed - Confirmation Modal -->
+<app-modal #markAppointmentAsCompletedModal>
+   <div title>Completed Appointment Report</div>
+   <div body>
+      <form [formGroup]="markAsCompletedForm.fg">
+         <div class="mb-2">
+            <div class="text-sm text-dark text-opacity-70">
+               Help us ensure comprehensive care! Please provide a brief report summarizing the patient's current
+               health status and any notable changes observed
+               during the appointment. Your insights are invaluable for the patient's ongoing care. Thank you for
+               your diligence!
+            </div>
+         </div>
+         <div class="mb-3">
+            <div class="">Your Report</div>
+            <form-textarea
+               [errors]="markAsCompletedForm.errors.doctorReport"
+               [maxLength]="768"
+               [rows]="6"
+               [showCounter]="true"
+               controlName="doctorReport"
+               label=""
+               placeholder="Your report on patient's health"
+            ></form-textarea>
+         </div>
+         <div>
+            <div class=""> Appointment Secret Code</div>
+            <form-input
+               [errors]="markAsCompletedForm.errors.secretCode"
+               autoComplete="off"
+               controlName="secretCode"
+               placeholder="Appointment secret code from patient"
+               type="text"
+            >
+            </form-input>
+         </div>
+      </form>
+   </div>
+   <div bottom>
+      <div class="flex justify-end gap-x-1">
+         <form-submit-button
+            (click)="markAppointmentAsCompletedModal.close()"
+            btnStyle="btn-primary-100"
+            label="Close"
+         ></form-submit-button>
+         <form-submit-button
+            (click)="markAsCompletedForm.submit()"
+            [disabled]="markAsCompletedForm.waiting"
+            [waiting]="markAsCompletedForm.waiting"
+            btnStyle="btn-blue"
+            label="Submit"
+         ></form-submit-button>
+      </div>
+   </div>
+</app-modal>
+<!-- Mark Appointment As Completed - Confirmation Modal -->
+
+<!-- Delay Appointment Confirmation - Modal -->
+<app-modal #appointmentDelayConfirmationModal>
+   <div title>Confirm Appointment Delay</div>
+   <div body>
+      <div>
+         <div>Are you sure you want to delay this appointment?</div>
+         <div class="mt-2 text-dark text-opacity-60">
+            Please proceed only if you are certain. Kindly review the
+            <a routerLink="/terms-and-conditions" target="_blank" class="underline">terms and conditions</a>
+            before proceeding with this action.
+         </div>
+      </div>
+   </div>
+   <div bottom>
+      <div class="flex justify-end gap-x-1">
+         <form-submit-button
+            (click)="appointmentDelayConfirmationModal.close()"
+            btnStyle="btn-primary-100 !text-blue-600"
+            label="Cancel Action"
+         ></form-submit-button>
+         <form-submit-button
+            (click)="delayAppointmentForm.submit()"
+            [disabled]="delayAppointmentForm.waiting"
+            [waiting]="delayAppointmentForm.waiting"
+            btnStyle="btn-blue"
+            label="Confirm Delay"
+         ></form-submit-button>
+      </div>
+   </div>
+</app-modal>
+<!-- Delay Appointment Confirmation - Modal -->
+
+<!-- Delay Appointment Time Reached - Modal -->
+<app-modal #delayAppointmentTimeReachedModal>
+   <div title class="text-danger-600">Cannot Delay Appointment</div>
+   <div body>
+      <div class="text-danger-600">
+         You cannot delay the appointment as it is scheduled to start in less than 30 minutes. Please proceed with
+         the appointment as planned.
+      </div>
+   </div>
+   <div bottom>
+      <div class="flex justify-end">
+         <form-submit-button
+            (click)="delayAppointmentTimeReachedModal.close()"
+            btnStyle="btn-primary-100"
+            label="Close"
+         ></form-submit-button>
+      </div>
+   </div>
+</app-modal>
+<!-- Delay Appointment Time Reached - Modal -->
+
+<!-- Delay Appointment Max Reached - Modal -->
+<app-modal #delayAppointmentMaxReachedModal>
+   <div title class="text-danger-600">Cannot Delay Appointment</div>
+   <div body>
+      <div class="text-danger-600">
+         You have reached the maximum number of delays allowed for this appointment. Please proceed with the
+         appointment as planned.
+      </div>
+   </div>
+   <div bottom>
+      <div class="flex justify-end">
+         <form-submit-button
+            (click)="delayAppointmentMaxReachedModal.close()"
+            btnStyle="btn-primary-100"
+            label="Close"
+         ></form-submit-button>
+      </div>
+   </div>
+</app-modal>
+
+<!-- Doctor Could not Join - Modal -->
+<app-modal #doctorCouldNotJoinConfirmationModal>
+   <div title>Confirmation of Your Absence</div>
+   <div body>
+      <div>
+         <div>Are you confirming that you were unable to join the appointment meeting?</div>
+         <div class="mt-2 text-dark text-opacity-60 text-sm">
+            Please proceed only if you are certain. Kindly review the
+            <a routerLink="/terms-and-conditions" target="_blank" class="underline">terms and conditions</a>
+            before proceeding with this action.
+         </div>
+      </div>
+   </div>
+   <div bottom>
+      <div class="flex justify-end gap-x-1">
+         <form-submit-button
+            (click)="doctorCouldNotJoinConfirmationModal.close()"
+            btnStyle="btn-primary-100"
+            label="Cancel"
+         ></form-submit-button>
+         <form-submit-button
+            (click)="doctorCouldNotJoinForm.submit()"
+            [waiting]="doctorCouldNotJoinForm.waiting"
+            btnStyle="btn-orange"
+            label="Confirm My Absence"
+         ></form-submit-button>
+      </div>
+   </div>
+</app-modal>
+<!-- Doctor Could not Join - Modal -->
+
+<!-- Patient Did not Join - Modal -->
+<app-modal #patientDidntJoinSubmitModal>
+   <div title>Confirmation of Patient's Absence</div>
+   <div body>
+      <div>
+         <div>
+            To validate the patient's absence from the scheduled appointment, please provide two clear video
+            recordings of your attempt to connect with the
+            patient via WhatsApp. Each video should not exceed 20MB in size. Ensure that your recordings do not
+            display other contacts for privacy reasons.
+            <span class="text-dark font-semibold text-base">
+               These videos will also be shared with the patient to verify the situation.
+            </span>
+            <span>
+               Note that if the videos contain other contacts or do not sufficiently display your attempt to contact the
+               patient, the request may be rejected. For further information, kindly review the
+               <a routerLink="/terms-and-conditions" target="_blank" class="underline">terms and conditions</a>
+               .
+            </span>
+         </div>
+         <div class="mt-3">
+            <ng-container
+               [formGroup]="patientDidntJoinForm.fg"
+            >
+               <div class="mb-3">
+                  <form-file-input
+                     [accept]="videoExtensions"
+                     [errors]="patientDidntJoinForm.errors.attempt1Video"
+                     controlName="attempt1Video"
+                     label="Video File - Attempt 1"
+                  ></form-file-input>
+               </div>
+               <div class="mb-3">
+                  <form-file-input
+                     [accept]="videoExtensions"
+                     [errors]="patientDidntJoinForm.errors.attempt2Video"
+                     controlName="attempt2Video"
+                     label="Video File - Attempt 2"
+                  ></form-file-input>
+               </div>
+            </ng-container>
+         </div>
+      </div>
+   </div>
+   <div bottom>
+      <div class="flex justify-end gap-x-1">
+         <form-submit-button
+            (click)="patientDidntJoinSubmitModal.close()"
+            [disabled]="patientDidntJoinForm.waiting"
+            btnStyle="btn-primary-100"
+            label="Close"
+         ></form-submit-button>
+         <form-submit-button
+            (click)="patientDidntJoinForm.submit()"
+            [disabled]="patientDidntJoinForm.waiting"
+            [waiting]="patientDidntJoinForm.waiting"
+            btnStyle="btn-lime"
+            label="Submit Request"
+         ></form-submit-button>
+      </div>
+   </div>
+</app-modal>
+<!-- Patient Did not Join - Modal -->
+
+<!-- Cancel Appointment - Modal -->
+<app-modal #cancelAppointmentConfirmationModal>
+   <div title>Confirm Appointment Cancellation</div>
+   <div body>
+      <div>
+         <div>Are you sure you want to cancel this appointment?</div>
+         <div class="mt-2 text-dark text-opacity-60">
+            Please read
+            <a routerLink="/terms-and-conditions" target="_blank" class="underline">Terms & Conditions</a>
+            before cancelling this appointment.
+         </div>
+      </div>
+   </div>
+   <div bottom>
+      <div class="flex justify-end gap-x-1">
+         <form-submit-button
+            (click)="cancelAppointmentConfirmationModal.close()"
+            btnStyle="btn-primary-100"
+            label="Keep Appointment"
+         ></form-submit-button>
+         <form-submit-button
+            (click)="cancelAppointmentForm.submit()"
+            [disabled]="cancelAppointmentForm.waiting"
+            [waiting]="cancelAppointmentForm.waiting"
+            btnStyle="btn-red"
+            label="Cancel Appointment"
+         ></form-submit-button>
+      </div>
+   </div>
+</app-modal>

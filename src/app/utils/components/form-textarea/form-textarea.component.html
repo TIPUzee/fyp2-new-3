@@ -1,0 +1,59 @@
+<div [formGroup]="formGroup">
+
+   <!---TE-Input--->
+   <div>
+      <div
+         data-te-input-helper-ref
+         class="form-input---helper-text"
+      >
+         {{ helperText }}
+      </div>
+      <div
+         #textInputEleWrapper
+         [ngClass]="{'form-input---invalid': currentError}"
+         data-te-input-wrapper-init
+         class="relative [&:hover>fa-icon]:opacity-100"
+      >
+         <textarea
+            #textInputEle
+            [attr.data-te-input-showcounter]="showCounter"
+            [formControlName]="controlName"
+            [id]="controlName + id"
+            [maxlength]="maxLength"
+            [ngClass]="{ 'opacity-50 pointer-events-none': disabled }"
+            [placeholder]="placeholder"
+            [rows]="rows"
+            class="peer form-input---input {{ inputEleClasses }}"
+         ></textarea>
+         <label
+            *ngIf="label"
+            [for]="controlName + id"
+            style="margin-left: 0;"
+            class="form-input---label"
+         >
+            {{ label }}
+         </label>
+         <div
+            *ngIf="showCounter"
+            [ngClass]="{'hidden': currentError}"
+            data-te-input-helper-ref
+            class="absolute w-full text-sm text-neutral-500 peer-focus:text-primary dark:text-neutral-200 dark:peer-focus:text-primary"
+         ></div>
+      </div>
+   </div>
+   <!---TE-Input--->
+
+   <!---Errors--->
+   <div>
+      <div
+         [ngClass]="{'!grid-rows-[1fr] !opacity-100': currentError !== ''}"
+         class="form---error"
+      >
+         <div>
+            {{ currentError }}
+         </div>
+      </div>
+   </div>
+   <!---Errors--->
+
+</div>

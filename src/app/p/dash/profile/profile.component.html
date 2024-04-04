@@ -1,0 +1,133 @@
+<div class="main workspace">
+   <div class="text-dark text-opacity-80">
+      <div class="inner-container mx-auto">
+         <form
+            (submit)="
+               $event.preventDefault();
+               profileUpdateForm.ValidateAndNotify() ? updateProfileModal.open() : null;
+            "
+            [formGroup]="profileUpdateForm.fg"
+            class="mb-3 mt-20 bg-primary-100 bg-opacity-90 rounded-lg shadow-lg px-10 py-14 max-w-[400px] mx-auto"
+         >
+            <div>
+               <div class="mb-4">
+                  <form-input
+                     [defaultValue]="profile.name"
+                     [errors]="profileUpdateForm.errors.name"
+                     controlName="name"
+                     label="Full Name"
+                     type="text"
+                  >
+                  </form-input>
+               </div>
+               <div class="mb-4">
+                  <form-date-picker
+                     [defaultValue]="profile.dob"
+                     [errors]="profileUpdateForm.errors.dob"
+                     [maxDateFromNow]="{ years: -18 }"
+                     controlName="dob"
+                     label="Date of birth"
+                     placeholder="e.g. 2000-01-01"
+                     startDate="2006-02-01"
+                  >
+                  </form-date-picker>
+               </div>
+               <div class="mb-4">
+                  <form-input
+                     [defaultValue]="profile.whatsappNumber"
+                     [errors]="profileUpdateForm.errors.whatsappNumber"
+                     controlName="whatsappNumber"
+                     helperText="For Professional Use"
+                     label="WhatsApp Number"
+                     placeholder="+923012345678"
+                     type="tel"
+                  >
+                  </form-input>
+               </div>
+               <div class="mb-4">
+                  <form-input
+                     [defaultValue]="profile.email"
+                     [errors]="profileUpdateForm.errors.email"
+                     controlName="email"
+                     label="Email Address"
+                     placeholder="john@gmail.com"
+                     type="email"
+                  >
+                  </form-input>
+               </div>
+               <div class="mb-4">
+                  <form-input
+                     [defaultValue]="''"
+                     [errors]="profileUpdateForm.errors.oldPassword"
+                     controlName="oldPassword"
+                     label="Old Password"
+                     placeholder="Must be the current password"
+                     type="password"
+                  >
+                  </form-input>
+               </div>
+               <div class="mb-4">
+                  <form-input
+                     [defaultValue]="profile.password"
+                     [errors]="profileUpdateForm.errors.password"
+                     controlName="password"
+                     label="New Password"
+                     placeholder="Must include alphabets and numbers"
+                     type="password"
+                  >
+                  </form-input>
+               </div>
+               <div class="mb-4">
+                  <form-input
+                     [defaultValue]="''"
+                     [errors]="profileUpdateForm.errors.confirmPassword"
+                     controlName="confirmPassword"
+                     label="Confirm Password"
+                     placeholder="Must match the password above"
+                     type="password"
+                  >
+                  </form-input>
+               </div>
+            </div>
+            <div class="flex justify-end -mb-4">
+               <form (submit)="$event.preventDefault(); profileReloadForm.submit()" class="me-1">
+                  <form-submit-button
+                     [disabled]="profileReloadForm.waiting"
+                     [waiting]="profileReloadForm.waiting"
+                     btnStyle="btn-primary-100"
+                     label="Reload"
+                  ></form-submit-button>
+               </form>
+               <form-submit-button
+                  [disabled]="profileUpdateForm.waiting" [formGroup]="profileUpdateForm.fg"
+                  [waiting]="profileUpdateForm.waiting"
+                  btnStyle="btn-red"
+                  label="Update"
+               ></form-submit-button>
+            </div>
+         </form>
+      </div>
+   </div>
+</div>
+
+<!-- Modal -->
+<app-modal #updateProfileModal>
+   <div title> Confirm Profile Update</div>
+   <div body> Are you sure you want to proceed with the profile update?</div>
+   <div bottom>
+      <div class="flex justify-end gap-x-1">
+         <form-submit-button
+            (click)="updateProfileModal.close()"
+            btnStyle="btn-blue"
+            label="Close"
+         ></form-submit-button>
+         <form-submit-button
+            (click)="profileUpdateForm.submit()" [disabled]="profileUpdateForm.waiting"
+            [formGroup]="profileUpdateForm.fg"
+            [waiting]="profileUpdateForm.waiting"
+            btnStyle="btn-red"
+            label="Update"
+         ></form-submit-button>
+      </div>
+   </div>
+</app-modal>

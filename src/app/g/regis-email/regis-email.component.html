@@ -1,0 +1,110 @@
+<div class="mb-20">
+   <div class="container mx-auto">
+      <!-- Login Form -->
+      <div>
+         <div>
+            <div class="bg-primary-100 bg-opacity-90 rounded-lg shadow-xl">
+               <div class="grid grid-cols-12 rounded-[inherit]">
+                  <div class="col-span-6 bg-">
+                     <div class="p-12 text-dark text-opacity-90">
+                        <form
+                           (submit)="$event.preventDefault(); regisVerifyEmailForm.submit();"
+                           [formGroup]="regisVerifyEmailForm.fg"
+                           class="mx-auto max-w-sm"
+                        >
+                           <div class="flex justify-center mb-4">
+                              <div class="h-16">
+                                 <img alt="" src="assets/img/logo.png" class="max-w-full max-h-full">
+                              </div>
+                           </div>
+                           <div class="flex justify-center mb-7">
+                              <div
+                                 class="text-lg font-semibold text-dark text-opacity-90"
+                              >
+                                 Beyond Company: Your Health's Portal
+                              </div>
+                           </div>
+                           <div class="mb-2">
+                              <div>Please verify your email address</div>
+                           </div>
+                           <div class="mb-5">
+                              <div>
+                                 An email has been sent to your provided email address. Please check your inbox (or
+                                 spam folder) and click the verification link to complete the registration process.
+                                 Thank you!
+                              </div>
+                           </div>
+                           <div class="mb-4">
+                              <form-input
+                                 [allowOnlyNumbers]="true"
+                                 [errors]="regisVerifyEmailForm.errors.code"
+                                 autoComplete="off"
+                                 controlName="code"
+                                 inputEleClasses="tracking-[1rem] text-center"
+                                 label="Verification Code"
+                                 showErrorOn="changed"
+                                 type="text"
+                              >
+                              </form-input>
+                           </div>
+                           <div class="mb-6">
+                              <form-submit-button
+                                 [disableOnStart]="true"
+                                 [disabled]="!regisVerifyEmailForm.fg.valid"
+                                 label="Verify Email"
+                              ></form-submit-button>
+                           </div>
+                           <div class="mb-2">
+                              <div class="text-sm text-dark text-opacity-70">Wrong Email?</div>
+                           </div>
+                           <div class="mb-4">
+                              <div>
+                                 <a
+                                    role="button"
+                                    routerLink="/regis"
+                                    class="text-center block w-full rounded border-2 border-blue-500 text-blue-500 hover:border-blue-600 hover:bg-blue-400 hover:bg-opacity-10 hover:text-blue-600 focus:border-blue-700 focus:text-blue-700 active:border-blue-800 active:text-blue-800 dark:border-blue-300 dark:text-blue-300 dark:hover:hover:bg-blue-300 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal transition duration-150 ease-in-out focus:outline-none focus:ring-0"
+                                 >Register Again
+                                 </a>
+                              </div>
+                           </div>
+                           <div class="mb-2">
+                              <div class="text-sm text-dark text-opacity-70">Already have an Account?</div>
+                           </div>
+                           <div>
+                              <div>
+                                 <a
+                                    role="button"
+                                    routerLink="/login"
+                                    class="text-center block w-full rounded border-2 border-blue-500 text-blue-500 hover:border-blue-600 hover:bg-blue-400 hover:bg-opacity-10 hover:text-blue-600 focus:border-blue-700 focus:text-blue-700 active:border-blue-800 active:text-blue-800 dark:border-blue-300 dark:text-blue-300 dark:hover:hover:bg-blue-300 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal transition duration-150 ease-in-out focus:outline-none focus:ring-0"
+                                 >Log in
+                                 </a>
+                              </div>
+                           </div>
+
+                        </form>
+                     </div>
+                  </div>
+                  <div
+                     style="background: linear-gradient(90deg, rgba(0,58,255,1) 0%, rgba(43,165,247,1) 100%)"
+                     class="col-span-6 text-primary-100  rounded-r-[inherit]"
+                  >
+                     <div class="h-full p-8 flex flex-col items-center justify-center">
+                        <div>
+                           <div class="text-2xl font-semibold mb-3 text-primary-100">Verify Your Email</div>
+                           <div
+                              class="max-w-sm text-primary-100 text-opacity-90"
+                           >Thank you for choosing our healthcare community! Complete your registration as a doctor or
+                            patient by verifying your email. Once verified, you'll unlock a spectrum of comprehensive
+                            healthcare services, including predictive disease analysis, brain tumor detection,
+                            appointment scheduling, and virtual consultations. Start your wellness journey today!
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <!-- Login Form -->
+   </div>
+</div>

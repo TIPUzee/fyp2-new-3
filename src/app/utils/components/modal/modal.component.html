@@ -1,0 +1,54 @@
+<!-- Modal -->
+<button #opener attr.data-te-target="#ModalNo{{ modalId }}" data-te-toggle="modal" class="hidden"></button>
+<div
+   id="ModalNo{{ modalId }}"
+   [ngClass]="currentOpeningId != noCurrentlyOpenedModals ? '' : '[&:has(>div.opacity-100)]:backdrop-blur-md bg-dark'"
+   aria-hidden="true"
+   aria-labelledby="exampleModalLabel"
+   data-te-modal-init
+   data-te-modal-non-invasive="true"
+   tabindex="-1"
+   class="backdrop-blur-0 opacity-0 [&:has(>div.opacity-100)]:opacity-100 bg-opacity-75 duration-150 fixed inset-0 z-[1055] hidden w-full overflow-y-auto overflow-x-hidden outline-none pointer-events-auto"
+>
+   <div
+      data-te-modal-dialog-ref
+      class="pointer-events-none relative w-auto translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:my-7 min-[576px]:max-w-[500px]"
+   >
+      <div
+         class="{{wrapperClass}} min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none dark:bg-neutral-600"
+      >
+         <div class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
+            <h5
+               id="exampleModalLabel"
+               class="[&:empty]:hidden text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
+            >
+               <ng-content select="[title]"></ng-content>
+            </h5>
+            <button
+               #closer
+               aria-label="Close"
+               data-te-modal-dismiss
+               type="button"
+               class="ms-auto box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
+            >
+               <svg
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-6 w-6"
+               >
+                  <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
+               </svg>
+            </button>
+         </div>
+         <div data-te-modal-body-ref class="[&:empty]:hidden relative flex-auto p-4">
+            <ng-content select="[body]"></ng-content>
+         </div>
+         <div class="[&:empty]:hidden rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
+            <ng-content select="[bottom]"></ng-content>
+         </div>
+      </div>
+   </div>
+</div>

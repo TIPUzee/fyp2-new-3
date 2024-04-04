@@ -1,0 +1,1 @@
+from .specialization_category import SpecializationCategory

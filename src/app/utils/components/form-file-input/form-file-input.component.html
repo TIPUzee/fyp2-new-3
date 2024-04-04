@@ -1,0 +1,51 @@
+<div [formGroup]="formGroup">
+
+   <!---TE-Input--->
+   <div>
+      <div
+         data-te-input-helper-ref
+         class="form-input---helper-text"
+      >
+         {{ helperText }}
+      </div>
+      <div
+         [attr.data-command-1]="updateError()"
+         [ngClass]="{'form-input---invalid': toShowError()}"
+      >
+         <label
+            [for]="controlName + id"
+            style="margin-left: 0;"
+            class="mb-1 inline-block text-neutral-700 dark:text-neutral-200"
+         >
+            {{ label }}
+         </label>
+         <input
+            #fileInputEle
+            (change)="onFileSelect($event)"
+            [accept]="accept"
+            [formControlName]="controlName"
+            [id]="controlName + id"
+            [multiple]="multiple"
+            [ngClass]="{ 'opacity-50 pointer-events-none': disabled, 'text-danger-600': currentError }"
+            [placeholder]="placeholder"
+            type="file"
+            class="cursor-pointer relative m-0 block w-full min-w-0 flex-auto rounded border border-solid border-neutral-300 bg-clip-padding px-3 py-[0.32rem] text-base font-normal text-neutral-700 transition duration-300 ease-in-out file:-mx-3 file:-my-[0.32rem] file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-neutral-100 file:px-3 file:py-[0.32rem] file:text-neutral-700 file:transition file:duration-150 file:ease-in-out file:[border-inline-end-width:1px] file:[margin-inline-end:0.75rem] hover:file:bg-neutral-200 focus:border-primary focus:text-neutral-700 focus:shadow-te-primary focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:file:bg-neutral-700 dark:file:text-neutral-100 dark:focus:border-primary"
+         >
+      </div>
+   </div>
+   <!---TE-Input--->
+
+   <!---Errors--->
+   <div>
+      <div
+         [ngClass]="{'!grid-rows-[1fr] !opacity-100': currentError !== ''}"
+         class="form---error"
+      >
+         <div>
+            {{ currentError }}
+         </div>
+      </div>
+   </div>
+   <!---Errors--->
+
+</div>

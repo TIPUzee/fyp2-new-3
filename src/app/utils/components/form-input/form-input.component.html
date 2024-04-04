@@ -1,0 +1,58 @@
+<div [formGroup]="formGroup">
+
+   <!---TE-Input--->
+   <div>
+      <div
+         data-te-input-helper-ref
+         class="form-input---helper-text"
+      >
+         {{ helperText }}
+      </div>
+      <div
+         #textInputEleWrapper
+         [ngClass]="{'form-input---invalid': currentError}"
+         data-te-input-wrapper-init
+         class="relative [&:hover>fa-icon]:opacity-100"
+      >
+         <input
+            #textInputEle
+            [autocomplete]="autoComplete"
+            [formControlName]="controlName"
+            [id]="controlName + id"
+            [ngClass]="{ 'opacity-50 pointer-events-none': disabled }"
+            [placeholder]="placeholder"
+            [type]="type"
+            class="peer form-input---input {{ inputEleClasses }}"
+         >
+         <label
+            *ngIf="label"
+            [for]="controlName + id"
+            class="form-input---label"
+         >
+            {{ label }}
+         </label>
+         <fa-icon
+            (click)="textInputEle.type = textInputEle.type === 'password' ? 'text' : 'password'"
+            *ngIf="type === 'password'"
+            [icon]="textInputEle.type === 'password' ? faEyeRegularIcon : faEyeSolidIcon"
+            class="form-input---password-eye-icon"
+         >
+         </fa-icon>
+      </div>
+   </div>
+   <!---TE-Input--->
+
+   <!---Errors--->
+   <div>
+      <div
+         [ngClass]="{'!grid-rows-[1fr] !opacity-100': currentError !== ''}"
+         class="form---error"
+      >
+         <div>
+            {{ currentError }}
+         </div>
+      </div>
+   </div>
+   <!---Errors--->
+
+</div>
