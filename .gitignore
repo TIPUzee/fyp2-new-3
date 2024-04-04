@@ -40,3 +40,12 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Virtual environment files
+*/venv/**
+venv/
+
+# Py cache
+**/__pycache__
+
+.nx/cache
