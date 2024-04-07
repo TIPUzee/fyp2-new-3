@@ -505,6 +505,7 @@ class SQLEntity(ABC):
     def update(
         self,
         set_cols: list[Any] | Literal['Changed'] = 'Changed',
+        set_increment_cols: list[Any] = None,
         where_equals: list[Any] | Literal['m_id'] = 'm_id',
         where_not_equals: list[Any] = None,
         where_in: list[Any] = None,
@@ -545,7 +546,7 @@ class SQLEntity(ABC):
         pre_removed_cols.extend(self.remove_from_changed_prop(where_between))
         pre_removed_cols.extend(self.remove_from_changed_prop(where_not_between))
 
-        set_cols_str, set_vals = self.__build_set_cols(set_cols)
+        set_cols_str, set_vals = self.__build_set_cols(set_cols, set_increment_cols)
         where_equals, where_vals = self.__build_where_cols(
             where_equals,
             where_not_equals,
@@ -577,13 +578,21 @@ class SQLEntity(ABC):
     def commit(self):
         self._sql.commit()
 
-    def __build_set_cols(self, cols):
+    def __build_set_cols(self, cols, increment_cols: list | None):
         if cols == 'Changed':
             cols = self.get_changed_props_names()
             if not cols:
                 raise ValueError('No changed properties to update')
-        set_cols = ', '.join([f"{col} = %s" for col in cols])
-        set_vals = self.get_changed_props_vals()
+        set_vals = []
+        set_cols = ''
+        for col in cols:
+            if increment_cols and col in increment_cols:
+                set_cols += f"{col} = {col} + %s, "
+                set_vals.append(getattr(self, col))
+            else:
+                set_cols += f"{col} = %s, "
+                set_vals.append(getattr(self, col))
+        set_cols = set_cols[:-2]
         return set_cols, set_vals
 
     def __build_insert_cols(self, cols):

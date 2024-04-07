@@ -59,22 +59,14 @@ export class AppointmentService {
                 doctorId: appointment.doctorId,
                 patientId: appointment.patientId,
                 symptomDescription: appointment.symptomDescription,
-                timeFrom: this.utils.convertToDMTDateObject(
-                    // @ts-ignore
-                    appointment.timeFrom
-                ),
-                timeTo: this.utils.convertToDMTDateObject(
-                    // @ts-ignore
-                    appointment.timeTo
-                ),
+                timeFrom: new Date(appointment.timeFrom),
+                timeTo: new Date(appointment.timeTo),
                 paidAmount: appointment.paidAmount,
                 status: appointment.status,
+                statusChangeTime: new Date(appointment.statusChangeTime),
                 delayCountByDoc: appointment.delayCountByDoc,
                 rescheduleCountByPat: appointment.rescheduleCountByPat,
-                paymentTime: this.utils.convertToDMTDateObject(
-                    // @ts-ignore
-                    appointment.paymentTime
-                ),
+                paymentTime: new Date(appointment.paymentTime),
                 doctorReport: appointment.doctorReport,
                 patientReview: appointment.patientReview,
                 rating: appointment.rating,

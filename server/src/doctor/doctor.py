@@ -24,7 +24,7 @@ class Doctor(SQLEntity, Vld.PropertyTypeValidatorEntity):
         self.m_whatsapp_number: Optional[str] = Vld.validatable(Vld.And(Vld.Str(), Vld.Phone(), Vld.MaxLen(16)))
         self.m_profile_pic_filename: Optional[str] = Vld.validatable(Vld.And(Vld.Str(), Vld.MaxLen(128)))
         self.m_cover_pic_filename: Optional[str] = Vld.validatable(Vld.And(Vld.Str(), Vld.MaxLen(128)))
-        self.m_wallet_amount: Optional[float] = Vld.validatable(Vld.And(Vld.Float(), Vld.MinVal(0)))
+        self.m_wallet_amount: Optional[float] = Vld.validatable(Vld.And(Vld.Float()))
         self.m_max_meeting_duration: Optional[int] = Vld.validatable(
             Vld.And(Vld.Int(), Vld.MinVal(15), Vld.MaxVal(120))
             )

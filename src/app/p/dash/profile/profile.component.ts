@@ -27,9 +27,11 @@ import { toast } from "ngx-sonner";
     styleUrl: './profile.component.scss',
 })
 export class ProfileComponent implements AfterViewInit {
-    
+    //
     // Modals
     @ViewChild('updateProfileModal') updateProfileModal!: ModalComponent;
+    //
+    // Custom Validator
     customValidators = {
         confirmPasswordRequireCondition: (control: AbstractControl) => {
             return control.parent?.get('password')?.value.length > 0;
@@ -47,15 +49,21 @@ export class ProfileComponent implements AfterViewInit {
             return !!control.parent?.get('password')?.value;
         }
     }
+    //
+    // Forms
+    //
+    // Profile Reload
     profileReloadForm = {
         waiting: false,
         submit: async () => {
             this.profileReloadForm.waiting = true;
             await this.profile.loadFromServer();
             this.profileReloadForm.waiting = false;
-            toast.success('Profile reloaded successfully');
+            toast.info('Profile reloaded');
         }
     }
+    //
+    // Profile Update
     profileUpdateForm = {
         fg: this._fb.group({
             name: [
@@ -167,8 +175,6 @@ export class ProfileComponent implements AfterViewInit {
             this.profileUpdateForm.waiting = false;
             
             if (res === false) {
-                toast.error('Something went wrong. Please try again.');
-                console.error('Error occurred while sending request to /p/profile', data, res);
                 return;
             }
             
@@ -186,17 +192,21 @@ export class ProfileComponent implements AfterViewInit {
             
             if (res.invalidOldPassword) {
                 this.profileUpdateForm.fg.controls.oldPassword.setErrors({ invalidOldPassword: true });
-                toast.error('Wrong old password');
+                toast.error('Wrong old password', {
+                    description: 'Please enter the correct old password to update your profile'
+                });
                 return;
             }
             
             if (!res.profileUpdated) {
-                toast.error('Profile update failed. Please try again.');
-                console.error('Error occurred while sending request to /p/profile', data, res);
+                toast.error('Profile update failed', {
+                    description: 'Please try again later',
+                });
                 return;
             }
             
-            toast.success('Profile updated successfully');
+            toast.success('Profile updated');
+            this.updateProfileModal.close();
             await this.profile.loadFromServer();
         },
         ValidateAndNotify: () => {

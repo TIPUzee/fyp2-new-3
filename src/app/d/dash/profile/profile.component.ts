@@ -524,7 +524,7 @@ export class ProfileComponent implements AfterViewInit {
                 toast.error('Please enter the correct old password');
             } else if (res.invalidSpecializationCategoryId) {
                 toast.error('Please your specialization category again');
-                await this.specCategories.loadFromServer();
+                await this.specCategories.load();
             } else if (res.invalidLanguages) {
                 toast.error('Please select your languages again');
             } else if (res.profileUpdated) {

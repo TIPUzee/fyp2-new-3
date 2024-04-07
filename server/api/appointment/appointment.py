@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 from utils import App, Func, UploadedFiles, SavedFile
-from src import Doctor, Patient, Appointment, AppointmentCallProofVideo
+from src import Doctor, Patient, Appointment, AppointmentCallProofVideo, Calc, SystemDetails
 
 
 @App.api_route('/appointments', method='POST', access_control=[Doctor.Login, Patient.Login])
 @App.optional_json_inputs(
     id=None, status=None,
 )
-def _(user: Doctor | Patient, id: list[int], status: list[Appointment.AppointmentStatus]):
+def _(user: Doctor | Patient, id: list[int], status: list[Appointment.StatusEnum]):
     request_response = {
         'appointments': [],
     }
@@ -90,13 +90,13 @@ def _(user: Doctor, appointment_id, doctor_report, secret_code):
     a = Appointment()
     a.m_id = appointment_id
     a.m_doctor_id = user.m_id
-    if not a.load(select_cols=['m_secret_code', 'm_status']):
+    if not a.load(select_cols=['m_secret_code', 'm_status', 'm_paid_amount']):
         request_response['appointment_not_exists'] = True
         return App.Res.client_error(**request_response)
 
-    if a.m_status != 'PENDING':
+    if a.m_status != a.StatusEnum.PENDING:
         request_response['not_completable'] = True
-        if a.m_status == 'COMPLETED':
+        if a.m_status == a.StatusEnum.COMPLETED:
             request_response['already_completed'] = True
         return App.Res.client_error(**request_response)
 
@@ -107,8 +107,21 @@ def _(user: Doctor, appointment_id, doctor_report, secret_code):
         return App.Res.client_error(**request_response)
 
     a.m_status = 'COMPLETED'
+    a.m_status_change_time = Func.get_current_time()
+
+    system = SystemDetails()
+
+    system.m_balance = Calc.appointment_system_fee(a.m_paid_amount, a.StatusEnum.COMPLETED)
+    user.m_wallet_amount = Calc.appointment_doctor_fee(a.m_paid_amount, a.StatusEnum.COMPLETED)
+
     a.update()
+    system.update(set_increment_cols=['m_balance'])
+    user.update(set_increment_cols=['m_wallet_amount'])
+
     a.commit()
+    user.commit()
+    system.commit()
+
     request_response['marked_as_completed'] = True
     return App.Res.ok(**request_response)
 
@@ -129,13 +142,13 @@ def _(user: Doctor, appointment_id):
     a = Appointment()
     a.m_id = appointment_id
     a.m_doctor_id = user.m_id
-    if not a.load(select_cols=['m_status', 'm_delay_count_by_doc']):
+    if not a.load(select_cols=['m_status', 'm_delay_count_by_doc', 'm_patient_id', 'm_paid_amount']):
         request_response['appointment_not_exists'] = True
         return App.Res.client_error(**request_response)
 
-    if a.m_status != 'PENDING':
+    if a.m_status != a.StatusEnum.PENDING:
         request_response['not_delayable'] = True
-        if a.m_status == 'DOC_REQUESTED_DELAY':
+        if a.m_status == a.StatusEnum.DOC_REQUESTED_DELAY:
             request_response['already_delayed'] = True
         return App.Res.client_error(**request_response)
 
@@ -143,10 +156,33 @@ def _(user: Doctor, appointment_id):
         request_response['max_delay_reached'] = True
         return App.Res.client_error(**request_response)
 
+    p = Patient()
+    p.m_id = a.m_patient_id
+    p.load(select_cols=['m_refundable_amount'])
+
     a.m_delay_count_by_doc += 1
     a.m_status = 'DOC_REQUESTED_DELAY'
+    a.m_status_change_time = Func.get_current_time()
+
+    system = SystemDetails()
+    system.m_balance = Calc.appointment_system_fee(a.m_paid_amount, a.StatusEnum.DOC_REQUESTED_DELAY, doc_delayed=True)
+
+    user.m_wallet_amount = Calc.appointment_doctor_cutoffs(a.m_paid_amount, a.StatusEnum.DOC_REQUESTED_DELAY,
+                                                           doc_delayed=True)
+
+    p.m_refundable_amount = Calc.appointment_patient_refunds(a.m_paid_amount, a.StatusEnum.DOC_REQUESTED_DELAY,
+                                                         doc_delayed=True)
+
     a.update()
+    system.update(set_increment_cols=['m_balance'])
+    user.update(set_increment_cols=['m_wallet_amount'])
+    p.update(set_increment_cols=['m_refundable_amount'])
+
     a.commit()
+    system.commit()
+    user.commit()
+    p.commit()
+
     request_response['delayed'] = True
     return App.Res.ok(**request_response)
 
@@ -170,15 +206,35 @@ def _(user: Doctor, appointment_id):
         request_response['appointment_not_exists'] = True
         return App.Res.client_error(**request_response)
 
-    if a.m_status != 'PENDING':
+    if a.m_status != a.StatusEnum.PENDING:
         request_response['status_not_changeable'] = True
-        if a.m_status == 'DOC_NOT_JOINED':
+        if a.m_status == a.StatusEnum.DOC_NOT_JOINED:
             request_response['already_marked_as_doctor_not_joined'] = True
         return App.Res.client_error(**request_response)
 
-    a.m_status = 'DOC_NOT_JOINED'
+    s = SystemDetails()
+
+    p = Patient()
+    p.m_id = a.m_patient_id
+    p.load(select_cols=['m_refundable_amount'])
+
+    a.m_status = a.StatusEnum.DOC_NOT_JOINED
+    a.m_status_change_time = Func.get_current_time()
+
+    s.m_balance = Calc.appointment_system_fee(a.m_paid_amount, a.StatusEnum.DOC_NOT_JOINED)
+    p.m_refundable_amount = Calc.appointment_patient_refunds(a.m_paid_amount, a.StatusEnum.DOC_NOT_JOINED)
+    user.m_wallet_amount = Calc.appointment_doctor_cutoffs(a.m_paid_amount, a.StatusEnum.DOC_NOT_JOINED)
+
     a.update()
+    s.update(set_increment_cols=['m_balance'])
+    p.update(set_increment_cols=['m_refundable_amount'])
+    user.update(set_increment_cols=['m_wallet_amount'])
+
     a.commit()
+    s.commit()
+    p.commit()
+    user.commit()
+
     request_response['marked_as_doctor_not_joined'] = True
     return App.Res.ok(**request_response)
 
@@ -213,13 +269,13 @@ def _(user: Doctor, appointment_id, attempt_1_video: UploadedFiles, attempt_2_vi
         request_response['appointment_not_exists'] = True
         return App.Res.client_error(**request_response)
 
-    if a.m_status != 'PENDING':
+    if a.m_status != a.StatusEnum.PENDING:
         request_response['status_not_changeable'] = True
-        if a.m_status == 'PAT_NOT_JOINED_REQ':
+        if a.m_status == a.StatusEnum.PAT_NOT_JOINED_REQ:
             request_response['request_already_submitted'] = True
-        elif a.m_status == 'PAT_NOT_JOINED_REJ':
+        elif a.m_status == a.StatusEnum.PAT_NOT_JOINED_REJ:
             request_response['request_already_rejected'] = True
-        elif a.m_status == 'PAT_NOT_JOINED':
+        elif a.m_status == a.StatusEnum.PAT_NOT_JOINED:
             request_response['request_already_approved'] = True
         return App.Res.client_error(**request_response)
 
@@ -270,8 +326,11 @@ def _(user: Doctor, appointment_id, attempt_1_video: UploadedFiles, attempt_2_vi
     video_2.commit()
 
     a.m_status = 'PAT_NOT_JOINED_REQ'
+    a.m_status_change_time = Func.get_current_time()
+
     a.update()
     a.commit()
+
     request_response['request_submitted'] = True
     return App.Res.ok(**request_response)
 
@@ -296,20 +355,45 @@ def _(user: Doctor | Patient, appointment_id):
     else:
         a.m_doctor_id = user.m_id
 
-    if not a.load(select_cols=['m_status']):
+    if not a.load(select_cols=['m_status', 'm_patient_id', 'm_paid_amount', 'm_doctor_id']):
         request_response['appointment_not_exists'] = True
         return App.Res.client_error(**request_response)
 
-    if a.m_status != 'PENDING':
+    if a.m_status != a.StatusEnum.PENDING:
         request_response['not_cancelable'] = True
-        if a.m_status == 'PAT_CANCELLED':
+        if a.m_status == a.StatusEnum.PAT_CANCELLED:
             request_response['already_cancelled_by_pat'] = True
-        if a.m_status == 'DOC_CANCELLED':
+        if a.m_status == a.StatusEnum.DOC_CANCELLED:
             request_response['already_cancelled_by_doc'] = True
         return App.Res.client_error(**request_response)
 
-    a.m_status = 'PAT_CANCELLED' if isinstance(user, Patient) else 'DOC_CANCELLED'
+    new_status = a.StatusEnum.PAT_CANCELLED if isinstance(user, Patient) else a.StatusEnum.DOC_CANCELLED
+    a.m_status = new_status
+    a.m_status_change_time = Func.get_current_time()
+
+    s = SystemDetails()
+    p = Patient()
+    p.m_id = a.m_patient_id
+    p.load(select_cols=['m_refundable_amount'])
+
+    d = Doctor()
+    d.m_id = a.m_doctor_id
+    d.load(select_cols=['m_wallet_amount'])
+
+    s.m_balance = Calc.appointment_system_fee(a.m_paid_amount, new_status)
+    p.m_refundable_amount = Calc.appointment_patient_refunds(a.m_paid_amount, new_status)
+    d.m_wallet_amount = (Calc.appointment_doctor_cutoffs(a.m_paid_amount, new_status) +
+                         Calc.appointment_doctor_fee(a.m_paid_amount, new_status))
+
     a.update()
+    s.update(set_increment_cols=['m_balance'])
+    p.update(set_increment_cols=['m_refundable_amount'])
+    d.update(set_increment_cols=['m_wallet_amount'])
+
     a.commit()
+    s.commit()
+    p.commit()
+    d.commit()
+
     request_response['cancel_operation_done'] = True
     return App.Res.ok(**request_response)

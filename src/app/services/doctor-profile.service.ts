@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { HTTPService } from "./http.service";
-import { UtilFuncService } from "./util-func.service";
 import { LoadDoctorProfileResponse } from "../interfaces/api-response-interfaces";
 import {
     DoctorAccountStatus,
@@ -27,15 +26,15 @@ export class DoctorProfileService {
         dob: new Date(),
         whatsappNumber: '',
         registrationTime: '',
-        status: 'NEW_ACCOUNT',
+        status: 'NEW_ACCOUNT' as DoctorAccountStatus,
         walletAmount: 0,
-        availabilityDurations: [],
+        availabilityDurations: [] as DoctorAvailabilityDuration[],
         specializationCategoryId: -1,
         maxMeetingDuration: 0,
         appointmentCharges: 0,
         specialization: '',
-        languages: [],
-        experiences: [],
+        languages: [] as DoctorLanguage[],
+        experiences: [] as DoctorExperience[],
     }
     
     constructor(

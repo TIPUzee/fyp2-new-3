@@ -1,7 +1,7 @@
 from typing import Optional, Literal
 from datetime import datetime
 
-from utils import SQLEntity, UploadedFiles, Validator as Vld
+from utils import SQLEntity, Validator as Vld
 
 
 class Appointment(SQLEntity, Vld.PropertyTypeValidatorEntity):
@@ -9,8 +9,8 @@ class Appointment(SQLEntity, Vld.PropertyTypeValidatorEntity):
         self.m_id: Optional[int] = Vld.validatable(Vld.And(Vld.Int(), Vld.MinVal(0)))
         self.m_patient_id: Optional[int] = Vld.validatable(Vld.And(Vld.Int(), Vld.MinVal(0)))
         self.m_doctor_id: Optional[int] = Vld.validatable(Vld.And(Vld.Int(), Vld.MinVal(0)))
-        self.m_time_from: Optional[int] = Vld.validatable(Vld.And(Vld.DateTimeObject()))
-        self.m_time_to: Optional[int] = Vld.validatable(Vld.And(Vld.DateTimeObject()))
+        self.m_time_from: Optional[datetime] = Vld.validatable(Vld.And(Vld.DateTimeObject()))
+        self.m_time_to: Optional[datetime] = Vld.validatable(Vld.And(Vld.DateTimeObject()))
         self.m_symptom_description: Optional[str] = Vld.validatable(Vld.And(
             Vld.Str(), Vld.MinLen(0), Vld.MaxLen(512)
         ))
@@ -24,6 +24,9 @@ class Appointment(SQLEntity, Vld.PropertyTypeValidatorEntity):
             'PAT_CANCELLED', 'PAT_NOT_JOINED_REQ', 'PAT_NOT_JOINED_REJ', 'PAT_NOT_JOINED', 'DOC_CANCELLED',
             'DOC_REQUESTED_DELAY', 'DOC_NOT_JOINED', 'SLOT_CLASH', 'PENDING', 'COMPLETED'
         )))
+        self.m_status_change_time: Optional[datetime] = Vld.validatable(Vld.And(
+            Vld.DateTimeObject()
+        ))
         self.m_delay_count_by_doc: Optional[int] = Vld.validatable(Vld.And(
             Vld.Int(), Vld.MinVal(0), Vld.MaxVal(255)
         ))
@@ -51,7 +54,7 @@ class Appointment(SQLEntity, Vld.PropertyTypeValidatorEntity):
         super().__init__()
         self.turn_on_validation()
 
-    class AppointmentStatus:
+    class StatusEnum:
         PAT_CANCELLED = 'PAT_CANCELLED'
         PAT_NOT_JOINED_REQ = 'PAT_NOT_JOINED_REQ'
         PAT_NOT_JOINED_REJ = 'PAT_NOT_JOINED_REJ'

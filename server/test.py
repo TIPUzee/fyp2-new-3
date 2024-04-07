@@ -1,5 +1,5 @@
 from datetime import datetime
 
-d = datetime.strptime("2000/03/31", '%Y-%m-%d')
+d = datetime.utcnow()
 
-print(d)
+print(d, d.weekday())

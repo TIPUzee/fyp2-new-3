@@ -5,7 +5,7 @@ import {
     PatientProfileInterface,
     RegistrableUserType,
     SpecializationCategory,
-    UserTypeInterface
+    UserTypeInterface, DoctorAnalytics, DoctorAppointmentSlot, Doctor
 } from "./interfaces";
 
 export interface LoadPatientProfileResponse {
@@ -147,4 +147,17 @@ export interface GetDoctorReviewsResponse {
     list: DoctorReviews[],
     nextOffset: number,
     limitPerLoad: number,
+}
+
+export interface GetDoctorAnalyticsResponse extends DoctorAnalytics {
+    doctorNotFound: boolean,
+}
+
+export interface GetDoctorAppointmentSlotsResponse {
+    doctorNotFound: boolean,
+    appointmentSlots: DoctorAppointmentSlot[][][],
+}
+
+export interface GetAllDoctorsResponse {
+    list: Doctor[]
 }

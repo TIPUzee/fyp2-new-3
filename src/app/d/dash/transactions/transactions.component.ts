@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { RatingStarsComponent } from '../../compo/rating-stars/rating-stars.component';
+import { RatingStarsComponent } from '../../../utils/components/rating-stars/rating-stars.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CommonService } from '../../../services/common.service';
 import { HtmlService } from '../../../services/html.service';

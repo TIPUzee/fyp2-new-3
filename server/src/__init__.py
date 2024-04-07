@@ -9,3 +9,5 @@ from .doctor_langauge import DoctorLanguage
 from .doctor_experience import DoctorExperience
 from .approval_document import ApprovalDocument
 from .appointment import Appointment, AppointmentCallProofVideo
+from .amount import Calc
+from .system_details import SystemDetails

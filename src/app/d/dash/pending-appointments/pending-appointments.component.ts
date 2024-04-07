@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { HtmlService } from '../../../services/html.service';
-import { RatingStarsComponent } from '../../compo/rating-stars/rating-stars.component';
+import { RatingStarsComponent } from '../../../utils/components/rating-stars/rating-stars.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AppointmentService } from "../../../services/appointment.service";
 import { FormSubmitButtonComponent } from "../../../utils/components/form-submit-button/form-submit-button.component";

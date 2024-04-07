@@ -1,5 +1,6 @@
 from typing import Any
 from datetime import datetime, timezone
+import pytz
 
 from werkzeug.datastructures import FileStorage
 
@@ -15,6 +16,10 @@ class Func:
     @staticmethod
     def get_current_time():
         return datetime.now(timezone.utc)
+
+    @staticmethod
+    def convert_offset_naive_to_aware_datetime(dt: datetime):
+        return pytz.utc.localize(dt)
 
     @staticmethod
     def assign_uuid(obj):

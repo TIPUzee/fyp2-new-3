@@ -3,7 +3,7 @@ import { AfterViewInit, Component } from '@angular/core';
 import { CommonService } from '../../../services/common.service';
 import { RouterLink } from '@angular/router';
 import { HtmlService } from '../../../services/html.service';
-import { RatingStarsComponent } from '../../compo/rating-stars/rating-stars.component';
+import { RatingStarsComponent } from '../../../utils/components/rating-stars/rating-stars.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 

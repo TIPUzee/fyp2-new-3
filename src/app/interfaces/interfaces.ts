@@ -21,23 +21,26 @@ export interface PatientProfileInterface {
     status: PatientAccountStatus,
 }
 
-export interface DoctorProfile {
+export interface Doctor {
     id: number,
     profilePicFilename: string | null,
     coverPicFilename: string | null,
-    email: string,
     name: string,
     dob: Date,
-    whatsappNumber: string,
     registrationTime: string,
     status: DoctorAccountStatus,
-    walletAmount: number,
-    availabilityDurations: DoctorAvailabilityDuration[],
     specializationCategoryId: number | null,
     maxMeetingDuration: number,
     appointmentCharges: number,
     specialization: string,
     languages: DoctorLanguage[],
+}
+
+export interface DoctorProfile extends Doctor {
+    email: string,
+    whatsappNumber: string,
+    walletAmount: number,
+    availabilityDurations: DoctorAvailabilityDuration[],
     experiences: DoctorExperience[]
 }
 
@@ -49,7 +52,7 @@ export interface DoctorAvailabilityDuration {
 
 export interface DoctorLanguage {
     id: number,
-    languageId: number
+    languageId: number,
 }
 
 export interface Language {
@@ -90,6 +93,7 @@ export interface Appointment {
     timeTo: Date,
     paidAmount: number,
     status: AppointmentStatus,
+    statusChangeTime: Date,
     delayCountByDoc: number,
     rescheduleCountByPat: number,
     paymentTime: Date,
@@ -114,5 +118,38 @@ export interface DoctorReviews {
     patientReview: string,
     rating: number,
     id: number,
+    timeTo: Date,
+}
+
+export interface DoctorAnalytics {
+    ratingAnalytics: {
+        totalAppointments: number,
+        rating1Star: number,
+        rating2Star: number,
+        rating3Star: number,
+        rating4Star: number,
+        rating5Star: number,
+        days: number,
+    },
+    nbOfAppointAnalytics: {
+        weeks: number,
+        totalAppointments: number,
+        completedAppoints: {
+            total: number,
+            weekVice: number[]
+        },
+        docCancelledAppoints: {
+            total: number,
+            weekVice: number[]
+        },
+        docNotJoinedAppoints: {
+            total: number,
+            weekVice: number[]
+        },
+    },
+}
+
+export interface DoctorAppointmentSlot {
+    timeFrom: Date,
     timeTo: Date,
 }

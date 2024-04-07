@@ -25,8 +25,11 @@ class UploadedFile(FileStorage):
         self.uu_filename = f'{self.time}_{self.uuid}{self.extension}'
         # not using content_length because it is not reliable
         self.filesize = len(file_storage.stream.read()) / 1024 / 1024
+        print('first read', self.filesize)
+        print('second read', len(file_storage.stream.read()) / 1024 / 1024)
 
     def save(self):
+        self.stream.seek(0)
         super().save(os.path.join('uploads', self.uu_filename))
 
     def is_video(self):

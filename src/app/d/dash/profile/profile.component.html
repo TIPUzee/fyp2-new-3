@@ -276,7 +276,7 @@
             <div class="col-span-4"></div>
 
             <!-- Weekly Availability Durations -->
-            <div class="col-span-12 -mb-3">Your Availability Time</div>
+            <div class="col-span-12 -mb-3">Your Availability (UTC) Time</div>
             <ng-container
                *ngFor="let day of ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']; let i = index;"
             >
@@ -392,7 +392,7 @@
             <!-- Experiences -->
             <div class="text-black font-semibold text-lg col-span-12 -mb-3">Your Education or Work Experiences</div>
             <div class="flex flex-col gap-y-4 col-span-12">
-               <ng-container *ngIf="profileUpdateForm.fg.controls.experiences.length === 0">
+               <ng-container *ngIf="profileUpdateForm.fg.controls.experiences.value.length === 0">
                   <div class="text-dark text-opacity-60 text-center">
                      No experience added...
                   </div>

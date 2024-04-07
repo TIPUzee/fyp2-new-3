@@ -16,7 +16,7 @@ class Patient(SQLEntity, vld.PropertyTypeValidatorEntity):
         self.m_dob: Optional[str] = vld.validatable(vld.And(vld.Str(), vld.Date()))
         self.m_whatsapp_number: Optional[str] = vld.validatable(vld.And(vld.Str(), vld.Phone(), vld.MaxLen(16)))
         self.m_registration_time: Optional[str] = vld.validatable(vld.And(vld.Str(), vld.DateTime()))
-        self.m_refundable_amount: Optional[float] = vld.validatable(vld.And(vld.Float(), vld.MinVal(0)))
+        self.m_refundable_amount: Optional[float] = vld.validatable(vld.And(vld.Float()))
         self.m_status: Optional[str] = vld.validatable(
             vld.And(
                 vld.Str(),

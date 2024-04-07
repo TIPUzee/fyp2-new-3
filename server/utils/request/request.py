@@ -55,6 +55,8 @@ class App:
     ):
         def decorator(func):
             def _(*args, **_kwargs):
+                import time
+                time.sleep(0)
                 user = App.__validate_access_control(access_control)
                 _kwargs = App.perform_pre_conversions(path_params_pre_conversion, **_kwargs)
                 App.__validate_path_params(path_params_validators, **_kwargs)
