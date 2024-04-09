@@ -3,7 +3,7 @@ import { CommonModule, ViewportScroller } from '@angular/common';
 import { Router, RouterOutlet } from '@angular/router';
 import { HTTPService } from "./services/http.service";
 import { UtilFuncService } from "./services/util-func.service";
-import { NgxSonnerToaster, toast } from 'ngx-sonner';
+import { NgxSonnerToaster } from 'ngx-sonner';
 
 @Component({
     selector: 'app-root',
@@ -41,7 +41,7 @@ export class AppComponent implements AfterViewInit {
             if (this.utils.getCurrentUser() === 'd') {
                 this.router.navigate(['/d/p-preview']);
             } else if (this.utils.getCurrentUser() === 'p') {
-                this.router.navigate(['/p/p']);
+                this.router.navigate(['/p/doctors']);
             } else {
                 this.router.navigate(['/home']);
             }

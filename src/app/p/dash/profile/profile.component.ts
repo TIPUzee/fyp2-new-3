@@ -10,7 +10,6 @@ import { AbstractControl, FormBuilder, ReactiveFormsModule, Validators as vl } f
 import { FormValidatorsService } from "../../../services/form-validators.service";
 import { FormDatePickerComponent } from "../../../utils/components/form-date-picker/form-date-picker.component";
 import { FormSelectComponent } from "../../../utils/components/form-select/form-select.component";
-import { UtilFuncService } from "../../../services/util-func.service";
 import { FormSubmitButtonComponent } from "../../../utils/components/form-submit-button/form-submit-button.component";
 import { HTTPService } from "../../../services/http.service";
 import { PatientProfileUpdateResponse } from "../../../interfaces/api-response-interfaces";
@@ -261,18 +260,17 @@ export class ProfileComponent implements AfterViewInit {
         public profile: PatientProfileService,
         private _fb: FormBuilder,
         private _fvs: FormValidatorsService,
-        private utils: UtilFuncService,
         private http: HTTPService,
     ) {
         this.profileUpdateForm.refreshValues();
-        this.profile.profileChange$.subscribe(() => {
+        this.profile.change$.subscribe(() => {
             this.profileUpdateForm.refreshValues();
         })
         this.profileUpdateForm.sensitiveFieldsChangeEvent();
+        this.html.initTailwindElements();
     }
     
     
     ngAfterViewInit(): void {
-        this.html.initTailwindElements();
     }
 }

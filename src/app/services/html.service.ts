@@ -39,7 +39,7 @@ export class HtmlService {
     
     
     addWindowHeightResizeEventListener(_callback: CallableFunction, _toCallOnStartup: boolean = false) {
-        window.addEventListener('resize', event => {
+        window.addEventListener('resize', () => {
             if (this._oldWindowHeight != window.innerHeight) {
                 _callback(window.innerHeight, window.innerWidth);
                 this._oldWindowHeight = window.innerHeight;
@@ -52,7 +52,7 @@ export class HtmlService {
     
     
     addWindowResizeEventListener(_callback: CallableFunction, _toCallOnStartup: boolean = false) {
-        window.addEventListener('resize', event => {
+        window.addEventListener('resize', () => {
             _callback(window.innerHeight, window.innerWidth);
         });
         if (_toCallOnStartup) {
@@ -62,7 +62,7 @@ export class HtmlService {
     
     
     addWindowWidthResizeEventListener(_callback: CallableFunction, _toCallOnStartup: boolean = false) {
-        window.addEventListener('resize', event => {
+        window.addEventListener('resize', () => {
             if (this._oldWindowWidth != window.innerWidth) {
                 _callback(window.innerHeight, window.innerWidth);
                 this._oldWindowWidth = window.innerWidth;
@@ -115,7 +115,7 @@ export class HtmlService {
         let dataTableInstance = new Datatable(
             dataTableContainer,
             { columns: columns, rows: rows },
-            { loading: rows == undefined ? true : false, clickableRows: true }
+            { loading: rows == undefined, clickableRows: true }
         );
         
         // Set Animation On Rerender
@@ -134,7 +134,7 @@ export class HtmlService {
                 ],
                 easing: 'easeInOutExpo',
                 delay: anime.stagger(60),
-                complete: e => {},
+                complete: () => {},
             });
         });
         
@@ -143,20 +143,20 @@ export class HtmlService {
             let searchBtns = searchButtonsContainer?.querySelectorAll('.searchBtn') as NodeListOf<HTMLDivElement>;
             let searchColumns: Array<string> = [];
             searchBtns?.forEach((val, _, __) => {
-                if (val.classList.contains('active') == true && val.hasAttribute('data-column-field')) {
+                if (val.classList.contains('active') && val.hasAttribute('data-column-field')) {
                     searchColumns.push(val.getAttribute('data-column-field')!);
                 }
             });
             dataTableInstance.search(dataTableSearch.value, searchColumns.length > 0 ? searchColumns : null);
         };
-        dataTableSearch.addEventListener('keyup', (event: Event) => {
+        dataTableSearch.addEventListener('keyup', () => {
             if (lastSearchQuery != dataTableSearch.value) {
                 lastSearchQuery = dataTableSearch.value;
                 searchEvent();
             }
         });
         
-        dataTableSearch.addEventListener('search', (event: Event) => {
+        dataTableSearch.addEventListener('search', () => {
             if (lastSearchQuery != dataTableSearch.value) {
                 lastSearchQuery = dataTableSearch.value;
                 searchEvent();
@@ -164,7 +164,7 @@ export class HtmlService {
         });
         let searchBtns = searchButtonsContainer?.querySelectorAll('.searchBtn') as NodeListOf<HTMLDivElement>;
         searchBtns?.forEach((val, _, __) => {
-            val.addEventListener('click', event => {
+            val.addEventListener('click', () => {
                 if (dataTableSearch.value != '') {
                     searchEvent();
                 }
@@ -273,6 +273,7 @@ export class HtmlService {
         }
         
         reInit();
+        setTimeout(reInit, 50);
         setTimeout(reInit, 150);
         // setTimeout(reInit, 250);
     }
@@ -286,19 +287,19 @@ export class HtmlService {
         once: boolean
     ): void {
         let _callback = (x: number, y: number) => {
-            var box = element.getBoundingClientRect();
+            const box = element.getBoundingClientRect();
             
-            var body = document.body;
-            var docEl = document.documentElement;
+            const body = document.body;
+            const docEl = document.documentElement;
             
-            var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
-            var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
+            const scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
+            // const scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
             
-            var clientTop = docEl.clientTop || body.clientTop || 0;
-            var clientLeft = docEl.clientLeft || body.clientLeft || 0;
+            const clientTop = docEl.clientTop || body.clientTop || 0;
+            // const clientLeft = docEl.clientLeft || body.clientLeft || 0;
             
-            var top = Math.round(box.top + scrollTop - clientTop);
-            var left = Math.round(box.left + scrollLeft - clientLeft);
+            const top = Math.round(box.top + scrollTop - clientTop);
+            // const left = Math.round(box.left + scrollLeft - clientLeft);
             
             if (y + window.innerHeight >= top + yPadding && y <= top + element.clientHeight - yPadding) {
                 callback();
@@ -312,13 +313,13 @@ export class HtmlService {
         var docEl = document.documentElement;
         
         var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
-        var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
+        // var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
         
         var clientTop = docEl.clientTop || body.clientTop || 0;
-        var clientLeft = docEl.clientLeft || body.clientLeft || 0;
+        // var clientLeft = docEl.clientLeft || body.clientLeft || 0;
         
         var top = Math.round(box.top + scrollTop - clientTop);
-        var left = Math.round(box.left + scrollLeft - clientLeft);
+        // var left = Math.round(box.left + scrollLeft - clientLeft);
         if (window.scrollY +
             window.innerHeight >=
             top +
@@ -341,7 +342,7 @@ export class HtmlService {
             return;
         }
         this.eleCurrentScroll[eleSelecter] = [ele.scrollLeft, ele.scrollTop];
-        ele.addEventListener('scroll', event => {
+        ele.addEventListener('scroll', () => {
             if (ele == null) {
                 return;
             }
@@ -377,7 +378,7 @@ export class HtmlService {
         
         document.addEventListener(
             'scroll',
-            event => {
+            () => {
                 if (scroll == '') {
                     func(window.scrollX, window.scrollY);
                 } else if (scroll == 'x') {
@@ -430,7 +431,7 @@ export class HtmlService {
             this.renderer.setStyle(newDiv, 'color', 'black');
             
             const screenWidth = window.innerWidth;
-            let breakPoint = '';
+            let breakPoint: string;
             if (screenWidth < 640) {
                 breakPoint = 'No';
             } else if (screenWidth < 768) {
@@ -453,7 +454,7 @@ export class HtmlService {
                 this.renderer.removeChild(body, newDiv);
             }, 60000);
         };
-        window.addEventListener('resize', event => {
+        window.addEventListener('resize', () => {
             printBreakPoint();
         });
         printBreakPoint();

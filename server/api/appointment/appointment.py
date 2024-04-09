@@ -37,14 +37,16 @@ def _(user: Doctor | Patient, id: list[int], status: list[Appointment.StatusEnum
         for i in a_json:
             d = Doctor()
             d.m_id = i['m_doctor_id']
-            d_json = d.select(select_cols=['m_name', 'm_dob'])
+            d_json = d.select(select_cols=[
+                'm_name', 'm_dob', 'm_profile_pic_filename', 'm_specialization', 'm_specialization_category_id',
+                'm_status'
+            ])
             if d_json:
                 all_appointments.append({
                     **i,
                     'doctor': {
                         'm_id': i['m_doctor_id'],
-                        'm_name': d_json[0]['m_name'],
-                        'm_dob': d_json[0]['m_dob'],
+                        **d_json[0],
                     },
                 })
 
@@ -64,9 +66,7 @@ def _(user: Doctor | Patient, id: list[int], status: list[Appointment.StatusEnum
                     **i,
                     'patient': {
                         'm_id': i['m_patient_id'],
-                        'm_name': p_json[0]['m_name'],
-                        'm_dob': p_json[0]['m_dob'],
-                        'm_whatsapp_number': p_json[0]['m_whatsapp_number'],
+                        **p_json[0],
                     },
                 })
 

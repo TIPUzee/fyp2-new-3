@@ -162,6 +162,7 @@ def _(
     user.m_max_meeting_duration = max_meeting_duration
     user.m_appointment_charges = appointment_charges
     user.m_specialization = specialization
+    user.m_active_for_appointments = any([ad['enabled'] for ad in availability_durations])
 
     img_validator = Vld.MustBeAnImage()
     old_cover_pic = user.m_cover_pic_filename
@@ -329,6 +330,7 @@ def _(user: None) -> None:
 
     d = Doctor()
     d.m_status = d.AccountStatusEnum.ACCOUNT_APPROVED
+    d.m_active_for_appointments = True
     doctors = d.select(not_select_cols=['m_password', 'm_email', 'm_whatsapp_number', 'm_wallet_amount'])
 
     l = DoctorLanguage()

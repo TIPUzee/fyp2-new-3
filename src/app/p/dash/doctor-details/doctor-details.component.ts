@@ -2,7 +2,7 @@ import { CommonModule, Location, NgOptimizedImage } from '@angular/common';
 import { AfterViewInit, Component, Input, OnChanges, ViewChild } from '@angular/core';
 import { CommonService } from '../../../services/common.service';
 import { HtmlService } from '../../../services/html.service';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import { UtilFuncService } from '../../../services/util-func.service';
@@ -375,6 +375,7 @@ export class DoctorDetailsComponent implements AfterViewInit, OnChanges {
         protected utils: UtilFuncService,
         private http: HTTPService,
         private location: Location,
+        private router: Router,
     ) {
         this.doctor.onLoad().subscribe(async () => {
             this.analytics.load();
@@ -384,6 +385,8 @@ export class DoctorDetailsComponent implements AfterViewInit, OnChanges {
             this.reviewRatingChart.refreshData();
             this.nbOfAppointmentsChart.refreshData();
         })
+        
+        this.fetchFromUrlParams();
     }
     
     
@@ -399,5 +402,10 @@ export class DoctorDetailsComponent implements AfterViewInit, OnChanges {
     }
     
     
-    
+    fetchFromUrlParams() {
+        let params = this.router.parseUrl(this.router.url).queryParams;
+        if (params.hasOwnProperty('d')) {
+            this.doctorId = parseInt(params['d'] as string);
+        }
+    }
 }

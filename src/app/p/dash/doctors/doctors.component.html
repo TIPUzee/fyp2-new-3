@@ -31,7 +31,7 @@
                   <ng-container
                      *ngIf="selectedLanguage.id === -1 || doctors.containsLanguage(doc.id, selectedLanguage.id)"
                   >
-                     <a [routerLink]="['../doctor', doc.id]" class="cursor-pointer block">
+                     <a [routerLink]="['../', 'doctor']" [queryParams]="{d: doc.id}" class="cursor-pointer block">
                         <div class="rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 bg-primary-100 bg-opacity-90 p-4">
                            <div class="px-0 mb-2 -mt-12 relative">
                               <img

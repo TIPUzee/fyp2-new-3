@@ -46,8 +46,9 @@ class Doctor(SQLEntity, Vld.PropertyTypeValidatorEntity):
                 )
             )
         )
-        self.m_status_change_time = Vld.PropertyValidatable(Vld.DateTimeObject())
-        self.m_specialization = Vld.PropertyValidatable(Vld.And(Vld.Str(), Vld.MinLen(5), Vld.MaxLen(44)))
+        self.m_status_change_time: Optional[datetime] = Vld.validatable(Vld.DateTimeObject())
+        self.m_specialization: Optional[str] = Vld.validatable(Vld.And(Vld.Str(), Vld.MinLen(5), Vld.MaxLen(44)))
+        self.m_active_for_appointments: Optional[bool] = Vld.validatable(Vld.Bool())
 
         setattr(self, Func.get_attr_custom_storage_name('m_dob'), self._dob)
         super().__init__()

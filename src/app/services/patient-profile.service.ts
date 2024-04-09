@@ -11,7 +11,7 @@ import { toast } from "ngx-sonner";
 })
 export class PatientProfileService {
     private profileChange = new Subject<void>();
-    public profileChange$ = this.profileChange.asObservable();
+    public change$ = this.profileChange.asObservable();
     
     id: number = 0;
     email: string = '';
