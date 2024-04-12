@@ -51,6 +51,7 @@ class App:
         path_params_pre_conversion: dict[str, Callable[[Any], Any]] = None,
         path_params_validators: dict[str, Callable[[Any], bool]] = None,
         access_control: list[type[AccessControlledEntity]] | Literal['All'] = None,
+        prefix_api: bool = True,
         **kwargs
     ):
         def decorator(func):
@@ -65,7 +66,8 @@ class App:
             _func = Res.handle(_)
             Func.assign_uuid(_func)
             App.__validate_api_route(route_url)
-            App.App.route(f'/api{route_url}', methods=[method], **kwargs)(_func)
+            _route_url = f'/api{route_url}' if prefix_api else route_url
+            App.App.route(_route_url, methods=[method], **kwargs)(_func)
 
         Func.assign_uuid(decorator)
         return decorator
