@@ -28,8 +28,12 @@ class SQL:
                 _ = ", ".join(['%s' for _ in param])
                 query = Func.SqlHelpers.replace_nth_occurrence_(query, '%s', _, len(new_params))
                 for new_param in param:
+                    if isinstance(new_param, dict):
+                        new_param = f'"{str(param)}"'
                     new_params.append(new_param)
             else:
+                if isinstance(param, dict):
+                    param = f'"{str(param)}"'
                 new_params.append(param)
         if Func.SqlHelpers.nb_of_coming_queries_to_print > 0:
             print(f'Query: {query}')

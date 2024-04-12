@@ -170,7 +170,6 @@ def _(user: None):
     else:
         request_response['invalid_login'] = True
 
-    print(request_response)
     return App.Res.ok(**request_response)
 
 

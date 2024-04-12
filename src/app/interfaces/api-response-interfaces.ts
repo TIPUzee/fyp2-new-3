@@ -5,7 +5,7 @@ import {
     PatientProfileInterface,
     RegistrableUserType,
     SpecializationCategory,
-    UserTypeInterface, DoctorAnalytics, DoctorAppointmentSlot, Doctor
+    UserTypeInterface, DoctorAnalytics, DoctorAppointmentSlot, Doctor, PayfastPaymentGatewayParams
 } from "./interfaces";
 
 export interface LoadPatientProfileResponse {
@@ -160,4 +160,35 @@ export interface GetDoctorAppointmentSlotsResponse {
 
 export interface GetAllDoctorsResponse {
     list: Doctor[]
+}
+
+export interface BookAppointmentResponse {
+    doctorNotExists: boolean,
+    doctorNotActive: boolean,
+    invalidSlot: boolean,
+    slotClash: boolean,
+    appointmentBooked: boolean,
+    appointmentToken: string,
+}
+
+export interface VerifyAppointmentBookingTokenResponse {
+    invalidToken: boolean,
+    doctorNotExists: boolean,
+    doctorNotActive: boolean,
+    invalidSlot: boolean,
+    slotClash: boolean,
+    appointmentAlreadyBooked: boolean,
+    verified: boolean,
+}
+
+export interface GetAppointmentBookingPaymentParamsResponse {
+    invalidToken: false,
+    doctorNotExists: false,
+    doctorNotActive: false,
+    invalidSlot: false,
+    slotClash: false,
+    appointmentAlreadyBooked: false,
+    verified: false,
+    paramsGenerated: false,
+    payfastParams: PayfastPaymentGatewayParams,
 }

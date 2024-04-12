@@ -1,7 +1,12 @@
 from __future__ import annotations
 
-from utils import App, Func, UploadedFiles, SavedFile
-from src import Doctor, Patient, Appointment, AppointmentCallProofVideo, Calc, SystemDetails
+from datetime import datetime, timedelta, timezone
+
+from utils import App, Func, UploadedFiles, SavedFile, Env
+from src import (
+    Doctor, Patient, Appointment, Calc, SystemDetails,
+    Payfast,
+)
 
 
 @App.api_route('/appointments', method='POST', access_control=[Doctor.Login, Patient.Login])
@@ -37,18 +42,22 @@ def _(user: Doctor | Patient, id: list[int], status: list[Appointment.StatusEnum
         for i in a_json:
             d = Doctor()
             d.m_id = i['m_doctor_id']
-            d_json = d.select(select_cols=[
-                'm_name', 'm_dob', 'm_profile_pic_filename', 'm_specialization', 'm_specialization_category_id',
-                'm_status'
-            ])
+            d_json = d.select(
+                select_cols=[
+                    'm_name', 'm_dob', 'm_profile_pic_filename', 'm_specialization', 'm_specialization_category_id',
+                    'm_status'
+                ]
+            )
             if d_json:
-                all_appointments.append({
-                    **i,
-                    'doctor': {
-                        'm_id': i['m_doctor_id'],
-                        **d_json[0],
-                    },
-                })
+                all_appointments.append(
+                    {
+                        **i,
+                        'doctor': {
+                            'm_id': i['m_doctor_id'],
+                            **d_json[0],
+                        },
+                    }
+                )
 
     else:
         a.m_doctor_id = user.m_id
@@ -62,13 +71,15 @@ def _(user: Doctor | Patient, id: list[int], status: list[Appointment.StatusEnum
             d.m_id = i['m_patient_id']
             p_json = d.select(select_cols=['m_name', 'm_dob', 'm_whatsapp_number'])
             if p_json:
-                all_appointments.append({
-                    **i,
-                    'patient': {
-                        'm_id': i['m_patient_id'],
-                        **p_json[0],
-                    },
-                })
+                all_appointments.append(
+                    {
+                        **i,
+                        'patient': {
+                            'm_id': i['m_patient_id'],
+                            **p_json[0],
+                        },
+                    }
+                )
 
     request_response['appointments'] = all_appointments
     return App.Res.ok(**request_response)
@@ -81,10 +92,10 @@ def _(user: Doctor | Patient, id: list[int], status: list[Appointment.StatusEnum
 def _(user: Doctor, appointment_id, doctor_report, secret_code):
     request_response = {
         'appointment_not_exists': False,
-        'invalid_secret_code': False,
-        'not_completable': False,
-        'marked_as_completed': False,
-        'already_completed': False,
+        'invalid_secret_code':    False,
+        'not_completable':        False,
+        'marked_as_completed':    False,
+        'already_completed':      False,
     }
 
     a = Appointment()
@@ -133,10 +144,10 @@ def _(user: Doctor, appointment_id, doctor_report, secret_code):
 def _(user: Doctor, appointment_id):
     request_response = {
         'appointment_not_exists': False,
-        'not_delayable': False,
-        'already_delayed': False,
-        'max_delay_reached': False,
-        'delayed': False,
+        'not_delayable':          False,
+        'already_delayed':        False,
+        'max_delay_reached':      False,
+        'delayed':                False,
     }
 
     a = Appointment()
@@ -167,11 +178,15 @@ def _(user: Doctor, appointment_id):
     system = SystemDetails()
     system.m_balance = Calc.appointment_system_fee(a.m_paid_amount, a.StatusEnum.DOC_REQUESTED_DELAY, doc_delayed=True)
 
-    user.m_wallet_amount = Calc.appointment_doctor_cutoffs(a.m_paid_amount, a.StatusEnum.DOC_REQUESTED_DELAY,
-                                                           doc_delayed=True)
+    user.m_wallet_amount = Calc.appointment_doctor_cutoffs(
+        a.m_paid_amount, a.StatusEnum.DOC_REQUESTED_DELAY,
+        doc_delayed=True
+    )
 
-    p.m_refundable_amount = Calc.appointment_patient_refunds(a.m_paid_amount, a.StatusEnum.DOC_REQUESTED_DELAY,
-                                                         doc_delayed=True)
+    p.m_refundable_amount = Calc.appointment_patient_refunds(
+        a.m_paid_amount, a.StatusEnum.DOC_REQUESTED_DELAY,
+        doc_delayed=True
+    )
 
     a.update()
     system.update(set_increment_cols=['m_balance'])
@@ -193,9 +208,9 @@ def _(user: Doctor, appointment_id):
 )
 def _(user: Doctor, appointment_id):
     request_response = {
-        'appointment_not_exists': False,
-        'status_not_changeable': False,
-        'marked_as_doctor_not_joined': False,
+        'appointment_not_exists':              False,
+        'status_not_changeable':               False,
+        'marked_as_doctor_not_joined':         False,
         'already_marked_as_doctor_not_joined': False,
     }
 
@@ -248,18 +263,18 @@ def _(user: Doctor, appointment_id):
 )
 def _(user: Doctor, appointment_id, attempt_1_video: UploadedFiles, attempt_2_video: UploadedFiles):
     request_response = {
-        'appointment_not_exists': False,
-        'status_not_changeable': False,
-        'attempt_1_video_not_uploaded': False,
-        'attempt_2_video_not_uploaded': False,
-        'attempt_1_video_not_video': False,
-        'attempt_2_video_not_video': False,
+        'appointment_not_exists':        False,
+        'status_not_changeable':         False,
+        'attempt_1_video_not_uploaded':  False,
+        'attempt_2_video_not_uploaded':  False,
+        'attempt_1_video_not_video':     False,
+        'attempt_2_video_not_video':     False,
         'attempt_1_video_size_exceeded': False,
         'attempt_2_video_size_exceeded': False,
-        'request_already_approved': False,
-        'request_already_rejected': False,
-        'request_already_submitted': False,
-        'request_submitted': False,
+        'request_already_approved':      False,
+        'request_already_rejected':      False,
+        'request_already_submitted':     False,
+        'request_submitted':             False,
     }
 
     a = Appointment()
@@ -303,7 +318,7 @@ def _(user: Doctor, appointment_id, attempt_1_video: UploadedFiles, attempt_2_vi
     attempt_1_video[0].save()
     attempt_2_video[0].save()
 
-    old_videos = AppointmentCallProofVideo()
+    old_videos = Appointment.CallProofVideo()
     old_videos.m_appointment_id = appointment_id
     old_videos_json = old_videos.select(select_cols=['m_filename'])
     for i in old_videos_json:
@@ -311,8 +326,8 @@ def _(user: Doctor, appointment_id, attempt_1_video: UploadedFiles, attempt_2_vi
     old_videos.delete(_limit=-1)
     old_videos.commit()
 
-    video_1 = AppointmentCallProofVideo()
-    video_2 = AppointmentCallProofVideo()
+    video_1 = Appointment.CallProofVideo()
+    video_2 = Appointment.CallProofVideo()
 
     video_1.m_appointment_id = appointment_id
     video_2.m_appointment_id = appointment_id
@@ -341,11 +356,11 @@ def _(user: Doctor, appointment_id, attempt_1_video: UploadedFiles, attempt_2_vi
 )
 def _(user: Doctor | Patient, appointment_id):
     request_response = {
-        'appointment_not_exists': False,
-        'not_cancelable': False,
+        'appointment_not_exists':   False,
+        'not_cancelable':           False,
         'already_cancelled_by_pat': False,
         'already_cancelled_by_doc': False,
-        'cancel_operation_done': False,
+        'cancel_operation_done':    False,
     }
 
     a = Appointment()
@@ -397,3 +412,233 @@ def _(user: Doctor | Patient, appointment_id):
 
     request_response['cancel_operation_done'] = True
     return App.Res.ok(**request_response)
+
+
+@App.api_route('/appointment/book', method='POST', access_control=[Patient.Login])
+@App.json_inputs(
+    'doctor_id', 'time_from', 'time_to', 'symptom_description'
+)
+def _(user: Patient, doctor_id: int, time_from: str, time_to: str, symptom_description: str):
+    request_response = {
+        'doctor_not_exists':  False,
+        'doctor_not_active':  False,
+        'invalid_slot':       False,
+        'slot_clash':         False,
+        'appointment_booked': False,
+        'appointment_token':  False,
+    }
+
+    d = Doctor()
+    d.m_id = doctor_id
+    if not d.load(
+            select_cols=['m_status', 'm_active_for_appointments', 'm_max_meeting_duration',
+                'm_appointment_charges']
+    ):
+        request_response['doctor_not_exists'] = True
+        return App.Res.client_error(**request_response)
+
+    if d.m_status != d.AccountStatusEnum.ACCOUNT_APPROVED or not d.m_active_for_appointments:
+        request_response['doctor_not_active'] = True
+        return App.Res.client_error(**request_response)
+
+    a = Appointment()
+    a.m_time_from = time_from
+    a.m_time_to = time_to
+
+    if not d.is_valid_slot(a.m_time_from, a.m_time_to):
+        request_response['invalid_slot'] = True
+        return App.Res.client_error(**request_response)
+
+    if d.any_slot_clash(a.m_time_from, a.m_time_to):
+        request_response['slot_clash'] = True
+        return App.Res.client_error(**request_response)
+
+    ar = Appointment.Request()
+    ar.m_patient_id = user.m_id
+    ar.delete(_limit=-1)
+    ar.commit()
+    ar.reset()
+
+    ar.m_patient_id = user.m_id
+    ar.m_doctor_id = doctor_id
+    ar.m_time_from = time_from
+    ar.m_time_to = time_to
+    ar.m_symptom_description = symptom_description
+    ar.m_payable_amount = d.m_appointment_charges
+
+    ar.insert(load_inserted_id_to='m_id')
+    ar.commit()
+
+    request_response['appointment_booked'] = True
+    request_response['appointment_token'] = Appointment.BookClientLogin.gen_token(ar)
+    return App.Res.ok(**request_response)
+
+
+@App.api_route('/appointment/book/verify-auth', method='GET', access_control=[Patient.Login])
+def _(user: Patient):
+    request_response = {
+        'invalid_token':              False,
+        'doctor_not_exists':          False,
+        'doctor_not_active':          False,
+        'invalid_slot':               False,
+        'slot_clash':                 False,
+        'appointment_already_booked': False,
+        'verified':                   False,
+    }
+
+    token = Appointment.BookClientLogin.fetch_token()
+    if not token:
+        request_response['invalid_token'] = True
+        return App.Res.client_error(**request_response)
+
+    payload = Appointment.BookClientLogin.parse_token(token)
+    if not payload:
+        request_response['invalid_token'] = True
+        return App.Res.client_error(**request_response)
+
+    ar = Appointment.BookClientLogin.get_user(payload)
+
+    if not ar:
+        request_response['invalid_token'] = True
+        return App.Res.client_error(**request_response)
+
+    if not ar.load():
+        a = Appointment()
+        a.m_time_from = ar.m_time_from
+        a.m_time_to = ar.m_time_to
+        a.m_doctor_id = ar.m_doctor_id
+        a.m_patient_id = ar.m_patient_id
+        if a.exists():
+            request_response['appointment_already_booked'] = True
+        else:
+            request_response['invalid_token'] = True
+        return App.Res.client_error(**request_response)
+
+    d = Doctor()
+    d.m_id = ar.m_doctor_id
+    if not d.load(select_cols=['m_status', 'm_active_for_appointments', 'm_max_meeting_duration']):
+        request_response['doctor_not_exists'] = True
+        return App.Res.client_error(**request_response)
+
+    if d.m_status != d.AccountStatusEnum.ACCOUNT_APPROVED or not d.m_active_for_appointments:
+        request_response['doctor_not_active'] = True
+        return App.Res.client_error(**request_response)
+
+    if not d.is_valid_slot(ar.m_time_from, ar.m_time_to):
+        request_response['invalid_slot'] = True
+        return App.Res.client_error(**request_response)
+
+    if d.any_slot_clash(ar.m_time_from, ar.m_time_to):
+        request_response['slot_clash'] = True
+        return App.Res.client_error(**request_response)
+
+    request_response['verified'] = True
+    return App.Res.ok(**request_response)
+
+
+@App.api_route('/appointment/book/payfast-params', method='GET', access_control=[Patient.Login])
+def _(user: Patient):
+    request_response = {
+        'invalid_token':              False,
+        'doctor_not_exists':          False,
+        'doctor_not_active':          False,
+        'invalid_slot':               False,
+        'slot_clash':                 False,
+        'appointment_already_booked': False,
+        'verified':                   False,
+        'params_generated':           False,
+        'payfast_params':             False,
+    }
+
+    token = Appointment.BookClientLogin.fetch_token()
+    if not token:
+        request_response['invalid_token'] = True
+        return App.Res.client_error(**request_response)
+
+    payload = Appointment.BookClientLogin.parse_token(token)
+    if not payload:
+        request_response['invalid_token'] = True
+        return App.Res.client_error(**request_response)
+
+    ar = Appointment.BookClientLogin.get_user(payload)
+
+    if not ar:
+        request_response['invalid_token'] = True
+        return App.Res.client_error(**request_response)
+
+    if not ar.load():
+        a = Appointment()
+        a.m_time_from = ar.m_time_from
+        a.m_time_to = ar.m_time_to
+        a.m_doctor_id = ar.m_doctor_id
+        a.m_patient_id = ar.m_patient_id
+        if a.exists():
+            request_response['appointment_already_booked'] = True
+        else:
+            request_response['invalid_token'] = True
+        return App.Res.client_error(**request_response)
+
+    d = Doctor()
+    d.m_id = ar.m_doctor_id
+    if not d.load(select_cols=['m_status', 'm_active_for_appointments', 'm_max_meeting_duration', 'm_name']):
+        request_response['doctor_not_exists'] = True
+        return App.Res.client_error(**request_response)
+
+    if d.m_status != d.AccountStatusEnum.ACCOUNT_APPROVED or not d.m_active_for_appointments:
+        request_response['doctor_not_active'] = True
+        return App.Res.client_error(**request_response)
+
+    if not d.is_valid_slot(ar.m_time_from, ar.m_time_to):
+        request_response['invalid_slot'] = True
+        return App.Res.client_error(**request_response)
+
+    if d.any_slot_clash(ar.m_time_from, ar.m_time_to):
+        request_response['slot_clash'] = True
+        return App.Res.client_error(**request_response)
+
+    request_response['verified'] = True
+
+    payfast_login_auth_token = Appointment.BookPayfastLogin.gen_token(ar)
+
+    payfast = Payfast()
+    payfast.m_id = ar.m_id
+    payfast.m_amount = ar.m_payable_amount
+
+    payfast_token, token_gen_time = payfast.get_form_token()
+
+    if (not payfast_token) or (not token_gen_time):
+        request_response['params_generated'] = False
+        return App.Res.client_error(**request_response)
+
+    payfast_param = {
+        'token':         payfast_token,
+        'currency_code': 'PKR',
+        'merchant_id':   Env.get('PAYFAST_MERCHANT_ID'),
+        'merchant_name': 'UAT Demo Merchant',
+        'basket_id':     payfast.m_id,
+        'txnamt':        payfast.m_amount,
+        'order_date':    Func.get_defined_datetime_str(token_gen_time)[:10],
+        'checkout_url':  f'http://{Env.get("SERVER_IP_WITH_PORT")}/api/appointment/book/payfast-notification'
+                         # f'?t={Func.encode_url_param_val(payfast_login_auth_token)}'
+                         ,
+        'form_url':      payfast.CurrentDetails.redirection_api,
+        'txndesc':       'A description goes here',
+        'proc_code':     '00',
+        'tran_type':     'ECOMM_PURCHASE',
+        'customer_mobile_no': user.m_whatsapp_number,
+        'customer_email_address': user.m_email,
+        'signature':    '1234567890',
+        'version':      '1.0.0',
+        'customer_name': user.m_name,
+        'items':         [{'sku': 'Appointment', 'name': d.m_name, 'price': payfast.m_amount, 'qty': 1}],
+    }
+
+    request_response['payfast_params'] = payfast_param
+    request_response['params_generated'] = True
+    print('payfast_param', payfast_param)
+    return App.Res.ok(**request_response)
+
+
+@App.api_route('/appointment/book/payfast-notification', method='GET')
+def _(user: None):
+    return App.Res.ok()

@@ -38,10 +38,10 @@
             <div [ngClass]="utils.getCurrentUser() == 'p' ? '' : 'hidden'" class="mt-4">
                <div class="flex justify-end">
                   <a
+                     [queryParams]="{ d: doctorId }"
+                     [routerLink]="['../', 'book']"
                      data-te-ripple-color="light"
                      data-te-ripple-init
-                     [routerLink]="['../', 'book']"
-                     [queryParams]="{ d: doctorId }"
                      class="cursor-pointer shake-top text-center block w-fit rounded bg-blue-500 text-neutral-50 shadow-[0_4px_9px_-4px_rgba(51,45,45,0.7)] hover:bg-blue-600 hover:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] focus:bg-blue-800 focus:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] active:bg-blue-700 active:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal transition duration-150 ease-in-out focus:outline-none focus:ring-0"
                   >
                      Book Appointment
@@ -53,7 +53,10 @@
                   <div class="text-xl font-semibold text-dark">Neurosurgeon</div>
                   <div>
                      Charger Per Appointment:
-                     <span class="text-danger-600 font-semibold">Rs. {{ doctor.details.appointmentCharges }}</span>
+                     <span class="text-danger-600 font-semibold">Rs. {{
+                           doctor.details.appointmentCharges
+                        }}
+                     </span>
                   </div>
                </div>
                <div class="">
@@ -64,7 +67,9 @@
                            <span
                               class="text-dark text-opacity-80 hover:bg-dark hover:bg-opacity-40 hover:text-primary-100 hover:text-opacity-100 transition-colors duration-300 font-light px-4 pt-1 pb-1 border border-current rounded-full block"
                            >
-                              {{ day | weekdayShort }} {{ [availDuration.from, availDuration.to] | availabilityTime }}
+                              {{ day | weekdayShort }} {{
+                                 [availDuration.from, availDuration.to] | availabilityTime
+                              }}
                            </span>
                         </ng-container>
                      </ng-container>
@@ -105,30 +110,38 @@
                               </ng-container>
 
                               <ng-container *ngIf="slots.list.length !== 0">
-                                 <ng-container
-                                    *ngFor="let daySlots of slots.list[slots.selectedWeek]; let i = index"
-                                 >
-                                    <ng-container [ngSwitch]="daySlots.length > 0">
+                                 <div class="[&:has(_.slot-available)_.slot-not-available-msg]:hidden">
 
-                                       <ng-container *ngSwitchCase="true">
-                                          <div>{{ daySlots[0].timeFrom.getDay() - 1 | weekdayShort }}</div>
+                                    <ng-container
+                                       *ngFor="let daySlots of slots.list[slots.selectedWeek]; let day = index"
+                                    >
+                                       <ng-container *ngIf="daySlots.length !== 0">
+                                          <ng-container *ngIf="daySlots[0]">
+                                             <div>
+                                                {{
+                                                   daySlots[0].timeFrom.getDay() - 1 | weekdayShort
+                                                }}
+                                             </div>
+                                          </ng-container>
                                           <ng-container *ngFor="let slot of daySlots; let i = index">
                                              <label
                                                 for="slotSelectorRadio{{ i }}"
-                                                class="mt-px -ms-2 ps-3 inline-block pl-[0.15rem]"
+                                                class="mt-px -ms-2 ps-3 block pl-[0.15rem] slot-available"
                                              >
-                                                - {{ slot.timeFrom }}
+                                                -
+                                                {{
+                                                   [slot.timeFrom, slot.timeTo] | appointmentDuration: true
+                                                }}
                                              </label>
                                           </ng-container>
                                        </ng-container>
-
-                                       <ng-container *ngSwitchCase="false">
-                                          <div>{{ daySlots[0].timeFrom.getDay() - 1 | weekdayShort }}</div>
-                                          <div class="text-dark text-opacity-60">No slots available</div>
-                                       </ng-container>
-
                                     </ng-container>
-                                 </ng-container>
+
+                                    <div class="text-dark text-opacity-60 slot-not-available-msg">
+                                       No slots available
+                                    </div>
+                                 </div>
+
                               </ng-container>
 
                            </ng-container>
@@ -229,7 +242,10 @@
                         </ng-container>
                         <div>{{ review.patientReview }}</div>
                         <div class="flex justify-end">
-                           <div class="text-sm text-dark text-opacity-50 -mb-1">{{ review.timeTo | datetime }}</div>
+                           <div class="text-sm text-dark text-opacity-50 -mb-1">{{
+                                 review.timeTo | datetime
+                              }}
+                           </div>
                         </div>
                      </div>
                   </ng-container>

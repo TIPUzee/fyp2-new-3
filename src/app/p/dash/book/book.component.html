@@ -1,164 +1,184 @@
 <div [ngSwitch]="!!doctor.details" class="main workspace">
 
-    <ng-container *ngSwitchCase="false">
-        <!-- Loading  -->
-        <div class="flex items-center justify-center h-[calc(100vh-4rem)]">
-            <div class="flex flex-col items-center gap-y-3">
-                <div class="flex items-center gap-x-2">
-                    <div class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-dark"></div>
-                    <div class="text-dark">Loading...</div>
-                </div>
+   <ng-container *ngSwitchCase="false">
+      <!-- Loading  -->
+      <div class="flex items-center justify-center h-[calc(100vh-4rem)]">
+         <div class="flex flex-col items-center gap-y-3">
+            <div class="flex items-center gap-x-2">
+               <div class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-dark"></div>
+               <div class="text-dark">Loading...</div>
             </div>
-        </div>
-    </ng-container>
+         </div>
+      </div>
+   </ng-container>
 
-    <ng-container *ngSwitchCase="true">
-        <div class="text-dark text-opacity-80 mt-8">
-            <div class="inner-container mx-auto">
-                <div class="mb-3 mt-3 bg-primary-100 bg-opacity-90 rounded-lg shadow-lg p-6 flex gap-x-6">
-                    <div class="profile-img flex justify-start">
-                        <div class="flex items-center flex-col gap-y-2">
-                            <img
-                                [src]="doctor.details.profilePicFilename" alt=""
-                                class="bg-primary-100 w-[220px] object-cover aspect-square rounded-lg shadow-lg ring ring-dark"
-                            />
-                            <div class="mt-1 -mb-1 w-fit">
-                                <app-rating-stars [rating]="analytics.avgRating"></app-rating-stars>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="h-full w-full flex flex-col">
-                        <div class="flex justify-between">
-                            <div class="text-dark font-semibold text-2xl w-max">{{ doctor.details.name }}</div>
-                            <div>Charger Per Appointment:
-                                <span class="text-end text-danger-600 font-semibold">Rs.
-                                    {{ doctor.details.appointmentCharges }}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="mb-2 -mt-1">
-                            <div class="text-xl text-dark">Neurosurgeon</div>
-                        </div>
-                        <div class="flex-grow"></div>
-                        <div class="">
-                            <div class="mt-2"> Availibility Timings</div>
-                            <div class="flex gap-x-2 gap-y-2 mt-1 items-center flex-wrap">
-                                <ng-container *ngFor="let availDuration of doctor.details.availabilityDurations; let day = index;">
-                                    <ng-container *ngIf="availDuration.enabled">
-                                        <span
-                                            class="text-dark text-opacity-80 hover:bg-dark hover:bg-opacity-40 hover:text-primary-100 hover:text-opacity-100 transition-colors duration-300 font-light px-4 pt-1 pb-1 border border-current rounded-full block"
-                                        >
-                                            {{ day | weekdayShort }}
-                                            {{ [availDuration.from, availDuration.to] | availabilityTime }}
-                                        </span>
-                                    </ng-container>
-                                </ng-container>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Next Block -->
-                <div class="mb-3 mt-3 bg-primary-100 bg-opacity-90 rounded-lg shadow-lg p-6">
-                    <div class="mb-3">
-                        <div class="text-xl font-semibold text-dark">Book Your Appointment</div>
-                    </div>
-                    <div class="">
-                        <div data-te-modal-body-ref class="relative flex-auto">
-                            <div data-te-input-wrapper-init class="relative mb-7">
-									 <textarea
-                                         id="symptomDescriptionInput"
-                                         [rows]="5"
-                                         data-te-input-showcounter="true"
-                                         maxlength="512"
-                                         placeholder="For example; I am having itching and flu for 2 days and I also have ..."
-                                         rows="3"
-                                         class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
-                                     ></textarea>
-                                <label
-                                    class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
-                                >Describe Your Symptoms
-                                </label>
-                                <div
-                                    data-te-input-helper-ref
-                                    class="absolute w-full text-sm text-neutral-500 peer-focus:text-primary dark:text-neutral-200 dark:peer-focus:text-primary"
-                                ></div>
-                            </div>
-                        </div>
-                        <div class="mt-4">Select Your Appointment Week</div>
-                        <div class="flex justify-start flex-wrap">
-                            <ng-container *ngFor="let week of ['Current Week', 'Next Week', 'Week After Next']; let i = index">
-                                <div class="mb-[0.125rem] mr-4 inline-block min-h-[1.5rem] pl-[1.5rem]">
-                                    <input
-                                        id="weekSelectorRadio{{ i }}"
-                                        [checked]="i == 0"
-                                        name="weekSelectorRadio"
-                                        type="radio"
-                                        value="weekSelectorRadio{{ i }}"
-                                        class="relative float-left -ml-[1.5rem] block mt-0.5 h-5 w-5 appearance-none rounded-full border-2 border-solid border-neutral-300 before:pointer-events-none before:absolute before:h-4 before:w-4 before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-[0px_0px_0px_13px_transparent] before:content-[''] after:absolute after:z-[1] after:block after:h-4 after:w-4 after:rounded-full after:content-[''] checked:border-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:left-1/2 checked:after:top-1/2 checked:after:h-[0.625rem] checked:after:w-[0.625rem] checked:after:rounded-full checked:after:border-primary checked:after:bg-primary checked:after:content-[''] checked:after:[transform:translate(-50%,-50%)] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:shadow-none focus:outline-none focus:ring-0 focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:border-primary checked:focus:before:scale-100 checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:border-neutral-600 dark:checked:border-primary dark:checked:after:border-primary dark:checked:after:bg-primary dark:focus:before:shadow-[0px_0px_0px_13px_rgba(255,255,255,0.4)] dark:checked:focus:border-primary dark:checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca]"
-                                    />
-                                    <label
-                                        for="weekSelectorRadio{{ i }}"
-                                        class="mt-px -ms-2 ps-3 inline-block pl-[0.15rem] hover:cursor-pointer"
-                                    >{{ week }}
-                                    </label>
-                                </div>
-                            </ng-container>
-                        </div>
-                        <div class="mt-3">Select Your Appointment Slot</div>
-                        <div class="flex flex-col justify-start flex-wrap mt-1">
-
-                            <ng-container [ngSwitch]="slots.loading">
-
-                                <ng-container *ngSwitchCase="true">
-                                    <div class="text-dark text-opacity-60">Loading available slots...</div>
-                                </ng-container>
-
-                                <ng-container *ngIf="slots.list.length !== 0">
-                                    <ng-container
-                                        *ngFor="let daySlots of slots.list[slots.selectedWeek]; let i = index"
-                                    >
-                                        <ng-container [ngSwitch]="daySlots.length > 0">
-
-                                            <ng-container *ngSwitchCase="true">
-                                                <div>{{ daySlots[0].timeFrom.getDay() - 1 | weekdayShort }}</div>
-                                                <ng-container *ngFor="let slot of daySlots; let i = index">
-                                                    <label
-                                                        for="slotSelectorRadio{{ i }}"
-                                                        class="mt-px -ms-2 ps-3 inline-block pl-[0.15rem]"
-                                                    >
-                                                        - {{ slot.timeFrom }}
-                                                    </label>
-                                                </ng-container>
-                                            </ng-container>
-
-                                            <ng-container *ngSwitchCase="false">
-                                                <div>{{ daySlots[0].timeFrom.getDay() - 1 | weekdayShort }}</div>
-                                                <div class="text-dark text-opacity-60">No slots available</div>
-                                            </ng-container>
-
-                                        </ng-container>
-                                    </ng-container>
-                                </ng-container>
-
-                            </ng-container>
-
-                        </div>
-                        <div class="mt-4">
-                            <div class="flex justify-end">
-                                <a
-                                    data-te-ripple-color="light"
-                                    data-te-ripple-init
-                                    routerLink="/p/pay"
-                                    class="shake-top btn btn-blue btn-shadow"
-                                > Book Appointment Now
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Next Block -->
+   <ng-container *ngSwitchCase="true">
+      <div class="text-dark text-opacity-80 mt-8">
+         <div class="inner-container mx-auto">
+            <div class="mb-3 mt-3 bg-primary-100 bg-opacity-90 rounded-lg shadow-lg p-6 flex gap-x-6">
+               <div class="profile-img flex justify-start">
+                  <div class="flex items-center flex-col gap-y-2">
+                     <img
+                        [src]="doctor.details.profilePicFilename" alt=""
+                        class="bg-primary-100 w-[220px] object-cover aspect-square rounded-lg shadow-lg ring ring-dark"
+                     />
+                     <div class="mt-1 -mb-1 w-fit">
+                        <app-rating-stars [rating]="analytics.avgRating"></app-rating-stars>
+                     </div>
+                  </div>
+               </div>
+               <div class="h-full w-full flex flex-col">
+                  <div class="flex justify-between">
+                     <div class="text-dark font-semibold text-2xl w-max">{{ doctor.details.name }}</div>
+                     <div>Charger Per Appointment:
+                        <span class="text-end text-danger-600 font-semibold">Rs.
+                           {{ doctor.details.appointmentCharges }}
+                        </span>
+                     </div>
+                  </div>
+                  <div class="mb-2 -mt-1">
+                     <div class="text-xl text-dark">{{ doctor.details.specialization }}</div>
+                  </div>
+                  <div class="flex-grow"></div>
+                  <div class="">
+                     <div class="mt-2">Availability Timings</div>
+                     <div class="flex gap-x-2 gap-y-2 mt-1 items-center flex-wrap">
+                        <ng-container *ngFor="let availDuration of doctor.details.availabilityDurations; let day = index;">
+                           <ng-container *ngIf="availDuration.enabled">
+                              <span
+                                 class="text-dark text-opacity-80 hover:bg-dark hover:bg-opacity-40 hover:text-primary-100 hover:text-opacity-100 transition-colors duration-300 font-light px-4 pt-1 pb-1 border border-current rounded-full block"
+                              >
+                                 {{ day | weekdayShort }}
+                                 {{ [availDuration.from, availDuration.to] | availabilityTime }}
+                              </span>
+                           </ng-container>
+                        </ng-container>
+                     </div>
+                  </div>
+               </div>
             </div>
-        </div>
-    </ng-container>
+            <!-- Next Block -->
+            <div class="mb-3 mt-3 bg-primary-100 bg-opacity-90 rounded-lg shadow-lg p-6">
+               <div class="mb-3">
+                  <div class="text-xl font-semibold text-dark">Book Your Appointment</div>
+               </div>
+               <div class="">
+                  <div data-te-modal-body-ref class="relative flex-auto">
+                     <ng-container [formGroup]="bookAppointment.fg">
+                        <div>
+                           <form-textarea
+                              [disabled]="bookAppointment.loading"
+                              [errors]="bookAppointment.errors.symptomDescription"
+                              [maxLength]="512"
+                              [rows]="5"
+                              [showCounter]="true"
+                              controlName="symptomDescription"
+                              label="Your Symptoms's Description"
+                              placeholder="For example; I am having itching and flu for 2 days and I also have ..."
+                           ></form-textarea>
+                        </div>
+                     </ng-container>
+                  </div>
+                  <div class="mt-4">Select Your Appointment Week</div>
+                  <div class="flex justify-start flex-wrap">
+                     <ng-container *ngFor="let week of ['Current Week', 'Next Week', 'Week After Next']; let i = index">
+                        <div class="mb-[0.125rem] mr-4 inline-block min-h-[1.5rem] pl-[1.5rem]">
+                           <input
+                              id="weekSelectorRadio{{ i }}"
+                              (change)="slots.selectWeek(i)"
+                              [checked]="i == 0"
+                              name="weekSelectorRadio"
+                              type="radio"
+                              value="weekSelectorRadio{{ i }}"
+                              class="relative float-left -ml-[1.5rem] block mt-0.5 h-5 w-5 appearance-none rounded-full border-2 border-solid border-neutral-300 before:pointer-events-none before:absolute before:h-4 before:w-4 before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-[0px_0px_0px_13px_transparent] before:content-[''] after:absolute after:z-[1] after:block after:h-4 after:w-4 after:rounded-full after:content-[''] checked:border-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:left-1/2 checked:after:top-1/2 checked:after:h-[0.625rem] checked:after:w-[0.625rem] checked:after:rounded-full checked:after:border-primary checked:after:bg-primary checked:after:content-[''] checked:after:[transform:translate(-50%,-50%)] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:shadow-none focus:outline-none focus:ring-0 focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:border-primary checked:focus:before:scale-100 checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:border-neutral-600 dark:checked:border-primary dark:checked:after:border-primary dark:checked:after:bg-primary dark:focus:before:shadow-[0px_0px_0px_13px_rgba(255,255,255,0.4)] dark:checked:focus:border-primary dark:checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca]"
+                           />
+                           <label
+                              for="weekSelectorRadio{{ i }}"
+                              class="mt-px -ms-2 ps-3 inline-block pl-[0.15rem] hover:cursor-pointer"
+                           >{{ week }}
+                           </label>
+                        </div>
+                     </ng-container>
+                  </div>
+                  <div class="mt-3">Select Your Appointment Slot</div>
+                  <div class="flex flex-col justify-start flex-wrap mt-1">
+
+                     <ng-container [ngSwitch]="slots.loading">
+
+                        <ng-container *ngSwitchCase="true">
+                           <div class="text-dark text-opacity-60">Loading available slots...</div>
+                        </ng-container>
+
+                        <ng-container *ngIf="slots.list.length !== 0">
+                           <div class="[&:has(_.slot-available)_.slot-not-available-msg]:hidden">
+
+                              <ng-container
+                                 *ngFor="let daySlots of slots.list[slots.selectedWeek]; let day = index"
+                              >
+                                 <ng-container *ngIf="daySlots.length !== 0">
+                                    <ng-container *ngIf="daySlots[0]">
+                                       <div>
+                                          {{
+                                             daySlots[0].timeFrom.getDay() - 1 | weekdayShort
+                                          }}
+                                       </div>
+                                    </ng-container>
+                                    <ng-container *ngFor="let slot of daySlots; let i = index">
+                                       <div class="pb-1">
+                                          <input
+                                             id="slotSelectorRadio{{ i }}"
+                                             (change)="slots.selectSlot(day, i)"
+                                             name="slotSelectorRadio"
+                                             type="radio"
+                                             value="{{ i }}"
+                                             class="relative float-left block mt-0.5 h-5 w-5 appearance-none rounded-full border-2 border-solid border-neutral-300 before:pointer-events-none before:absolute before:h-4 before:w-4 before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-[0px_0px_0px_13px_transparent] before:content-[''] after:absolute after:z-[1] after:block after:h-4 after:w-4 after:rounded-full after:content-[''] checked:border-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:left-1/2 checked:after:top-1/2 checked:after:h-[0.625rem] checked:after:w-[0.625rem] checked:after:rounded-full checked:after:border-primary checked:after:bg-primary checked:after:content-[''] checked:after:[transform:translate(-50%,-50%)] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:shadow-none focus:outline-none focus:ring-0 focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:border-primary checked:focus:before:scale-100 checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:border-neutral-600 dark:checked:border-primary dark:checked:after:border-primary dark:checked:after:bg-primary dark:focus:before:shadow-[0px_0px_0px_13px_rgba(255,255,255,0.4)] dark:checked:focus:border-primary dark:checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca]"
+                                          />
+                                          <label
+                                             for="slotSelectorRadio{{ i }}"
+                                             class="mt-px -ms-2 ps-5 inline-block pl-[0.15rem] hover:cursor-pointer slot-available"
+                                          >
+                                             {{
+                                                [slot.timeFrom, slot.timeTo] | appointmentDuration: true
+                                             }}
+                                          </label>
+                                       </div>
+                                    </ng-container>
+                                 </ng-container>
+                              </ng-container>
+
+                              <div class="text-dark text-opacity-60 slot-not-available-msg">
+                                 No slots available
+                              </div>
+
+                              <ng-container [formGroup]="bookAppointment.fg">
+                                 <form-error-box
+                                    [errors]="bookAppointment.errors.timeForm"
+                                    controlName="timeForm"
+                                 ></form-error-box>
+                              </ng-container>
+                           </div>
+
+                        </ng-container>
+
+                     </ng-container>
+
+                  </div>
+                  <div class="mt-4">
+                     <div class="flex justify-end">
+                        <form-submit-button
+                           (click)="bookAppointment.submit()"
+                           [disabled]="bookAppointment.loading || slots.loading || doctor.loading"
+                           [waiting]="bookAppointment.loading"
+                           label="Book Appointment"
+                           class="btn btn-primary btn-shadow"
+                        ></form-submit-button>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <!-- Next Block -->
+         </div>
+      </div>
+   </ng-container>
 
 </div>

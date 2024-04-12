@@ -1,11 +1,14 @@
 from __future__ import annotations
 
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from typing import Optional, Literal, Union
 
 from flask import request
 
 from utils import AccessControlledEntity, App, EmailBaseClass, Secret, SQLEntity, Validator as Vld, Func
+
+from ..appointment import Appointment
+from ..availability_duration import AvailabilityDuration
 
 
 class Doctor(SQLEntity, Vld.PropertyTypeValidatorEntity):
@@ -27,10 +30,12 @@ class Doctor(SQLEntity, Vld.PropertyTypeValidatorEntity):
         self.m_wallet_amount: Optional[float] = Vld.validatable(Vld.And(Vld.Float()))
         self.m_max_meeting_duration: Optional[int] = Vld.validatable(
             Vld.And(Vld.Int(), Vld.MinVal(15), Vld.MaxVal(120))
+        )
+        self.m_appointment_charges: Optional[int] = Vld.validatable(
+            Vld.And(
+                Vld.Int(), Vld.MinVal(500), Vld.MaxVal(5000)
             )
-        self.m_appointment_charges: Optional[int] = Vld.validatable(Vld.And(
-            Vld.Int(), Vld.MinVal(500), Vld.MaxVal(5000)
-        ))
+        )
         self.m_status: Optional[Union[
             Literal['NEW_ACCOUNT'], Literal['ACCOUNT_SUSPENDED'], Literal['APPROVAL_REQUESTED'],
             Literal['APPROVAL_REJECTED'], Literal['ACCOUNT_APPROVED']
@@ -74,7 +79,100 @@ class Doctor(SQLEntity, Vld.PropertyTypeValidatorEntity):
         if isinstance(value, date):
             setattr(self, Func.get_attr_custom_storage_name('m_dob'), value)
         else:
-            setattr(self, Func.get_attr_custom_storage_name('m_dob'),  datetime.strptime(value, '%Y-%m-%d'))
+            setattr(self, Func.get_attr_custom_storage_name('m_dob'), datetime.strptime(value, '%Y-%m-%d'))
+
+    def _get_appointment_slots_of_week(self, time: datetime, _filter: bool):
+        if not self.m_max_meeting_duration:
+            raise ValueError('Doctor\'s max meeting duration is not set/loaded')
+
+        # week starting time
+        week_threshold = time - timedelta(days=time.weekday() - 1)
+        week_threshold = week_threshold.replace(hour=0, minute=0, second=0, microsecond=0)
+
+        ad = AvailabilityDuration()
+        ad.m_doctor_id = self.m_id
+        ad = ad.select()
+
+        #               Create available slots
+        available_slots = []
+        for i, _ad in enumerate(ad):
+            if not _ad['m_enabled']:
+                continue
+            time_from = _ad['m_from']
+            time_to = _ad['m_to']
+            while time_from + self.m_max_meeting_duration <= time_to:
+                available_slots.append(
+                    {
+                        'time_from': week_threshold + timedelta(days=i - 1, minutes=time_from),
+                        'time_to':   week_threshold + timedelta(
+                            days=i - 1,
+                            minutes=time_from + self.m_max_meeting_duration
+                            ),
+                    }
+                )
+                time_from += self.m_max_meeting_duration
+
+        #               Remove the slots that are already allocated
+        a = Appointment()
+        a.turn_off_validation()
+        a.m_doctor_id = self.m_id
+        a.m_time_from = week_threshold
+        if _filter:
+            appointments = a.select(
+                select_cols=['m_time_from', 'm_time_to'],
+                where_greater_than=['m_time_from']
+            )
+
+            slot_index_to_remove = []
+            slots_to_remove = []
+            for _a in appointments:
+                _a['m_time_from'] = Func.convert_offset_naive_to_aware_datetime(_a['m_time_from'])
+                _a['m_time_to'] = Func.convert_offset_naive_to_aware_datetime(_a['m_time_to'])
+
+                for _i, _slot in enumerate(available_slots):
+                    if (not Appointment.do_slots_clash(_slot['time_from'], _slot['time_to'], _a['m_time_from'],
+                                                       _a['m_time_to'])) and (_slot not in slots_to_remove):
+                        slot_index_to_remove.append(_i)
+                        slots_to_remove.append(_slot)
+
+            for _i in slot_index_to_remove:
+                available_slots.pop(_i)
+        return available_slots
+
+    def get_appointment_slots(self, _filter: bool = True):
+        threshold_time = Func.get_current_time()
+        threshold_time = threshold_time.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
+
+        appointment_slots_week_vice = []
+
+        for i in range(3):
+            time = threshold_time + timedelta(weeks=i)
+            _slots = self._get_appointment_slots_of_week(time, _filter)
+            day_vice_slots = []
+            for j in range(7):
+                day_vice_slots.append([])
+                for slot in _slots:
+                    if slot['time_from'].weekday() == j:
+                        day_vice_slots[j].append(slot)
+            appointment_slots_week_vice.append(day_vice_slots)
+
+        return appointment_slots_week_vice
+
+    def is_valid_slot(self, time_from: datetime, time_to: datetime) -> bool:
+        for weekSlots in self.get_appointment_slots(_filter=False):
+            for daySlots in weekSlots:
+                for slot in daySlots:
+                    if slot['time_from'] == time_from and slot['time_to'] == time_to:
+                        return True
+        return False
+
+    def any_slot_clash(self, time_from: datetime, time_to: datetime) -> bool:
+        for weekSlots in self.get_appointment_slots(_filter=True):
+            for daySlots in weekSlots:
+                for slot in daySlots:
+                    if slot['time_from'] == time_from and slot['time_to'] == time_to:
+                        return False
+        return True
 
     class Login(AccessControlledEntity):
         def __init__(self):
@@ -169,13 +267,13 @@ class Doctor(SQLEntity, Vld.PropertyTypeValidatorEntity):
         def gen_token(user: Doctor, code: int) -> str:
             _ = Secret.encode_token(
                 {
-                    'm_name': user.m_name,
-                    'm_dob': user.m_dob,
+                    'm_name':            user.m_name,
+                    'm_dob':             user.m_dob,
                     'm_whatsapp_number': user.m_whatsapp_number,
-                    'm_email': user.m_email,
-                    'm_password': user.m_password,
-                    'code': code,
-                    'role': 'doctor.register'
+                    'm_email':           user.m_email,
+                    'm_password':        user.m_password,
+                    'code':              code,
+                    'role':              'doctor.register'
                 }
             )
             return f'Bearer {_}'

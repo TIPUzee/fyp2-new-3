@@ -6,7 +6,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class AppointmentDurationPipe implements PipeTransform {
     
-    transform(dates: Date[]): string {
+    transform(dates: Date[], noWeekDay: boolean = false): string {
         // Ensure dates array has two elements
         if (dates.length !== 2 || !dates[0] || !dates[1]) {
             return '';
@@ -20,6 +20,9 @@ export class AppointmentDurationPipe implements PipeTransform {
         const date = this.formatDate(dates[0]);
         
         // Construct the final string
+        if (noWeekDay) {
+            return `${ timeFrom } to ${ timeTo } - ${ date }`;
+        }
         return `${ dayOfWeek } - ${ timeFrom } to ${ timeTo } - ${ date }`;
     }
     

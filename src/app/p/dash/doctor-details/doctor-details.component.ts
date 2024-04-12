@@ -25,6 +25,7 @@ import { AgChartOptions } from 'ag-charts-community';
 import { agChartBackgroundConfig } from "../../../configs/agchart-options";
 import { Subject } from "rxjs";
 import { RatingStarsComponent } from "../../../utils/components/rating-stars/rating-stars.component";
+import { AppointmentDurationPipe } from "../../../pipes/appointment-duration.pipe";
 
 @Component({
     selector: 'app-doctor-details',
@@ -32,7 +33,8 @@ import { RatingStarsComponent } from "../../../utils/components/rating-stars/rat
     imports: [
         CommonModule, RatingStarsComponent, RouterLink, FontAwesomeModule,
         NgOptimizedImage, LocalImageFileComponent, AvailabilityTimePipe, MonthYearPipe, WeekdayShortPipe,
-        InViewportModule, InViewportDirective, DatetimePipe, AgChartsAngular, RatingStarsComponent
+        InViewportModule, InViewportDirective, DatetimePipe, AgChartsAngular, RatingStarsComponent,
+        AppointmentDurationPipe
     ],
     templateUrl: './doctor-details.component.html',
     styleUrl: './doctor-details.component.scss',
@@ -364,6 +366,7 @@ export class DoctorDetailsComponent implements AfterViewInit, OnChanges {
             });
             
             this.slots.list = slots;
+            console.log('slots list transformed', this.slots.list);
             return true;
         }
     }

@@ -1,5 +1,5 @@
 import { AfterViewInit, Component } from '@angular/core';
-import { CommonModule, ViewportScroller } from '@angular/common';
+import { CommonModule, ViewportScroller, Location } from '@angular/common';
 import { Router, RouterOutlet } from '@angular/router';
 import { HTTPService } from "./services/http.service";
 import { UtilFuncService } from "./services/util-func.service";
@@ -21,6 +21,7 @@ export class AppComponent implements AfterViewInit {
         private router: Router,
         private http: HTTPService,
         private utils: UtilFuncService,
+        private location: Location
     ) {
         // htmlService.setPrintCurrentBreakPoint();
         scroller.setOffset([200, 200]);
@@ -36,17 +37,16 @@ export class AppComponent implements AfterViewInit {
     
     
     redirectToHomeOnUnexpectedReload() {
-        if (this.router.url === '/' || this.router.url === '') {
+        if (this.location.isCurrentPathEqualTo('/')) {
             // this.router.navigate(['/home']); return;
             if (this.utils.getCurrentUser() === 'd') {
                 this.router.navigate(['/d/p-preview']);
             } else if (this.utils.getCurrentUser() === 'p') {
-                this.router.navigate(['/p/doctors']);
+                this.router.navigate(['/p/pay'], { queryParams: { d: 5 } });
             } else {
                 this.router.navigate(['/home']);
             }
         }
     }
-    
     
 }

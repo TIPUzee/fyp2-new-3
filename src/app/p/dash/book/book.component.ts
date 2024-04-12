@@ -7,6 +7,7 @@ import { HtmlService } from '../../../services/html.service';
 import { Subject } from "rxjs";
 import { DoctorAnalytics, DoctorAppointmentSlot, DoctorProfile } from "../../../interfaces/interfaces";
 import {
+    BookAppointmentResponse,
     GetDoctorAnalyticsResponse,
     GetDoctorAppointmentSlotsResponse,
     GetDoctorDetailsResponse
@@ -16,13 +17,22 @@ import { HTTPService } from "../../../services/http.service";
 import { UtilFuncService } from "../../../services/util-func.service";
 import { AvailabilityTimePipe } from "../../../pipes/availability-time.pipe";
 import { WeekdayShortPipe } from "../../../pipes/weekday-short.pipe";
-import { FormBuilder, Validators as vl } from "@angular/forms";
+import { FormBuilder, ReactiveFormsModule, Validators as vl } from "@angular/forms";
 import { FormValidatorsService } from "../../../services/form-validators.service";
+import { AppointmentDurationPipe } from "../../../pipes/appointment-duration.pipe";
+import { FormSubmitButtonComponent } from "../../../utils/components/form-submit-button/form-submit-button.component";
+import { FormTextareaComponent } from "../../../utils/components/form-textarea/form-textarea.component";
+import { FormErrorBoxComponent } from "../../../utils/components/form-error-box/form-error-box.component";
+import { CookieService } from "ngx-cookie-service";
 
 @Component({
     selector: 'app-book',
     standalone: true,
-    imports: [CommonModule, RatingStarsComponent, RouterLink, AvailabilityTimePipe, WeekdayShortPipe],
+    imports: [
+        CommonModule, RatingStarsComponent, RouterLink, AvailabilityTimePipe, WeekdayShortPipe,
+        AppointmentDurationPipe, FormSubmitButtonComponent, FormTextareaComponent, ReactiveFormsModule,
+        FormErrorBoxComponent
+    ],
     templateUrl: './book.component.html',
     styleUrl: './book.component.scss',
 })
@@ -123,9 +133,15 @@ export class BookComponent implements AfterViewInit {
     slots = {
         list: [] as DoctorAppointmentSlot[][][],
         selectedWeek: 0,
+        selectedSlotDayIndex: 0,
+        selectedSlotIndex: -1,
         loading: false,
         selectWeek: (index: number) => {
             this.slots.selectedWeek = index;
+        },
+        selectSlot: (day: number, index: number) => {
+            this.slots.selectedSlotDayIndex = day;
+            this.slots.selectedSlotIndex = index;
         },
         load: async () => {
             if (this.doctorId === -1) return false;
@@ -163,6 +179,7 @@ export class BookComponent implements AfterViewInit {
             });
             
             this.slots.list = slots;
+            console.info('slots loaded', this.slots.list);
             return true;
         }
     }
@@ -172,9 +189,12 @@ export class BookComponent implements AfterViewInit {
     // Book appointment form
     bookAppointment = {
         fg: this._fb.group({
-            timeForm: ['', vl.required],
+            doctorId: [this.doctorId, vl.required],
+            timeFrom: ['', vl.required],
             timeTo: ['', vl.required],
-            symptomDescription: ['', vl.required, vl.minLength(10), vl.maxLength(512), this._fvs.leadingSpaces(),],
+            symptomDescription: [
+                '', vl.compose([vl.required, vl.minLength(10), vl.maxLength(512), this._fvs.leadingSpaces()])
+            ],
         }),
         errors: {
             timeForm: {
@@ -204,7 +224,18 @@ export class BookComponent implements AfterViewInit {
                 }
                 return;
             }
+            this.bookAppointment.fg.controls.doctorId.setValue(this.doctorId);
             
+            if (this.slots.selectedSlotIndex !== -1) {
+                this.bookAppointment.fg.controls.timeFrom.setValue(this.utils.convertDateToDefinedDateTimeFormat(this.utils.convertLocalDateToUTCDate(
+                    this.slots.list[this.slots.selectedWeek][this.slots.selectedSlotDayIndex][this.slots.selectedSlotIndex].timeFrom
+                )));
+                this.bookAppointment.fg.controls.timeTo.setValue(this.utils.convertDateToDefinedDateTimeFormat(this.utils.convertLocalDateToUTCDate(
+                    this.slots.list[this.slots.selectedWeek][this.slots.selectedSlotDayIndex][this.slots.selectedSlotIndex].timeTo
+                )));
+            }
+            
+            this.bookAppointment.fg.markAllAsTouched();
             return !this.bookAppointment.fg.invalid;
         },
         submit: async () => {
@@ -216,27 +247,48 @@ export class BookComponent implements AfterViewInit {
             
             let res = await this.http.sendRequest({
                 method: 'POST',
-                url: `/doctor/${ this.doctorId }/appointment`,
+                url: `/appointment/book`,
                 jsonData: data,
-            }) as { success: boolean } | false;
+            }) as BookAppointmentResponse | false;
             
             this.bookAppointment.loading = false;
             
-            if (res === false) {
-                return false;
-            }
+            if (res === false) return false;
             
-            if (res.success) {
-                toast.success('Appointment booked successfully', {
-                    description: 'You will be notified when the doctor confirms the appointment',
-                });
-                return true;
-            } else {
-                toast.error('Failed to book appointment', {
+            if (res.doctorNotExists) {
+                toast.error('Doctor not found', {
                     description: 'Please try again later',
                 });
-                return false;
+            } else if (res.doctorNotActive) {
+                toast.error('Doctor is not active', {
+                    description: 'Please try again later',
+                });
+            } else if (res.invalidSlot) {
+                toast.error('Something went wrong', {
+                    description: 'Please select your slot again',
+                });
+                await this.slots.load();
+            } else if (res.slotClash) {
+                toast.error('Someone else booked the slot', {
+                    description: 'Please select another slot',
+                });
+                await this.slots.load();
+            } else if (res.appointmentBooked) {
+                toast.success('Please proceed to payment', {
+                    description: 'To confirm your appointment booking',
+                });
+                if (this.cookies.check('AppointmentBookingTempAuthorization')) {
+                    this.cookies.delete('AppointmentBookingTempAuthorization', '/p/', 'localhost');
+                }
+                this.cookies.set('AppointmentBookingTempAuthorization', res.appointmentToken, 1, '/', 'localhost');
+                await this.router.navigate(['p', 'pay'], { queryParams: { d: this.doctorId } });
+                return true;
+            } else {
+                toast.error('Something went wrong', {
+                    description: 'Please try again later',
+                });
             }
+            return false;
         },
     }
     
@@ -251,6 +303,7 @@ export class BookComponent implements AfterViewInit {
         private location: Location,
         private _fb: FormBuilder,
         private _fvs: FormValidatorsService,
+        private cookies: CookieService,
     ) {
         this.fetchFromUrlParams();
         this.doctor.onLoad().subscribe(() => {

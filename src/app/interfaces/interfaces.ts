@@ -153,3 +153,32 @@ export interface DoctorAppointmentSlot {
     timeFrom: Date,
     timeTo: Date,
 }
+
+export interface PayfastPaymentGatewayParamItem {
+    sku: string,
+    name: string,
+    price: number,
+    qty: number
+}
+
+export interface PayfastPaymentGatewayParams {
+    token: string,
+    currencyCode: string,
+    merchantId: string,
+    merchantName: string,
+    basketId: number,
+    txnamt: number,
+    orderDate: string,
+    successUrl: string,
+    failureUrl: string,
+    checkoutUrl: string,
+    formUrl: string,
+    txndesc: string,
+    procCode: string,
+    tranType: string,
+    customerMobileNo: string,
+    customerEmailAddress: string,
+    signature: string,
+    version: string,
+    items: PayfastPaymentGatewayParamItem[],
+}

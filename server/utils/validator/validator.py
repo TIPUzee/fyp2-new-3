@@ -727,11 +727,14 @@ class Validator:
             >>> p = Person()
             >>> p.m_date_time = 'Ali' # False
             >>> p.m_date_time = [1, 2, 3] # False
-            >>> p.m_date_time = '2021-10-10 12:00:00' # True
+            >>> p.m_date_time = '2021-10-10 12:00:00 AM' # True
         """
 
         def _(val) -> bool:
-            return bool(re.match(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$', val))
+            try:
+                return bool(re.match(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$', val))
+            except:
+                return False
 
         _.__custom_str_format__ = f'DateTime("YYYY-MM-DD HH:MM:SS")'
         return _
@@ -1111,7 +1114,7 @@ class Validator:
             ...         super().__init__()
             >>> p = Person()
             >>> p.m_date_time = datetime.now() # True
-            >>> p.m_date_time = '2021-10-10 12:00:00' # False
+            >>> p.m_date_time = '2021-10-10 12:00:00' # True
         """
 
         def _(val) -> bool:

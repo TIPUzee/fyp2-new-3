@@ -1,1 +1,1 @@
-from .appointment import Appointment, AppointmentCallProofVideo
+from .appointment import Appointment

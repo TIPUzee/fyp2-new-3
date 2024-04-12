@@ -1,5 +1,7 @@
 from typing import Any
 from datetime import datetime, timezone
+from urllib.parse import urlencode
+
 import pytz
 
 from werkzeug.datastructures import FileStorage
@@ -20,6 +22,20 @@ class Func:
     @staticmethod
     def convert_offset_naive_to_aware_datetime(dt: datetime):
         return pytz.utc.localize(dt)
+
+    @staticmethod
+    def get_defined_datetime_str(dt: datetime):
+        return dt.strftime('%Y-%m-%d %H:%M:%S')
+
+    @staticmethod
+    def encode_url_params(params: dict[str, Any]):
+        # For example, {'t': 'Bearer abc'} -> 't=Bearer%20abc'
+        return urlencode(params)
+
+    @staticmethod
+    def encode_url_param_val(param: Any):
+        # For example, {'t': 'Bearer abc'} -> 't=Bearer%20abc'
+        return urlencode({'t': param})[2:]
 
     @staticmethod
     def assign_uuid(obj):
