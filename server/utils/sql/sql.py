@@ -11,15 +11,22 @@ from ..env import Env
 
 class SQL:
     def __init__(self):
+        host = Env.get('DEV_MYSQL_HOST') if Env.get('PROD_MODE') else Env.get('PROD_MYSQL_HOST')
+        user = Env.get('DEV_MYSQL_USER') if Env.get('PROD_MODE') else Env.get('PROD_MYSQL_USER')
+        password = Env.get('DEV_MYSQL_PASSWORD') if Env.get('PROD_MODE') else Env.get('PROD_MYSQL_PASSWORD')
         try:
+            database = Env.get('DEV_MYSQL_DB') if Env.get('PROD_MODE') else Env.get('PROD_MYSQL_DB')
             self.connection = connector.connect(
-                host=Env.get('DEV_MYSQL_HOST') if Env.get('PROD_MODE') else Env.get('PROD_MYSQL_HOST'),
-                user=Env.get('DEV_MYSQL_USER') if Env.get('PROD_MODE') else Env.get('PROD_MYSQL_USER'),
-                password=Env.get('DEV_MYSQL_PASSWORD') if Env.get('PROD_MODE') else Env.get('PROD_MYSQL_PASSWORD'),
-                database=Env.get('DEV_MYSQL_DB') if Env.get('PROD_MODE') else Env.get('PROD_MYSQL_DB')
+                host=host,
+                user=user,
+                password=password,
+                database=database
             )
         except:
-            raise Exception('Error in connecting to MySQL database with details as host, user, password, database')
+            raise Exception(
+                f'Error in connecting to MySQL database with details as {host}, {user}, {password}, '
+                f'{database}'
+            )
         self.cursor: Optional[MySQLCursor] = None
 
     def execute(self, query: str, params: list = None) -> list[dict[str, Any]] | int:
