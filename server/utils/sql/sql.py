@@ -6,15 +6,16 @@ from mysql import connector
 from mysql.connector.cursor import MySQLCursor
 
 from ..funcs.funcs import Func
+from ..env import Env
 
 
 class SQL:
     def __init__(self):
         self.connection = connector.connect(
-            host='localhost',
-            user='root',
-            password='',
-            database='ai_disease_predictor'
+            host=Env.get('DEV_MYSQL_HOST') if Env.get('PROD_MODE') == '1' else Env.get('PROD_MYSQL_HOST'),
+            user=Env.get('DEV_MYSQL_USER') if Env.get('PROD_MODE') == '1' else Env.get('PROD_MYSQL_USER'),
+            password=Env.get('DEV_MYSQL_PASSWORD') if Env.get('PROD_MODE') == '1' else Env.get('PROD_MYSQL_PASSWORD'),
+            database=Env.get('DEV_MYSQL_DB') if Env.get('PROD_MODE') == '1' else Env.get('PROD_MYSQL_DB')
         )
         self.cursor: Optional[MySQLCursor] = None
 
