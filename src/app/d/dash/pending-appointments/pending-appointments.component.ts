@@ -24,6 +24,7 @@ import { FormFileInputComponent } from "../../../utils/components/form-file-inpu
 import { VideoExtensions } from "../../../constants/constants";
 import { DatetimePipe } from "../../../pipes/datetime.pipe";
 import { DobPipe } from "../../../pipes/dob.pipe";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 @Component({
     selector: 'app-pending-appointments',
@@ -118,7 +119,7 @@ export class PendingAppointmentsComponent implements AfterViewInit {
             }
             
             this.markAppointmentAsCompletedModal.close();
-            await this.allAppointments.loadFromServer({ id: [appointmentId] });
+            await this.allAppointments.load({ id: [appointmentId] });
         },
     }
     //
@@ -160,7 +161,7 @@ export class PendingAppointmentsComponent implements AfterViewInit {
             }
             
             this.appointmentDelayConfirmationModal.close();
-            await this.allAppointments.loadFromServer({ id: [data.appointmentId] });
+            await this.allAppointments.load({ id: [data.appointmentId] });
         }
     }
     //
@@ -195,11 +196,15 @@ export class PendingAppointmentsComponent implements AfterViewInit {
                 toast.success('Your meeting absence has been recorded');
             } else {
                 toast.error('Failed to mark appointment as doctor-details not joined');
-                console.error('Error occurred while sending request to /appointments/doctor-details-not-joined', data, res);
+                console.error(
+                    'Error occurred while sending request to /appointments/doctor-details-not-joined',
+                    data,
+                    res
+                );
             }
             
             this.doctorCouldNotJoinConfirmationModal.close();
-            await this.allAppointments.loadFromServer({ id: [data.appointmentId] });
+            await this.allAppointments.load({ id: [data.appointmentId] });
         }
     }
     //
@@ -292,7 +297,7 @@ export class PendingAppointmentsComponent implements AfterViewInit {
             
             this.patientDidntJoinForm.fg.reset();
             this.patientDidntJoinSubmitModal.close();
-            await this.allAppointments.loadFromServer({ id: [this.selectedAppointmentId] });
+            await this.allAppointments.load({ id: [this.selectedAppointmentId] });
         }
     }
     //
@@ -329,7 +334,7 @@ export class PendingAppointmentsComponent implements AfterViewInit {
             }
             
             this.cancelAppointmentConfirmationModal.close();
-            await this.allAppointments.loadFromServer({ id: [this.selectedAppointmentId] });
+            await this.allAppointments.load({ id: [this.selectedAppointmentId] });
         }
     }
     
@@ -341,15 +346,15 @@ export class PendingAppointmentsComponent implements AfterViewInit {
         private _fvs: FormValidatorsService,
         private http: HTTPService,
     ) {
+        this.allAppointments.change$.pipe(takeUntilDestroyed()).subscribe(() => {
+            this.appointments = this.allAppointments.list.filter((appointment) => appointment.status === 'PENDING');
+            this.html.initTailwindElements();
+        })
     }
     
     
     ngAfterViewInit(): void {
         this.appointments = this.allAppointments.list.filter((appointment) => appointment.status === 'PENDING');
-        this.allAppointments.change$.subscribe(() => {
-            this.appointments = this.allAppointments.list.filter((appointment) => appointment.status === 'PENDING');
-            this.html.initTailwindElements();
-        })
         this.html.initTailwindElements();
     }
     

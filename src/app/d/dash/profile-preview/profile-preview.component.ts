@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { DoctorDetailsComponent } from '../../../p/dash/doctor-details/doctor-details.component';
 import { DoctorProfileService } from "../../../services/doctor-profile.service";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 @Component({
     selector: 'app-profile-preview',
@@ -15,7 +16,7 @@ export class ProfilePreviewComponent {
     doctorId: number = -1;
     constructor(protected profile: DoctorProfileService) {
         this.doctorId = this.profile.details.id;
-        this.profile.change$.subscribe(() => {
+        this.profile.change$.pipe(takeUntilDestroyed()).subscribe(() => {
             this.doctorId = this.profile.details.id;
         })
     }

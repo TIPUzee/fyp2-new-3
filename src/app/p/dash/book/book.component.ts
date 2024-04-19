@@ -24,6 +24,7 @@ import { FormSubmitButtonComponent } from "../../../utils/components/form-submit
 import { FormTextareaComponent } from "../../../utils/components/form-textarea/form-textarea.component";
 import { FormErrorBoxComponent } from "../../../utils/components/form-error-box/form-error-box.component";
 import { CookieService } from "ngx-cookie-service";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 @Component({
     selector: 'app-book',
@@ -306,7 +307,7 @@ export class BookComponent implements AfterViewInit {
         private cookies: CookieService,
     ) {
         this.fetchFromUrlParams();
-        this.doctor.onLoad().subscribe(() => {
+        this.doctor.onLoad().pipe(takeUntilDestroyed()).subscribe(() => {
             this.analytics.load();
             this.slots.load();
         });
@@ -317,11 +318,6 @@ export class BookComponent implements AfterViewInit {
     
     ngAfterViewInit(): void {
         this.html.initTailwindElements();
-        this.scroller.setHistoryScrollRestoration('auto');
-        this.scroller.setOffset([300, 300]);
-        setTimeout(() => {
-            this.scroller.scrollToAnchor('symptomDescriptionInput');
-        }, 1500);
     }
     
     

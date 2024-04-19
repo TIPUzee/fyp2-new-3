@@ -26,6 +26,7 @@ import { agChartBackgroundConfig } from "../../../configs/agchart-options";
 import { Subject } from "rxjs";
 import { RatingStarsComponent } from "../../../utils/components/rating-stars/rating-stars.component";
 import { AppointmentDurationPipe } from "../../../pipes/appointment-duration.pipe";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 @Component({
     selector: 'app-doctor-details',
@@ -380,11 +381,11 @@ export class DoctorDetailsComponent implements AfterViewInit, OnChanges {
         private location: Location,
         private router: Router,
     ) {
-        this.doctor.onLoad().subscribe(async () => {
+        this.doctor.onLoad().pipe(takeUntilDestroyed()).subscribe(async () => {
             this.analytics.load();
             this.slots.load();
         })
-        this.analytics.onLoad().subscribe(async () => {
+        this.analytics.onLoad().pipe(takeUntilDestroyed()).subscribe(async () => {
             this.reviewRatingChart.refreshData();
             this.nbOfAppointmentsChart.refreshData();
         })

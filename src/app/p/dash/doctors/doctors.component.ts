@@ -8,6 +8,7 @@ import { LanguageService } from "../../../services/language.service";
 import { Doctor, Language, SpecializationCategory } from "../../../interfaces/interfaces";
 import { AllDoctorsService } from "../../../services/all-doctors.service";
 import { SpecializationCategoriesService } from "../../../services/specialization-categories.service";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 @Component({
     selector: 'app-doctors',
@@ -45,17 +46,17 @@ export class DoctorsComponent implements AfterViewInit {
     ) {
         // languages
         this.languages = allLanguages.languages;
-        allLanguages.change$.subscribe(() => {
+        allLanguages.change$.pipe(takeUntilDestroyed()).subscribe(() => {
             this.languages = allLanguages.languages;
         })
         // doctors
         this.doctors.list = allDoctors.list;
-        allDoctors.change$.subscribe(() => {
+        allDoctors.change$.pipe(takeUntilDestroyed()).subscribe(() => {
             this.doctors.list = allDoctors.list;
         })
         // specializations
         this.specializations = allSpecializations.list;
-        allSpecializations.change$.subscribe(() => {
+        allSpecializations.change$.pipe(takeUntilDestroyed()).subscribe(() => {
             this.specializations = allSpecializations.list;
         })
     }

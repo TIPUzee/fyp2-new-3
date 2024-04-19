@@ -29,7 +29,8 @@ class SQL:
             )
         self.cursor: Optional[MySQLCursor] = None
 
-    def execute(self, query: str, params: list = None) -> list[dict[str, Any]] | int:
+    def execute(self, query: str, params: list = None, _fetch_as_dict: bool = True) -> (
+            list[dict[str, Any]] | tuple[dict[str, int], list[list[Any]]] | int):
         if not params:
             params = []
         self.cursor = self.connection.cursor()
@@ -54,7 +55,10 @@ class SQL:
         self.cursor.execute(query, new_params)
 
         if 'select' in query.lower():
-            return Func.SqlHelpers.fetch_all_as_dicts(self.cursor)
+            if _fetch_as_dict:
+                return Func.SqlHelpers.fetch_all_as_dicts(self.cursor)
+            else:
+                return Func.SqlHelpers.fetch_all_as_array(self.cursor)
         else:
             if 'insert' in query.lower():
                 return self.cursor.lastrowid

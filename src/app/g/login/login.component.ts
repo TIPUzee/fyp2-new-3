@@ -60,6 +60,13 @@ export class LoginComponent implements AfterViewInit {
                 return;
             }
             
+            if (res.accountSuspended) {
+                toast.error('Your account has been suspended', {
+                    description: 'Please contact support for more information.'
+                });
+                return;
+            }
+            
             if (res.invalidCredentials) {
                 toast.error('Wrong email or password');
                 return;

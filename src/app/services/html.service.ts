@@ -99,10 +99,8 @@ export class HtmlService {
     
     createDataTable(
         dataTableContainer: HTMLDivElement,
-        dataTableSearch: HTMLInputElement,
         columns: Array<Object>,
         rows: Array<Array<any>> | undefined = undefined,
-        searchButtonsContainer: HTMLDivElement | undefined,
     ): any {
         // Inits
         let anime_id = this._datatable_unique_anime_id_count;
@@ -139,37 +137,6 @@ export class HtmlService {
         });
         
         // Set Search Event
-        let searchEvent = () => {
-            let searchBtns = searchButtonsContainer?.querySelectorAll('.searchBtn') as NodeListOf<HTMLDivElement>;
-            let searchColumns: Array<string> = [];
-            searchBtns?.forEach((val, _, __) => {
-                if (val.classList.contains('active') && val.hasAttribute('data-column-field')) {
-                    searchColumns.push(val.getAttribute('data-column-field')!);
-                }
-            });
-            dataTableInstance.search(dataTableSearch.value, searchColumns.length > 0 ? searchColumns : null);
-        };
-        dataTableSearch.addEventListener('keyup', () => {
-            if (lastSearchQuery != dataTableSearch.value) {
-                lastSearchQuery = dataTableSearch.value;
-                searchEvent();
-            }
-        });
-        
-        dataTableSearch.addEventListener('search', () => {
-            if (lastSearchQuery != dataTableSearch.value) {
-                lastSearchQuery = dataTableSearch.value;
-                searchEvent();
-            }
-        });
-        let searchBtns = searchButtonsContainer?.querySelectorAll('.searchBtn') as NodeListOf<HTMLDivElement>;
-        searchBtns?.forEach((val, _, __) => {
-            val.addEventListener('click', () => {
-                if (dataTableSearch.value != '') {
-                    searchEvent();
-                }
-            });
-        });
         
         // Set Previous Selected Row Bg Colored
         (
@@ -183,6 +150,11 @@ export class HtmlService {
         });
         
         return dataTableInstance;
+    }
+    
+    
+    dataTableSearch(dataTableInstance: any, searchQuery: string, searchColumns: string[]) {
+        dataTableInstance.search(searchQuery, searchColumns);
     }
     
     
@@ -253,7 +225,7 @@ export class HtmlService {
     
     
     initTailwindElements(): void {
-        function reInit () {
+        function reInit() {
             initTE({
                 Datatable,
                 Input,
@@ -464,6 +436,6 @@ export class HtmlService {
     updateDataTable(dataTableInstance: any, rows: Array<Array<any>>): void {
         setTimeout(() => {
             dataTableInstance.update({ rows }, { loading: false });
-        }, 2000);
+        }, 0);
     }
 }

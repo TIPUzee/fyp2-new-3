@@ -2,6 +2,7 @@ import { ElementRef, Injectable } from '@angular/core';
 import { env } from '../../env/env';
 import { FormGroup } from "@angular/forms";
 import { CookieService } from "ngx-cookie-service";
+
 // import { Location } from '@angular/common';
 
 @Injectable({
@@ -26,6 +27,32 @@ export class UtilFuncService {
         const parts = inputDate.split('-');
         
         return `${ parts[2] }-${ parts[1] }-${ parts[0] }`;
+    }
+    
+    
+    convertDateToDefinedDateFormat(date: Date): string {
+        // e.g. 2021-09-01
+        const year = date.getFullYear();
+        const month = (
+            date.getMonth() + 1
+        ).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        return `${ year }-${ month }-${ day }`;
+    }
+    
+    
+    convertDateToDefinedDateTimeFormat(date: Date): string {
+        // e.g. 2021-09-01 08:00 PM
+        return `${ this.convertDateToDefinedDateFormat(date) } ${ this.convertDateToDefinedTimeFormat(date) }`;
+    }
+    
+    
+    convertDateToDefinedTimeFormat(date: Date): string {
+        // e.g. 08:00:00 or 13:00:00
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        const seconds = date.getSeconds().toString().padStart(2, '0');
+        return `${ hours }:${ minutes }:${ seconds }`;
     }
     
     
@@ -58,33 +85,19 @@ export class UtilFuncService {
         return this.convertDateFormat(formattedDate);
     }
     
+    
     convertLocalDateToUTCDate(date: Date): Date {
         return new Date(date.getTime() + date.getTimezoneOffset() * 60000);
     }
     
-    convertDateToDefinedDateFormat(date: Date): string {
-        // e.g. 2021-09-01
-        const year = date.getFullYear();
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const day = date.getDate().toString().padStart(2, '0');
-        return `${ year }-${ month }-${ day }`;
-    }
-    
-    convertDateToDefinedTimeFormat(date: Date): string {
-        // e.g. 08:00:00 or 13:00:00
-        const hours = date.getHours().toString().padStart(2, '0');
-        const minutes = date.getMinutes().toString().padStart(2, '0');
-        const seconds = date.getSeconds().toString().padStart(2, '0');
-        return `${ hours }:${ minutes }:${ seconds }`;
-    }
-    
-    convertDateToDefinedDateTimeFormat(date: Date): string {
-        // e.g. 2021-09-01 08:00 PM
-        return `${ this.convertDateToDefinedDateFormat(date) } ${ this.convertDateToDefinedTimeFormat(date) }`;
-    }
     
     convertToDMTDateObject(dateTime: string): Date {
         return new Date(dateTime);
+    }
+    
+    
+    floorValue(val: number): number {
+        return Math.floor(val);
     }
     
     
@@ -192,6 +205,7 @@ export class UtilFuncService {
         this.cookie.set('userType', userType, 365, '/', 'localhost');
     }
     
+    
     toNumber(value: any): number {
         if (typeof value === 'number') {
             return value;
@@ -287,6 +301,5 @@ export class UtilFuncService {
             throw new Error('API url must start with /');
         }
     }
-    
     
 }

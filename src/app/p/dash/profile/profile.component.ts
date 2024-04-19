@@ -14,6 +14,7 @@ import { FormSubmitButtonComponent } from "../../../utils/components/form-submit
 import { HTTPService } from "../../../services/http.service";
 import { PatientProfileUpdateResponse } from "../../../interfaces/api-response-interfaces";
 import { toast } from "ngx-sonner";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 @Component({
     selector: 'app-profile',
@@ -229,22 +230,22 @@ export class ProfileComponent implements AfterViewInit {
         },
         sensitiveFieldsChangeEvent: () => {
             // if email changes
-            this.profileUpdateForm.fg.controls.email.statusChanges.subscribe(() => {
+            this.profileUpdateForm.fg.controls.email.statusChanges.pipe(takeUntilDestroyed()).subscribe(() => {
                 this.profileUpdateForm.fg.controls.oldPassword.updateValueAndValidity();
                 this.profileUpdateForm.fg.controls.oldPassword.markAsTouched();
             })
             // if whatsapp number changes
-            this.profileUpdateForm.fg.controls.whatsappNumber.statusChanges.subscribe(() => {
+            this.profileUpdateForm.fg.controls.whatsappNumber.statusChanges.pipe(takeUntilDestroyed()).subscribe(() => {
                 this.profileUpdateForm.fg.controls.oldPassword.updateValueAndValidity();
                 this.profileUpdateForm.fg.controls.oldPassword.markAsTouched();
             })
             // if new password changes
-            this.profileUpdateForm.fg.controls.password.statusChanges.subscribe(() => {
+            this.profileUpdateForm.fg.controls.password.statusChanges.pipe(takeUntilDestroyed()).subscribe(() => {
                 this.profileUpdateForm.fg.controls.oldPassword.updateValueAndValidity();
                 this.profileUpdateForm.fg.controls.oldPassword.markAsTouched();
             })
             // if confirm password changes
-            this.profileUpdateForm.fg.controls.confirmPassword.statusChanges.subscribe(() => {
+            this.profileUpdateForm.fg.controls.confirmPassword.statusChanges.pipe(takeUntilDestroyed()).subscribe(() => {
                 this.profileUpdateForm.fg.controls.oldPassword.updateValueAndValidity();
                 this.profileUpdateForm.fg.controls.oldPassword.markAsTouched();
                 this.profileUpdateForm.fg.controls.password.updateValueAndValidity();
@@ -263,7 +264,7 @@ export class ProfileComponent implements AfterViewInit {
         private http: HTTPService,
     ) {
         this.profileUpdateForm.refreshValues();
-        this.profile.change$.subscribe(() => {
+        this.profile.change$.pipe(takeUntilDestroyed()).subscribe(() => {
             this.profileUpdateForm.refreshValues();
         })
         this.profileUpdateForm.sensitiveFieldsChangeEvent();

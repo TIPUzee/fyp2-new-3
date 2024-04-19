@@ -1,0 +1,161 @@
+<div class="main workspace !pt-4 !pb-1">
+   <div class="w-full mb-0 mt-0">
+      <div class="text-xl text-center mb-2 text-black text-opacity-60">Appointments</div>
+   </div>
+   <div class="bg-white rounded-lg px-5 pb-3 pt-5 shadow-xl relative">
+      <div class="">
+         <div class="relative flex w-full flex-col justify-stretch">
+            <div class="flex mb-2">
+               <input
+                  id="datatable-search-input"
+                  #dataTableSearch
+                  (input)="mainClass.searched.search(dataTableSearch.value)"
+                  (keyup)="mainClass.searched.search(dataTableSearch.value)"
+                  [value]="mainClass.searched.query"
+                  aria-describedby="button-addon1"
+                  aria-label="Search"
+                  placeholder="Search"
+                  type="search"
+                  class="w-full relative m-0 -mr-0.5 block min-w-0 flex-auto rounded border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary-400 focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary-400"
+               />
+               <div class="ms-2">
+                  <form-refresh-button
+                     (click)="load({ force: true })"
+                     [disabled]="mainClass.loading"
+                     [loading]="mainClass.loading"
+                  ></form-refresh-button>
+               </div>
+            </div>
+            <div>
+               <div #searchButtonsContainer class="flex gap-x-2 overflow-x-auto pb-1">
+                  <ng-container *ngFor="let column of columns; let i = index">
+                     <ng-container *ngIf="column.field">
+                        <div>
+                           <div
+                              #searchFieldSelectorContainer
+                              (click)="mainClass.searched.selectKey(column.field);"
+                              [attr.data-column-field]="column['field']"
+                              [ngClass]="{'active': mainClass.searched.list.includes(column.field)}"
+                              class="searchBtn whitespace-nowrap [&.active]:bg-dark [&.active]:text-primary-100 relative px-4 pb-1 pt-1.5 border border-dark text-dark text-opacity-70 hover:text-opacity-90 text-sm rounded cursor-pointer"
+                           >
+                              {{ column['label'] }}
+                           </div>
+                        </div>
+                     </ng-container>
+                  </ng-container>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div
+         id="dataTableContainer"
+         #dataTableContainer
+         data-te-fixed-header="true"
+         class="[&_tr:hover]:bg-primary-300 [&_tr:hover]:bg-opacity-30 [&_tr]:transition-colors [&_tr]:duration-200 whitespace-nowrap scroll-auto [&_*]:scroll-auto max-w-full [&_tbody_tr]:opacity-0 [&>[data-te-datatable-inner-ref]]:max-h-[calc(100vh-255px)] [&_td]:py-2"
+      >
+      </div>
+   </div>
+</div>
+
+<a
+   data-te-ripple-color="light"
+   data-te-ripple-init
+   data-te-target="#possibleActions"
+   data-te-toggle="modal"
+   type="button"
+   class="hidden cursor-pointer shake-top text-center w-fit rounded bg-blue-500 text-neutral-50 shadow-[0_4px_9px_-4px_rgba(51,45,45,0.7)] hover:bg-blue-600 hover:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] focus:bg-blue-800 focus:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] active:bg-blue-700 active:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal transition duration-150 ease-in-out focus:outline-none focus:ring-0"
+>
+   Possible Actions Hidden Button
+</a>
+
+<!-- Modal - Possible Actions -->
+<app-modal #possibleActionsModal>
+   <div title>
+      Possible Actions
+      <span class="text-dark text-opacity-70 font-normal text-base">
+         ID: {{ selectedObj.id }}
+      </span>
+   </div>
+   <div body>
+      <!-- Form -->
+      <div [ngClass]="{'hidden': selectedObj.status !== 'PAT_NOT_JOINED_REQ'}">
+         <form [formGroup]="selectedObjectForm.fg">
+            <div class="font-semibold">Patient Did Not Join Meeting</div>
+            <div class="mb-3">
+               The doctor has submitted a request regarding the patient's absence from the scheduled appointment. The
+               doctor claims to have made two
+               attempts to contact the patient via WhatsApp, with uploaded recordings as proof. Please review the
+               provided recordings and decide whether to
+               approve or reject the doctor's request.
+            </div>
+            <div class="mb-3 flex flex-col gap-y-3 text-center">
+               <ng-container *ngIf="proofVideos.loading">
+                  <div>Loading...</div>
+               </ng-container>
+               <ng-container *ngFor="let video of proofVideos.list; let videoIndex = index;">
+                  <a
+                     (click)="proofVideos.selectIndex(videoIndex); watchReviewAttemptVideoModal.open()"
+                     data-te-ripple-color="light"
+                     data-te-ripple-init
+                     data-te-target="#watchReviewAttemptVideoModal"
+                     data-te-toggle="modal"
+                     type="button"
+                     class="btn btn-primary-100"
+                  >
+                     Review Attempt {{ videoIndex + 1 }} Recording
+                  </a>
+               </ng-container>
+            </div>
+            <div class="flex justify-end">
+               <form-submit-button
+                  (click)="selectedObjectForm.reject()"
+                  [disabled]="selectedObjectForm.loading"
+                  [waiting]="selectedObjectForm.loading"
+                  btnStyle="btn-red btn-shadow"
+                  label="Reject"
+               ></form-submit-button>
+            </div>
+         </form>
+      </div>
+
+      <div [ngClass]="{ 'hidden': selectedObj.status === 'PAT_NOT_JOINED_REQ' }">
+         ...
+      </div>
+   </div>
+   <div bottom class="flex flex-col gap-y-1">
+      <a
+         [queryParams]="{ id: selectedObj.doctorId }" [routerLink]="['../', 'd']"
+         class="btn btn-primary-100 text-blue-700 w-full text-center"
+      >
+         View Doctor
+      </a>
+      <a
+         [queryParams]="{ id: selectedObj.doctorId }" [routerLink]="['../', 'p']"
+         class="btn btn-primary-100 text-blue-700 w-full text-center"
+      >
+         View Patient
+      </a>
+   </div>
+</app-modal>
+<!-- Modal - Possible Actions -->
+
+<!-- Watch Doctor Join Meeting Attempt Video - Modal -->
+<app-modal #watchReviewAttemptVideoModal (onClose)="proofVideos.playVideo=false">
+   <div title>
+      Review Attempt {{ proofVideos.selectedVideoIndex + 1 }} Recording
+   </div>
+   <div body>
+      <div class="text-center">
+         <ng-container *ngIf="proofVideos.list.length && proofVideos.playVideo">
+            <video
+               autoplay
+               controls
+               (canplay)="proofVideos.canplay()"
+            >
+               <source [src]="proofVideos.list[proofVideos.selectedVideoIndex]">
+            </video>
+         </ng-container>
+      </div>
+   </div>
+</app-modal>
+<!-- Watch Doctor Join Meeting Attempt Video - Modal -->

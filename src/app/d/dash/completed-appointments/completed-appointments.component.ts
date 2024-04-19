@@ -12,6 +12,7 @@ import { AppointmentDurationPipe } from "../../../pipes/appointment-duration.pip
 import { DatetimePipe } from "../../../pipes/datetime.pipe";
 import { FormSubmitButtonComponent } from "../../../utils/components/form-submit-button/form-submit-button.component";
 import { DobPipe } from "../../../pipes/dob.pipe";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 @Component({
     selector: 'app-completed-appointments',
@@ -41,7 +42,7 @@ export class CompletedAppointmentsComponent implements AfterViewInit {
     
     ngAfterViewInit(): void {
         this.appointments = this.allAppointments.list.filter(appointment => appointment.status === 'COMPLETED');
-        this.allAppointments.change$.subscribe(() => {
+        this.allAppointments.change$.pipe(takeUntilDestroyed()).subscribe(() => {
             this.appointments = this.allAppointments.list.filter(appointment => appointment.status === 'COMPLETED');
         })
         

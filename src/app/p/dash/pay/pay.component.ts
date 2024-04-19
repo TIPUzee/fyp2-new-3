@@ -288,4 +288,30 @@ export class PayComponent implements AfterViewInit {
         }
     }
     
+    
+    makePayfastRequest() {
+        const url = 'https://ipg1.apps.net.pk/Ecommerce/api/Transaction/GetAccessToken';
+        const params = {
+            MERCHANT_ID: 19893,
+            SECURED_KEY: 'KwF0fQpYjGrgad0JRTLb89eGq',
+            TXNAMT: 1050,
+            BASKET_ID: 12
+        };
+        
+        this._http.post<any>(url, params).subscribe(
+            (response) => {
+                console.log('Response:', response);
+                const token = response.ACCESS_TOKEN;
+                const generatedDateTime = response.GENERATED_DATE_TIME;
+                // Handle response data as needed
+                console.info('Token:', token);
+                console.info('Generated Date Time:', generatedDateTime);
+            },
+            (error) => {
+                console.error('Error:', error);
+                // Handle error
+            }
+        );
+    }
+    
 }

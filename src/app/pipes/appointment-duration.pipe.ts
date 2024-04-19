@@ -40,7 +40,6 @@ export class AppointmentDurationPipe implements PipeTransform {
     
     // Helper method to format time in 12-hour format with AM/PM
     private formatTime(date: Date): string {
-        console.info("date", date);
         let hours = date.getHours();
         const minutes = date.getMinutes();
         const ampm = hours >= 12 ? 'PM' : 'AM';

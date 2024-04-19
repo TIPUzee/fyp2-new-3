@@ -15,8 +15,7 @@
                      <a
                         class="transition-all duration-300 bg-layer absolute left-0 w-full whitespace-nowrap overflow-clip text-ellipsis align-super pt-[6px] pb-[8px] px-3 !text-transparent pointer-events-none text-opacity-70 hover:text-opacity-90 bg-opacity-[0.15] rounded-lg"
                      >.
-                     </a
-                     >
+                     </a>
                   </div>
                   <a
                      [routerLinkActiveOptions]="{ exact: true }"
@@ -24,60 +23,42 @@
                      routerLink="./"
                      class="relative whitespace-nowrap overflow-clip text-ellipsis align-super pt-[6px] pb-[8px] px-3 text-white text-opacity-70 hover:text-opacity-90 bg-opacity-[0.15] rounded-lg transition-colors duration-300"
                   >Analytics
-                  </a
-                  >
-                  <a
-                     [routerLinkActive]="['active', 'text-opacity-90']"
-                     routerLink="pats"
-                     class="relative whitespace-nowrap overflow-clip text-ellipsis align-super pt-[6px] pb-[8px] px-3 text-white text-opacity-70 hover:text-opacity-90 bg-opacity-[0.15] rounded-lg transition-colors duration-300"
-                  >Patients
-                  </a
-                  >
-                  <a
-                     [routerLinkActive]="['active', 'text-opacity-90']"
-                     routerLink="docs"
-                     class="relative whitespace-nowrap overflow-clip text-ellipsis align-super pt-[6px] pb-[8px] px-3 text-white text-opacity-70 hover:text-opacity-90 bg-opacity-[0.15] rounded-lg transition-colors duration-300"
-                  >All Doctors
-                  </a
-                  >
-                  <a
-                     [routerLinkActive]="['active', 'text-opacity-90']"
-                     routerLink="docs-approval-req"
-                     class="relative whitespace-nowrap overflow-clip text-ellipsis align-super pt-[6px] pb-[8px] px-3 text-white text-opacity-70 hover:text-opacity-90 bg-opacity-[0.15] rounded-lg transition-colors duration-300"
-                  >
-                     <div class="relative w-fit">
-                        Pending Doctor Actions
-                        <span class="flicker-3 absolute top-[-2px] right-[-10px] w-[11px] aspect-square rounded-full bg-blue-600"></span>
-                     </div>
                   </a>
                   <a
                      [routerLinkActive]="['active', 'text-opacity-90']"
-                     routerLink="all-appo"
+                     routerLink="p"
                      class="relative whitespace-nowrap overflow-clip text-ellipsis align-super pt-[6px] pb-[8px] px-3 text-white text-opacity-70 hover:text-opacity-90 bg-opacity-[0.15] rounded-lg transition-colors duration-300"
-                  >All Appointments
-                  </a
                   >
+                     Patients
+                  </a>
                   <a
                      [routerLinkActive]="['active', 'text-opacity-90']"
-                     routerLink="comp-appo"
+                     routerLink="d"
                      class="relative whitespace-nowrap overflow-clip text-ellipsis align-super pt-[6px] pb-[8px] px-3 text-white text-opacity-70 hover:text-opacity-90 bg-opacity-[0.15] rounded-lg transition-colors duration-300"
-                  >Completed Appointments
-                  </a
                   >
+                     Doctors
+                  </a>
+                  <a
+                     [routerLinkActive]="['active', 'text-opacity-90']"
+                     routerLink="appo"
+                     class="relative whitespace-nowrap overflow-clip text-ellipsis align-super pt-[6px] pb-[8px] px-3 text-white text-opacity-70 hover:text-opacity-90 bg-opacity-[0.15] rounded-lg transition-colors duration-300"
+                  >
+                     Appointments
+                  </a>
                   <a
                      [routerLinkActive]="['active', 'text-opacity-90']"
                      routerLink="active-appo"
                      class="relative whitespace-nowrap overflow-clip text-ellipsis align-super pt-[6px] pb-[8px] px-3 text-white text-opacity-70 hover:text-opacity-90 bg-opacity-[0.15] rounded-lg transition-colors duration-300"
-                  >Active Appointments
-                  </a
                   >
+                     Active Appointments
+                  </a>
                   <a
                      [routerLinkActive]="['active', 'text-opacity-90']"
                      routerLink="fail-appo"
                      class="relative whitespace-nowrap overflow-clip text-ellipsis align-super pt-[6px] pb-[8px] px-3 text-white text-opacity-70 hover:text-opacity-90 bg-opacity-[0.15] rounded-lg transition-colors duration-300"
-                  >Failed Appointments
-                  </a
                   >
+                     Failed Appointments
+                  </a>
                   <a
                      [routerLinkActive]="['active', 'text-opacity-90']"
                      routerLink="appo-actions"
@@ -93,15 +74,13 @@
                      routerLink="appo-pays"
                      class="relative whitespace-nowrap overflow-clip text-ellipsis align-super pt-[6px] pb-[8px] px-3 text-white text-opacity-70 hover:text-opacity-90 bg-opacity-[0.15] rounded-lg transition-colors duration-300"
                   >Appointment Payments
-                  </a
-                  >
+                  </a>
                   <a
                      [routerLinkActive]="['active', 'text-opacity-90']"
                      routerLink="doc-w-trxs"
                      class="relative whitespace-nowrap overflow-clip text-ellipsis align-super pt-[6px] pb-[8px] px-3 text-white text-opacity-70 hover:text-opacity-90 bg-opacity-[0.15] rounded-lg transition-colors duration-300"
                   >Doctor Withdrawal Transactions
-                  </a
-                  >
+                  </a>
                   <a
                      [routerLinkActive]="['active', 'text-opacity-90']"
                      routerLink="doc-w-req"
@@ -117,8 +96,7 @@
                      routerLink="pat-w-trxs"
                      class="relative whitespace-nowrap overflow-clip text-ellipsis align-super pt-[6px] pb-[8px] px-3 text-white text-opacity-70 hover:text-opacity-90 bg-opacity-[0.15] rounded-lg transition-colors duration-300"
                   >Patient Withdrawal Transactions
-                  </a
-                  >
+                  </a>
                   <a
                      [routerLinkActive]="['active', 'text-opacity-90']"
                      routerLink="pat-w-req"
@@ -147,16 +125,9 @@
                      [routerLinkActive]="['active', 'text-opacity-90']"
                      routerLink="lang"
                      class="relative whitespace-nowrap overflow-clip text-ellipsis align-super pt-[6px] pb-[8px] px-3 text-white text-opacity-70 hover:text-opacity-90 bg-opacity-[0.15] rounded-lg transition-colors duration-300"
-                  >Languages
-                  </a
                   >
-                  <a
-                     [routerLinkActive]="['active', 'text-opacity-90']"
-                     routerLink="/a/sjdflksjdf"
-                     class="relative whitespace-nowrap overflow-clip text-ellipsis align-super pt-[6px] pb-[8px] px-3 text-white text-opacity-70 hover:text-opacity-90 bg-opacity-[0.15] rounded-lg transition-colors duration-300"
-                  >Page Not Found
-                  </a
-                  >
+                     Languages
+                  </a>
                </div>
             </div>
             <div class="px-3 py-4">

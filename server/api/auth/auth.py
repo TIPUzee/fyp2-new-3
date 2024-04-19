@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from utils import App, Func, Validator as Vld
 from src import Patient, Doctor, MixedUserUtil, Admin, AvailabilityDuration
+from utils.request.response import Response
 
 
 @App.api_route('/auth/regis/s1', 'POST', access_control='All')
@@ -123,6 +124,7 @@ def _(user: Patient | Doctor, code: int):
 def _(user: None, email: str, password: str):
     request_response = {
         'invalid_credentials': False,
+        'account_suspended': False,
         'login_successful': False,
         'token': False,
         'user_type': False,
@@ -136,6 +138,10 @@ def _(user: None, email: str, password: str):
         if not u.exists():
             continue
         u.load()
+        if isinstance(u, Patient) or isinstance(u, Doctor):
+            if u.m_status == u.AccountStatusEnum.ACCOUNT_SUSPENDED:
+                request_response['account_suspended'] = True
+                return App.Res.ok(**request_response)
         request_response['token'] = user_class.Login.gen_token(u)
         request_response['user_type'] = user_class.__name__.lower()[0]
         request_response['login_successful'] = True
@@ -150,6 +156,7 @@ def _(user: None):
     request_response = {
         'invalid_login': False,
         'user_type': 'g',
+        'account_suspended': False,
     }
 
     for user_class in [Patient, Doctor, Admin]:
@@ -163,6 +170,12 @@ def _(user: None):
             u = user_class.Login.get_user(payload)
             if u is None:
                 continue
+        except Response as e:
+            data, status = e.generate_response()
+            data = data['data']
+            if data['account_suspended']:
+                request_response['account_suspended'] = True
+                return App.Res.ok(**request_response)
         except:
             continue
         request_response['user_type'] = user_class.__name__.lower()[0]

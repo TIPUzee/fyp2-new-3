@@ -85,7 +85,7 @@ class Payfast(SQLEntity, Vld.PropertyTypeValidatorEntity):
 
         response = requests.post(self.CurrentDetails.token_api, data=url_post_params)
         payload = response.json()
-        print('transaction details', self.CurrentDetails.token_api)
+        print('patient_refund_transaction details', self.CurrentDetails.token_api)
         print('url_post_params', url_post_params)
         print('response', payload)
         token = payload.get('ACCESS_TOKEN', False)

@@ -4,12 +4,11 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowLeft, faCloudArrowUp } from '@fortawesome/free-solid-svg-icons';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { DoctorsComponent } from '../doctors/doctors.component';
 
 @Component({
     selector: 'app-languages',
     standalone: true,
-    imports: [FontAwesomeModule, RouterLink, CommonModule, RouterOutlet, RouterLinkActive, DoctorsComponent],
+    imports: [FontAwesomeModule, RouterLink, CommonModule, RouterOutlet, RouterLinkActive],
     templateUrl: './languages.component.html',
     styleUrl: './languages.component.scss',
 })
@@ -89,11 +88,9 @@ export class LanguagesComponent implements AfterViewInit {
             [2, 'English', 43],
         ];
         this.dataTableInstance = this.htmlService.createDataTable(
-            this.dataTableContainer.nativeElement,
             this.dataTableSearch.nativeElement,
             this.columns,
             undefined,
-            this.searchBtnsContainer.nativeElement,
         );
         
         (

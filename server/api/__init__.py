@@ -8,3 +8,4 @@ from .doctor import _
 from .test import _
 from .public_utils import _
 from .appointment import _
+from .patient_refund__transaction import _

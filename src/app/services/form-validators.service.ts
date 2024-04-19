@@ -447,4 +447,21 @@ export class FormValidatorsService {
     }
     
     
+    phoneNumberFormat(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const value = control.value;
+            
+            if (!value) {
+                return null;
+            }
+            
+            const phoneNumberRegex = /^\+[1-9]\d{1,14}$/;
+            
+            if (phoneNumberRegex.test(value)) {
+                return null;
+            } else {
+                return { phoneNumberFormat: true };
+            }
+        };
+    }
 }

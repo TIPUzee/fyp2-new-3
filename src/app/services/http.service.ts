@@ -5,6 +5,9 @@ import { Router } from "@angular/router";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { toast } from "ngx-sonner";
 import { AuthVerifyLoginsResponse, GetTempTokenResponse } from "../interfaces/api-response-interfaces";
+import { env } from "../../env/env";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { take } from "rxjs";
 
 interface JsonResponse {
     data: Record<string, any> | null;
@@ -17,14 +20,18 @@ interface JsonResponse {
 })
 export class HTTPService {
     public tempLoginToken: string = '';
+    takeUntilDestroyed: any;
     
     
     constructor(
         private utils: UtilFuncService,
         public cookies: CookieService,
         private router: Router,
-        private http: HttpClient
-    ) {
+        private http: HttpClient,
+    )
+    {
+        this.takeUntilDestroyed = takeUntilDestroyed();
+        console.info('Env', env.prod ? 'prod' : 'dev');
         this.loadTempLoginToken();
     }
     
@@ -103,14 +110,14 @@ export class HTTPService {
                 }
             });
             
-            this.http[_method](processedUrl, formData, { headers: _headers }).subscribe(
+            this.http[_method](processedUrl, formData, { headers: _headers }).pipe(take(1)).subscribe(
                 (res: Record<any, any>) => {
                     resolve(this.utils.transformJsonSnakeCaseToCamelCaseDeep(res['data']));
                 },
                 (err) => {
                     console.error(err.status, 'status', err);
                     if (err.status === 0) {
-                        this.handleNetworkError(resolve);
+                        this.handleNetworkError(resolve, null);
                         resolve(false);
                     } else if (err.status === 405) {
                         toast.error('An error occurred while processing your request.', {
@@ -153,26 +160,25 @@ export class HTTPService {
         return new Promise((resolve) => {
             let retried = 0;
             
+            
             let json = this.utils.transformJsonCamelCaseToSnakeCaseDeep(jsonData);
             
             const processedUrl = this.processUrl(url, isOwnServerApiCall, urlParams);
-            const xhr = this.createXhrObject(method, processedUrl, headers);
-            
-            xhr.onload = () => this.handleLoad(xhr, isOwnServerApiCall, resolve);
-            xhr.onerror = () => {
-                if (retried >= retryCount) {
-                    this.handleNetworkError(resolve);
-                    return;
-                }
-                send();
-            }
-            
             let send = () => {
                 retried++;
-                this.createXhrObject(method, processedUrl, headers);
+                let xhr = this.createXhrObject(method, processedUrl, headers);
                 xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.onload = () => this.handleLoad(xhr, isOwnServerApiCall, resolve);
+                xhr.onerror = (e) => {
+                    if (retried >= retryCount) {
+                        this.handleNetworkError(resolve, e.target);
+                        return;
+                    }
+                    send();
+                }
                 xhr.send(JSON.stringify(json));
             }
+            
             send();
         });
     }
@@ -247,6 +253,7 @@ export class HTTPService {
     ) {
         if (this.methodNotAllowedError(xhr) ||
             await this.unauthorizedAccessError(xhr, isOwnServerApiCall, resolve)) {
+            resolve(false);
             return;
         }
         
@@ -271,7 +278,8 @@ export class HTTPService {
     }
     
     
-    private handleNetworkError(resolve: any) {
+    private handleNetworkError(resolve: any, err: EventTarget | null) {
+        
         toast.error(
             'Network error. Please try again later!'
         );
@@ -313,8 +321,6 @@ export class HTTPService {
             moduleNotAllowed: boolean,
             accountSuspended: boolean,
         }
-        
-        console.error('Unauthorized access', xhr.responseURL, xhr.response);
         
         if (res.userDoesNotExist) {
             toast.error(

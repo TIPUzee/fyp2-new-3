@@ -135,6 +135,7 @@ class Doctor(SQLEntity, Vld.PropertyTypeValidatorEntity):
                         slot_index_to_remove.append(_i)
                         slots_to_remove.append(_slot)
 
+            slot_index_to_remove.reverse()
             for _i in slot_index_to_remove:
                 available_slots.pop(_i)
         return available_slots

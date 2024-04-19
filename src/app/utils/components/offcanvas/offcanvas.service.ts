@@ -6,13 +6,6 @@ import { Injectable } from '@angular/core';
 export class OffcanvasService {
     anyOffcanvasOpened: number = 0;
 
-    async AdminCompletedAppointmentsCompo(): Promise<any> {
-        let a;
-        await import('../../../a/dash/completed-appointments/completed-appointments.component').then(x => {
-            a = x.CompletedAppointmentsComponent;
-        });
-        return a;
-    }
 
     async AdminPatientsCompo(): Promise<any> {
         let a;
@@ -38,14 +31,6 @@ export class OffcanvasService {
         return a;
     }
 
-    async AdminAllAppointmentCompo(): Promise<any> {
-        let a;
-        await import('../../../a/dash/all-appointments/all-appointments.component').then(x => {
-            a = x.AllAppointmentsComponent;
-        });
-        return a;
-    }
-
     async AdminDoctorWithdrawalRequestsCompo(): Promise<any> {
         let a;
         await import('../../../a/dash/doctor-drawal-requests/doctor-drawal-requests.component').then(x => {
@@ -58,14 +43,6 @@ export class OffcanvasService {
         let a;
         await import('../../../a/dash/doctor-drawal-transactions/doctor-drawal-transactions.component').then(x => {
             a = x.DoctorDrawalTransactionsComponent;
-        });
-        return a;
-    }
-
-    async AdminDoctorsCompo(): Promise<any> {
-        let a;
-        await import('../../../a/dash/doctors/doctors.component').then(x => {
-            a = x.DoctorsComponent;
         });
         return a;
     }

@@ -27,6 +27,7 @@
     "ag-charts-angular": "^9.2.0",
     "animejs": "^3.2.2",
     "apexcharts": "^3.48.0",
+    "firebase": "^10.11.0",
     "i": "^0.3.7",
     "ng-in-viewport": "^16.1.0",
     "ngx-cookie-service": "^17.1.0",

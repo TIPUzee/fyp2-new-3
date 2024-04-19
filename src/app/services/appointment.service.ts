@@ -20,14 +20,14 @@ export class AppointmentService {
         private http: HTTPService,
         private utils: UtilFuncService
     ) {
-        this.loadFromServer();
+        this.load();
     }
     
     
-    public async loadFromServer(
-        { id, status } : { id?: number[], status?: AppointmentStatus[] } = {}
-    ) {
-
+    public async load(
+        { id, status }: { id?: number[], status?: AppointmentStatus[] } = {}
+    ): Promise<boolean> {
+        
         let data = {
             id,
             status,
@@ -38,11 +38,11 @@ export class AppointmentService {
             method: 'POST',
             jsonData: data,
         }) as LoadAppointmentsResponse | false;
-
+        
         if (res === false) {
             toast.error('Failed to load some data');
             console.error('Error occurred while sending request to /appointments', data, res);
-            return;
+            return false;
         }
         
         for (const appointment of res.appointments) {
@@ -75,6 +75,8 @@ export class AppointmentService {
                 doctor: doctor ? {
                     id: doctor.id,
                     name: doctor.name,
+                    profilePicFilename: this.utils.makeOwnServerUrl(this.utils.makeApiUrl('/file/' +
+                        doctor.profilePicFilename)),
                 } : null,
                 patient: patient ? {
                     id: patient.id,
@@ -88,5 +90,6 @@ export class AppointmentService {
             });
         }
         this.change.next();
+        return true;
     }
 }

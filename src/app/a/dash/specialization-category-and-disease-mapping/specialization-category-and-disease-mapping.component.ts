@@ -4,12 +4,11 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowLeft, faCloudArrowUp } from '@fortawesome/free-solid-svg-icons';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { DoctorsComponent } from '../doctors/doctors.component';
 
 @Component({
     selector: 'app-specialization-category-and-disease-mapping',
     standalone: true,
-    imports: [FontAwesomeModule, RouterLink, CommonModule, RouterOutlet, RouterLinkActive, DoctorsComponent],
+    imports: [FontAwesomeModule, RouterLink, CommonModule, RouterOutlet, RouterLinkActive],
     templateUrl: './specialization-category-and-disease-mapping.component.html',
     styleUrl: './specialization-category-and-disease-mapping.component.scss',
 })
@@ -90,11 +89,9 @@ export class SpecializationCategoryAndDiseaseMappingComponent implements AfterVi
             [2, 'Dermatology', 'Dengue'],
         ];
         this.dataTableInstance = this.htmlService.createDataTable(
-            this.dataTableContainer.nativeElement,
             this.dataTableSearch.nativeElement,
             this.columns,
             undefined,
-            this.searchBtnsContainer.nativeElement,
         );
         
         (

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { ModalService } from './modal.service';
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 @Component({
     selector: 'app-modal',
@@ -19,6 +20,7 @@ export class ModalComponent implements AfterViewInit {
     currentOpeningId: number | null = null;
     noCurrentlyOpenedModals!: number;
     @Input({ required: false }) wrapperClass: string = '';
+    @Output() onClose: EventEmitter<void> = new EventEmitter<void>();
     
     
     constructor(private el: ElementRef, public modalService: ModalService) {
@@ -26,7 +28,7 @@ export class ModalComponent implements AfterViewInit {
         this.modalId = this.modalService.generateId();
         // init subjects
         this.noCurrentlyOpenedModals = this.modalService._noCurrentlyOpenedModal;
-        this.modalService.noCurrentlyOpenedModalSubject.subscribe(count => {
+        this.modalService.noCurrentlyOpenedModalSubject.pipe(takeUntilDestroyed()).subscribe(count => {
             this.noCurrentlyOpenedModals = count;
         });
     }
@@ -40,6 +42,7 @@ export class ModalComponent implements AfterViewInit {
     
     public close(): void {
         this.closer.nativeElement.click();
+        this.raiseCloseEvent();
     }
     
     
@@ -59,4 +62,9 @@ export class ModalComponent implements AfterViewInit {
         this.currentOpeningId = this.modalService.generateOpeningId();
         this.opener.nativeElement.click();
     }
+    
+    raiseCloseEvent(): void {
+        this.onClose.emit();
+    }
+    
 }

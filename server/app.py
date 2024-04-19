@@ -5,6 +5,8 @@ App.enable_cors()
 
 from api import _ # noqa
 
+app = App.App  # For WSGI
+
 if __name__ == '__main__':
     print('Starting app - AI-Disease Predictor - __main__')
     print('Current Mode:', 'Production' if Env.get('PROD_MODE') else 'Development')

@@ -176,17 +176,17 @@ export const routes: Routes = [
                         data: { animation: 'home' },
                     },
                     {
-                        path: 'pats',
+                        path: 'p',
                         loadComponent: () => import('./a/dash/patients/patients.component').then(x => x.PatientsComponent),
-                        data: { animation: 'patients' },
+                        data: { animation: 'p' },
                     },
                     {
-                        path: 'docs',
-                        loadComponent: () => import('./a/dash/doctors/doctors.component').then(x => x.DoctorsComponent),
-                        data: { animation: 'doctors' },
+                        path: 'd',
+                        loadComponent: () => import('./a/dash/all-doctors/all-doctors.component').then(x => x.AllDoctorsComponent),
+                        data: { animation: 'd' },
                         children: [
                             {
-                                path: 'profile',
+                                path: 'p',
                                 loadComponent: () => import('./p/dash/doctor-details/doctor-details.component').then(x => x.DoctorDetailsComponent),
                                 data: { animation: 'doctor-details-profile' },
                             },
@@ -206,15 +206,9 @@ export const routes: Routes = [
                         ],
                     },
                     {
-                        path: 'all-appo',
-                        loadComponent: () => import('./a/dash/all-appointments/all-appointments.component').then(x => x.AllAppointmentsComponent),
+                        path: 'appo',
+                        loadComponent: () => import('./a/dash/appointments/appointments.component').then(x => x.AppointmentsComponent),
                         data: { animation: 'all-appointments' },
-                    },
-                    {
-                        path: 'comp-appo',
-                        loadComponent: () => import('./a/dash/completed-appointments/completed-appointments.component').then(
-                            x => x.CompletedAppointmentsComponent),
-                        data: { animation: 'completed-appointments' },
                     },
                     {
                         path: 'fail-appo',

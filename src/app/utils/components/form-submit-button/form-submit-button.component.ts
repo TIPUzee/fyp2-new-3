@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, ViewChild } from '@angular/core';
 import { NgClass } from "@angular/common";
 
 @Component({
@@ -29,4 +29,5 @@ export class FormSubmitButtonComponent implements OnInit {
     ngOnInit() {
         this.disabled = this.disableOnStart;
     }
+    
 }

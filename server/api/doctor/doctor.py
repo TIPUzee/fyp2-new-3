@@ -3,7 +3,7 @@ from datetime import timedelta, datetime
 from utils import App, SavedFile, Validator as Vld, Func, UploadedFiles, SavedFilesZip
 from src import (
     Appointment, Doctor, AvailabilityDuration, SpecializationCategory, MixedUserUtil,
-    DoctorLanguage, DoctorExperience, ApprovalDocument, Language,
+    DoctorLanguage, DoctorExperience, ApprovalDocument, Language, Admin
 )
 
 
@@ -535,17 +535,102 @@ def _(user: None, doctor_id: int) -> None:
     access_control='All'
 )
 def _(user: None, doctor_id: int) -> None:
+    import time
+    time.sleep(3)
     request_response = {
         'doctor_not_found':  False,
+        'doctor_not_active': False,
         'appointment_slots': False,
     }
 
     d = Doctor()
     d.turn_off_validation()
     d.m_id = doctor_id
-    if not d.load(['m_max_meeting_duration']):
+    if not d.load(['m_max_meeting_duration', 'm_active_for_appointments']):
         request_response['doctor_not_found'] = True
         return App.Res.client_error(**request_response)
 
+    if not d.m_active_for_appointments:
+        request_response['doctor_not_active'] = True
+        return App.Res.client_error(**request_response)
+
     request_response['appointment_slots'] = d.get_appointment_slots()
+    return App.Res.ok(**request_response)
+
+
+@App.api_route('/a/doctors', 'GET', access_control=[Admin.Login])
+def _(user: Admin):
+    return get_doctors(user)
+
+
+@App.api_route(
+    '/a/doctor/<id>', path_params_pre_conversion={'id': int}, path_params_validators={'id': Vld.Int()},
+    method='GET', access_control=[Admin.Login]
+)
+def _(user: Admin, id: int):
+    return get_doctors(user, id)
+
+
+def get_doctors(user: Admin, id: int = None):
+    import time
+    time.sleep(0.5)
+    request_response = {
+        'doctors': []
+    }
+    d = Doctor()
+    if id:
+        d.m_id = id
+    request_response['doctors'] = d.select(select_cols='All')
+    return App.Res.ok(**request_response)
+
+
+@App.api_route('/a/doctor', 'PUT', access_control=[Admin.Login])
+@App.json_inputs('id', 'email', 'password', 'status')
+def _(user: Admin, id, email: str, password, status):
+    request_response = {
+        'email_already_exists': False,
+        'doctor_not_found':    False,
+        'doctor_updated':      False
+    }
+
+    d = Doctor()
+    d.m_id = id
+    if not d.load(select_cols=['m_email', 'm_status']):
+        request_response['doctor_not_found'] = True
+        return App.Res.client_error(**request_response)
+
+    if MixedUserUtil.email_exists(email) and email.lower() != d.m_email.lower():
+        request_response['email_already_exists'] = True
+        return App.Res.client_error(**request_response)
+
+    d.m_email = email
+    d.m_password = password
+    if d.m_status != status:
+        d.m_status = status
+        d.m_status_change_time = Func.get_current_time()
+
+    d.update()
+    d.commit()
+
+    request_response['doctor_updated'] = True
+    return App.Res.ok(**request_response)
+
+
+@App.api_route('/a/doctor/<id>/documents', path_params_pre_conversion={'id': int},
+               path_params_validators={'id': Vld.Int()}, method='GET', access_control=[Admin.Login])
+def _(user: Admin, id: int):
+    request_response = {
+            'doctor_not_found': False,
+            'docs':            [],
+    }
+
+    ad = ApprovalDocument()
+    ad.m_doctor_id = id
+    docs = ad.select(select_cols=['m_filename'])
+
+    if not docs:
+        request_response['doctor_not_found'] = True
+        return App.Res.client_error(**request_response)
+
+    request_response['docs'] = [doc['m_filename'] for doc in docs]
     return App.Res.ok(**request_response)

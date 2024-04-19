@@ -105,6 +105,7 @@ export interface Appointment {
     doctor: null | {
         id: number,
         name: string,
+        profilePicFilename: string,
     },
     patient: null | {
         id: number,
@@ -112,6 +113,16 @@ export interface Appointment {
         whatsappNumber: string,
         dob: Date,
     }
+}
+
+export interface AppointmentWithSlots extends Appointment {
+    slots: {
+        status: 'LOADING' | 'NOT_FOUND' | 'ERROR' | 'FOUND' | 'DOC_NOT_ACTIVE',
+        list: DoctorAppointmentSlot[][][],
+        selectedWeekIndex: number,
+        selectedDayIndex: number,
+        selectedSlotIndex: number,
+    },
 }
 
 export interface DoctorReviews {
@@ -181,4 +192,21 @@ export interface PayfastPaymentGatewayParams {
     signature: string,
     version: string,
     items: PayfastPaymentGatewayParamItem[],
+}
+
+export type PatientRefundTransactionRequestStatus = 'REQUESTED' | 'REJECTED' | 'COMPLETED';
+
+export interface PatientRefundTransactionRequest {
+    amount: number,
+    id: number,
+    patientId: number,
+    receiverEpNb: string,
+    receiverEpUsername: string,
+    rejectionReason: string,
+    requestTime: Date,
+    senderEpNb: string,
+    senderEpUsername: string,
+    status: PatientRefundTransactionRequestStatus,
+    trxId: string,
+    trxTime: Date | null
 }

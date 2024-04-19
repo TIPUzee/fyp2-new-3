@@ -35,6 +35,7 @@ import { DoctorProfileUpdateResponse } from "../../../interfaces/api-response-in
 import { SonnerPreviewComponent } from "../../../utils/components/sonner-preview/sonner-preview.component";
 import { toast } from 'ngx-sonner';
 import { DoctorAccountStatus } from "../../../interfaces/interfaces";
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
     selector: 'app-profile',
@@ -59,6 +60,7 @@ export class ProfileComponent implements AfterViewInit {
     // State variables
     specCatOptions!: FormSelectOption[];
     accountStatus: DoctorAccountStatus = 'NEW_ACCOUNT';
+    takeUntilDestroyed: any;
     //
     // HTML Elements
     @ViewChild('dobInput') dobInput!: ElementRef<HTMLDivElement>;
@@ -208,6 +210,7 @@ export class ProfileComponent implements AfterViewInit {
                     vl.required,
                     vl.minLength(10),
                     vl.maxLength(15),
+                    this._fvs.phoneNumberFormat(),
                 ]),
                 vl.composeAsync([
                     this._fvs.whatsappNumberMustNotExist(() => [this.profile.details.whatsappNumber])
@@ -368,6 +371,7 @@ export class ProfileComponent implements AfterViewInit {
                 required: 'Whatsapp Number is required',
                 minlength: 'Whatsapp Number must be at least 10 characters long',
                 maxlength: 'Whatsapp Number must be at most 15 characters long',
+                phoneNumberFormat: 'Invalid phone number format, e.g., +923001234567',
                 whatsappNumberMustNotExist: 'Whatsapp Number has already taken',
             },
             email: {
@@ -688,22 +692,24 @@ export class ProfileComponent implements AfterViewInit {
         protected http: HTTPService,
         protected specCategories: SpecializationCategoriesService,
     ) {
+        this.takeUntilDestroyed = takeUntilDestroyed();
+        
     }
     
     
     ngAfterViewInit(): void {
         this.clearAllExperiences();
         this.profileUpdateForm.refreshValues();
-        this.profile.change$.subscribe(async () => {
+        this.profile.change$.pipe(this.takeUntilDestroyed).subscribe(async () => {
             this.profileUpdateForm.refreshValues();
             this.html.initTailwindElements();
         })
         
         this.initSpecializationCategoryOptions();
-        this.specCategories.change$.subscribe(() => {
+        this.specCategories.change$.pipe(this.takeUntilDestroyed).subscribe(() => {
             this.initSpecializationCategoryOptions();
         })
-        
+
         this.removeExperienceFromProfile(0);
         
         this.initProfileAvailabilityDurationsDateChangeEvent();
@@ -760,17 +766,17 @@ export class ProfileComponent implements AfterViewInit {
     
     
     initDynamicImageFileComponents() {
-        this.profileUpdateForm.fg.controls.coverPic.valueChanges.subscribe((file) => {
-            if (file) {
-                this.coverPicImage?.loadLocalImageFile(file);
+        this.profileUpdateForm.fg.controls.coverPic.valueChanges.pipe(this.takeUntilDestroyed).subscribe(() => {
+            if (this.profileUpdateForm.fg.controls.coverPic.value) {
+                this.coverPicImage?.loadLocalImageFile(this.profileUpdateForm.fg.controls.coverPic.value);
             } else {
                 this.coverPicImage?.loadURLImageFile(this.utils.makeOwnServerUrl('/api/file/' +
                     this.profile.details.coverPicFilename));
             }
         })
-        this.profileUpdateForm.fg.controls.profilePic.valueChanges.subscribe((file) => {
-            if (file) {
-                this.profilePicImage?.loadLocalImageFile(file);
+        this.profileUpdateForm.fg.controls.profilePic.valueChanges.pipe(this.takeUntilDestroyed).pipe(this.takeUntilDestroyed).subscribe(() => {
+            if (this.profileUpdateForm.fg.controls.profilePic.value) {
+                this.profilePicImage?.loadLocalImageFile(this.profileUpdateForm.fg.controls.profilePic.value);
             } else {
                 this.profilePicImage?.loadURLImageFile(this.utils.makeOwnServerUrl('/api/file/' +
                     this.profile.details.profilePicFilename));
@@ -781,7 +787,7 @@ export class ProfileComponent implements AfterViewInit {
     
     initProfileAvailabilityDurationsDateChangeEvent() {
         this.profileUpdateForm.fg.controls.availabilityDurations.controls.forEach((ad: any) => {
-            ad.controls.from.valueChanges.subscribe(() => {
+            ad.controls.from.valueChanges.pipe(this.takeUntilDestroyed).subscribe(() => {
                 ad.controls.to.updateValueAndValidity();
                 if (ad.controls.to.untouched) {
                     ad.controls.to.markAsTouched();
@@ -794,10 +800,10 @@ export class ProfileComponent implements AfterViewInit {
     initProfileExperiencesDateChangeEvent() {
         for (let i = 0; i < this.profileUpdateForm.fg.controls.experiences.controls.length; i++) {
             let exp = this.profileUpdateForm.fg.controls.experiences.controls[i];
-            exp.controls.dateFrom.valueChanges.subscribe(() => {
+            exp.controls.dateFrom.valueChanges.pipe(this.takeUntilDestroyed).subscribe(() => {
                 exp.controls.dateTo.updateValueAndValidity();
                 if (exp.controls.dateTo.untouched) {
-                exp.controls.dateTo.markAsTouched();
+                    exp.controls.dateTo.markAsTouched();
                 }
             });
         }
@@ -830,7 +836,7 @@ export class ProfileComponent implements AfterViewInit {
                 this.profile.details.profilePicFilename));
         }
         _();
-        this.profile.change$.subscribe(() => {
+        this.profile.change$.pipe(this.takeUntilDestroyed).subscribe(() => {
             _();
         })
     }

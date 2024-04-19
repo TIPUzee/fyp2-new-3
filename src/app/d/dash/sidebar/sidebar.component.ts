@@ -7,6 +7,7 @@ import { DoctorProfileService } from '../../../services/doctor-profile.service';
 import { ModalComponent } from "../../../utils/components/modal/modal.component";
 import { FormSubmitButtonComponent } from "../../../utils/components/form-submit-button/form-submit-button.component";
 import { UtilFuncService } from "../../../services/util-func.service";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 @Component({
     selector: 'app-sidebar',
@@ -41,7 +42,7 @@ export class SidebarComponent implements AfterViewInit {
         if (this.name) {
             this.nameFirstLetter = this.name[0].toUpperCase();
         }
-        this.profile.change$.subscribe(() => {
+        this.profile.change$.pipe(takeUntilDestroyed()).subscribe(() => {
             this.name = this.profile.details.name;
             if (this.name) {
                 this.nameFirstLetter = this.name[0].toUpperCase();

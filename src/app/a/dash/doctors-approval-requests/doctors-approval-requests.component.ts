@@ -6,6 +6,7 @@ import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } fr
 import { CommonModule } from '@angular/common';
 import { DoctorDetailsComponent } from '../../../p/dash/doctor-details/doctor-details.component';
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 @Component({
     selector: 'app-doctors-approval-requests',
@@ -86,7 +87,7 @@ export class DoctorsApprovalRequestsComponent implements AfterViewInit {
     
     
     constructor(private htmlService: HtmlService, public router: Router, public activatedRoute: ActivatedRoute) {
-        activatedRoute.queryParams.subscribe((val: Object) => {
+        activatedRoute.queryParams.pipe(takeUntilDestroyed()).subscribe((val: Object) => {
             if (val.hasOwnProperty('spec')) {
                 this.isShowingFilteredList = true;
             }
@@ -174,11 +175,9 @@ export class DoctorsApprovalRequestsComponent implements AfterViewInit {
             ],
         ];
         this.dataTableInstance = this.htmlService.createDataTable(
-            this.dataTableContainer.nativeElement,
             this.dataTableSearch.nativeElement,
             this.columns,
             undefined,
-            this.searchBtnsContainer.nativeElement,
         );
         
         (

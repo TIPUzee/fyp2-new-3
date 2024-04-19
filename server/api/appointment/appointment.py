@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
-
-from utils import App, Func, UploadedFiles, SavedFile, Env
+from utils import App, Func, UploadedFiles, SavedFile, Env, Validator as Vld
 from src import (
     Doctor, Patient, Appointment, Calc, SystemDetails,
-    Payfast,
+    Payfast, Admin
 )
 
 
@@ -171,7 +169,7 @@ def _(user: Doctor, appointment_id):
     p.m_id = a.m_patient_id
     p.load(select_cols=['m_refundable_amount'])
 
-    a.m_delay_count_by_doc += 1
+    a.m_delay_count_by_doc = 1
     a.m_status = 'DOC_REQUESTED_DELAY'
     a.m_status_change_time = Func.get_current_time()
 
@@ -188,7 +186,9 @@ def _(user: Doctor, appointment_id):
         doc_delayed=True
     )
 
-    a.update()
+    a.m_refunded_amount = p.m_refundable_amount
+
+    a.update(set_increment_cols=['m_refunded_amount', 'm_delay_count_by_doc'])
     system.update(set_increment_cols=['m_balance'])
     user.update(set_increment_cols=['m_wallet_amount'])
     p.update(set_increment_cols=['m_refundable_amount'])
@@ -239,8 +239,9 @@ def _(user: Doctor, appointment_id):
     s.m_balance = Calc.appointment_system_fee(a.m_paid_amount, a.StatusEnum.DOC_NOT_JOINED)
     p.m_refundable_amount = Calc.appointment_patient_refunds(a.m_paid_amount, a.StatusEnum.DOC_NOT_JOINED)
     user.m_wallet_amount = Calc.appointment_doctor_cutoffs(a.m_paid_amount, a.StatusEnum.DOC_NOT_JOINED)
+    a.m_refunded_amount = p.m_refundable_amount
 
-    a.update()
+    a.update(set_increment_cols=['m_refunded_amount'])
     s.update(set_increment_cols=['m_balance'])
     p.update(set_increment_cols=['m_refundable_amount'])
     user.update(set_increment_cols=['m_wallet_amount'])
@@ -389,18 +390,17 @@ def _(user: Doctor | Patient, appointment_id):
     s = SystemDetails()
     p = Patient()
     p.m_id = a.m_patient_id
-    p.load(select_cols=['m_refundable_amount'])
 
     d = Doctor()
     d.m_id = a.m_doctor_id
-    d.load(select_cols=['m_wallet_amount'])
 
     s.m_balance = Calc.appointment_system_fee(a.m_paid_amount, new_status)
     p.m_refundable_amount = Calc.appointment_patient_refunds(a.m_paid_amount, new_status)
     d.m_wallet_amount = (Calc.appointment_doctor_cutoffs(a.m_paid_amount, new_status) +
                          Calc.appointment_doctor_fee(a.m_paid_amount, new_status))
+    a.m_refunded_amount = p.m_refundable_amount
 
-    a.update()
+    a.update(set_increment_cols=['m_refunded_amount'])
     s.update(set_increment_cols=['m_balance'])
     p.update(set_increment_cols=['m_refundable_amount'])
     d.update(set_increment_cols=['m_wallet_amount'])
@@ -611,26 +611,26 @@ def _(user: Patient):
         return App.Res.client_error(**request_response)
 
     payfast_param = {
-        'token':         payfast_token,
-        'currency_code': 'PKR',
-        'merchant_id':   Env.get('PAYFAST_MERCHANT_ID'),
-        'merchant_name': 'UAT Demo Merchant',
-        'basket_id':     payfast.m_id,
-        'txnamt':        payfast.m_amount,
-        'order_date':    Func.get_defined_datetime_str(token_gen_time)[:10],
-        'checkout_url':  f'http://{Env.get("SERVER_IP_WITH_PORT")}/api/appointment/book/payfast-notification'
-                         # f'?t={Func.encode_url_param_val(payfast_login_auth_token)}'
-                         ,
-        'form_url':      payfast.CurrentDetails.redirection_api,
-        'txndesc':       'A description goes here',
-        'proc_code':     '00',
-        'tran_type':     'ECOMM_PURCHASE',
-        'customer_mobile_no': user.m_whatsapp_number,
+        'token':                  payfast_token,
+        'currency_code':          'PKR',
+        'merchant_id':            Env.get('PAYFAST_MERCHANT_ID'),
+        'merchant_name':          'UAT Demo Merchant',
+        'basket_id':              payfast.m_id,
+        'txnamt':                 payfast.m_amount,
+        'order_date':             Func.get_defined_datetime_str(token_gen_time)[:10],
+        'checkout_url':           f'http://{Env.get("SERVER_IP_WITH_PORT")}/api/appointment/book/payfast-notification'
+        # f'?t={Func.encode_url_param_val(payfast_login_auth_token)}'
+        ,
+        'form_url':               payfast.CurrentDetails.redirection_api,
+        'txndesc':                'A description goes here',
+        'proc_code':              '00',
+        'tran_type':              'ECOMM_PURCHASE',
+        'customer_mobile_no':     user.m_whatsapp_number,
         'customer_email_address': user.m_email,
-        'signature':    '1234567890',
-        'version':      '1.0.0',
-        'customer_name': user.m_name,
-        'items':         [{'sku': 'Appointment', 'name': d.m_name, 'price': payfast.m_amount, 'qty': 1}],
+        'signature':              '1234567890',
+        'version':                '1.0.0',
+        'customer_name':          user.m_name,
+        'items':                  [{'sku': 'Appointment', 'name': d.m_name, 'price': payfast.m_amount, 'qty': 1}],
     }
 
     request_response['payfast_params'] = payfast_param
@@ -642,3 +642,250 @@ def _(user: Patient):
 @App.api_route('/appointment/book/payfast-notification', method='GET')
 def _(user: None):
     return App.Res.ok()
+
+
+@App.api_route(
+    '/appointment/<appointment_id>/reschedule', path_params_pre_conversion={'appointment_id': int},
+    method='PUT', access_control=[Patient.Login]
+)
+@App.json_inputs(
+    'time_from', 'time_to'
+)
+def _(user: Patient, appointment_id: int, time_from: str, time_to: str) -> None:
+    print('time_from', time_from, 'time_to', time_to)
+
+    request_response = {
+        'appointment_not_exists': False,
+        'not_reschedulable':      False,
+        'doctor_not_exists':      False,
+        'doctor_not_active':      False,
+        'max_reschedule_reached': False,
+        'invalid_slot':           False,
+        'slot_clash':             False,
+        'rescheduled':            False,
+    }
+
+    a = Appointment()
+    a.m_id = appointment_id
+    a.m_patient_id = user.m_id
+    if not a.load(select_cols=['m_status', 'm_doctor_id', 'm_reschedule_count_by_pat']):
+        request_response['appointment_not_exists'] = True
+        return App.Res.client_error(**request_response)
+
+    if a.m_status != a.StatusEnum.PENDING and a.m_status != a.StatusEnum.DOC_REQUESTED_DELAY and \
+            a.m_status != a.StatusEnum.SLOT_CLASH:
+        request_response['not_reschedulable'] = True
+        return App.Res.client_error(**request_response)
+
+    if a.m_status == a.StatusEnum.PENDING and a.m_reschedule_count_by_pat >= 2:
+        request_response['max_reschedule_reached'] = True
+        return App.Res.client_error(**request_response)
+
+    d = Doctor()
+    d.m_id = a.m_doctor_id
+    if not d.load(select_cols=['m_max_meeting_duration', 'm_active_for_appointments']):
+        request_response['doctor_not_exists'] = True
+        return App.Res.client_error(**request_response)
+
+    if not d.m_active_for_appointments:
+        request_response['doctor_not_active'] = True
+        return App.Res.client_error(**request_response)
+
+    _a = Appointment()  # for validation
+    _a.m_time_from = time_from
+    _a.m_time_to = time_to
+
+    if not d.is_valid_slot(_a.m_time_from, _a.m_time_to):
+        request_response['invalid_slot'] = True
+        return App.Res.client_error(**request_response)
+
+    if d.any_slot_clash(_a.m_time_from, _a.m_time_to):
+        request_response['slot_clash'] = True
+        return App.Res.client_error(**request_response)
+
+    appoint_prev_status = a.m_status
+    a.m_time_from = time_from
+    a.m_time_to = time_to
+    a.m_status = a.StatusEnum.PENDING
+    a.m_reschedule_count_by_pat = 0
+    a.m_status_change_time = Func.get_current_time()
+
+    if appoint_prev_status == a.StatusEnum.PENDING:
+        a.m_reschedule_count_by_pat = 1
+
+    a.update(set_increment_cols=['m_reschedule_count_by_pat'])
+    a.commit()
+
+    request_response['rescheduled'] = True
+    return App.Res.ok(**request_response)
+
+
+@App.api_route(
+    '/appointment/<appointment_id>/review',
+    path_params_pre_conversion={'appointment_id': int},
+    method='PUT', access_control=[Patient.Login]
+)
+@App.json_inputs(
+    'rating', 'review'
+)
+def _(user: Patient, appointment_id: int, rating: int, review: str) -> None:
+    request_response = {
+        'appointment_not_exists': False,
+        'already_reviewed':       False,
+        'cannot_review':          False,
+        'reviewed_successfully':  False,
+    }
+
+    a = Appointment()
+    a.m_id = appointment_id
+    a.m_patient_id = user.m_id
+    if not a.load(select_cols=['m_status', 'm_doctor_id', 'm_patient_review']):
+        request_response['appointment_not_exists'] = True
+        return App.Res.client_error(**request_response)
+
+    if a.m_status != a.StatusEnum.COMPLETED:
+        request_response['cannot_review'] = True
+        return App.Res.client_error(**request_response)
+
+    if a.m_patient_review:
+        request_response['already_reviewed'] = True
+        return App.Res.client_error(**request_response)
+
+    a.m_patient_review = review
+    a.m_rating = rating
+
+    print('a.m_rating', a.m_rating)
+
+    a.update()
+    a.commit()
+
+    request_response['reviewed_successfully'] = True
+    return App.Res.ok(**request_response)
+
+
+@App.api_route('/appointments/transactions', method='GET', access_control=[Patient.Login])
+def _(user: Patient) -> None:
+    import time
+    time.sleep(3)
+    request_response = {
+        'transactions': [],
+    }
+
+    a = Appointment()
+    a.m_patient_id = user.m_id
+    a_json = a.select(
+        select_cols=[
+            'm_id', 'm_doctor_id', 'm_time_from', 'm_time_to', 'm_payment_time', 'm_status', 'm_paid_amount',
+            'm_refunded_amount'
+        ], _order_by='m_time_from', _desc=True
+    )
+
+    d = Doctor()
+    for i in a_json:
+        d.reset()
+        d.m_id = i['m_doctor_id']
+        d_json = d.select(select_cols=['m_name'], _limit=1)
+        if d_json:
+            request_response['transactions'].append(
+                {
+                    **i,
+                    'doctor': {
+                        'm_id': i['m_doctor_id'],
+                        **d_json[0],
+                    },
+                }
+            )
+        else:
+            request_response['transactions'].append(i)
+
+    return App.Res.ok(**request_response)
+
+
+@App.api_route('/a/appointments', 'GET', access_control=[Admin.Login])
+def _(user: Admin):
+    return get_appointments(user)
+
+
+@App.api_route(
+    '/a/appointment/<id>', path_params_pre_conversion={'id': int}, path_params_validators={'id': Vld.Int()},
+    method='GET', access_control=[Admin.Login]
+)
+def _(user: Admin, id: int):
+    return get_appointments(user, id)
+
+
+def get_appointments(user: Admin, id: int = None):
+    request_response = {
+        'appointments': []
+    }
+    a = Appointment()
+    if id:
+        a.m_id = id
+    request_response['appointments'] = a.select(select_cols='All')
+    return App.Res.ok(**request_response)
+
+
+@App.api_route(
+    '/a/appointment/<id>/patient-not-joined/reject', path_params_pre_conversion={'id': int}, path_params_validators={'id': Vld.Int()},
+    method='PUT', access_control=[Admin.Login]
+)
+def _(user: Admin, id: int):
+    request_response = {
+        'appointment_not_exists':              False,
+        'status_not_changeable':               False,
+        'already_marked_as_patient_not_joined_reject': False,
+        'marked_as_patient_not_joined_reject': False,
+    }
+
+    a = Appointment()
+    a.turn_off_validation()
+    a.m_id = id
+    if not a.load(select_cols=['m_status']):
+        request_response['appointment_not_exists'] = True
+        return App.Res.client_error(**request_response)
+
+    if a.m_status != a.StatusEnum.PAT_NOT_JOINED_REQ:
+        request_response['status_not_changeable'] = True
+        if a.m_status == a.StatusEnum.PAT_NOT_JOINED_REJ:
+            request_response['already_marked_as_patient_not_joined_reject'] = True
+        return App.Res.client_error(**request_response)
+
+    a.m_status = a.StatusEnum.PAT_NOT_JOINED_REJ
+    a.m_status_change_time = Func.get_current_time()
+
+    a.update()
+    a.commit()
+
+    request_response['marked_as_patient_not_joined_reject'] = True
+    return App.Res.ok(**request_response)
+
+
+@App.api_route(
+    '/a/appointment/<id>/patient-not-joined/attempt-videos', path_params_pre_conversion={'id': int},
+    path_params_validators={'id': Vld.Int()},
+    method='GET', access_control=[Admin.Login]
+)
+def _(user: Admin, id: int):
+    request_response = {
+        'appointment_not_exists': False,
+        'status_not_suitable': False,
+        'videos': [],
+    }
+
+    a = Appointment()
+    a.turn_off_validation()
+    a.m_id = id
+    if not a.load(select_cols=['m_status']):
+        request_response['appointment_not_exists'] = True
+        return App.Res.client_error(**request_response)
+
+    if a.m_status != a.StatusEnum.PAT_NOT_JOINED_REQ:
+        request_response['status_not_suitable'] = True
+        return App.Res.client_error(**request_response)
+
+    cv = Appointment.CallProofVideo()
+    cv.m_appointment_id = id
+    videos = cv.select(select_cols=['m_filename'])
+
+    request_response['videos'] = [i['m_filename'] for i in videos]
+    return App.Res.ok(**request_response)

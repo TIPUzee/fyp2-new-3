@@ -1461,7 +1461,7 @@ class Validator:
         def turn_off_validation_once(self):
             self._validation_turned_off_once_ = True
 
-        def get_validation_on_status(self):
+        def get_validation_off_status(self):
             return self._validation_turned_off_
 
         def set_validator_errors_type(

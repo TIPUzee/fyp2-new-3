@@ -95,6 +95,19 @@ class Func:
                 result.append(curr_obj)
             return result
 
+        @staticmethod
+        def fetch_all_as_array(cursor) -> tuple[dict[str, int], list[list[Any]]]:
+            # (mapping, data)
+            # For example, ({'id': 0, 'name': 1}, [[1, 'John'], [2, 'Doe']])
+            cols_names = cursor.column_names
+            result = []
+            for row in cursor.fetchall():
+                curr_obj = []
+                for i, _ in enumerate(cols_names):
+                    curr_obj.append(row[i])
+                result.append(curr_obj)
+            return {cols_names[i]: i for i in range(len(cols_names))}, result
+
     class FileHelpers:
         @staticmethod
         def nb_of_lines(file_path: list[FileStorage]) -> int:

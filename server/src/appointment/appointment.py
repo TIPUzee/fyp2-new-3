@@ -75,6 +75,11 @@ class _BookClientLogin(AccessControlledEntity):
     @staticmethod
     def parse_token(raw_token: str) -> str | False:
         from utils import Secret
+        if isinstance(raw_token, str):
+            if ' ' not in raw_token:
+                return False
+        else:
+            return False
         payload = Secret.decode_token(raw_token.split(' ')[1])
         if payload and payload['role'] == 'appointment.book.client.login':
             return payload
@@ -222,7 +227,7 @@ class Appointment(SQLEntity, Vld.PropertyTypeValidatorEntity):
         )
         self.m_rating: Optional[int] = Vld.validatable(
             Vld.And(
-                Vld.Int(), Vld.MinVal(0), Vld.MaxVal(5)
+                Vld.Int(), Vld.MinVal(1), Vld.MaxVal(5)
             )
         )
         self.m_secret_code: Optional[str] = Vld.validatable(

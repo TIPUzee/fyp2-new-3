@@ -240,7 +240,8 @@ class SQLEntity(ABC):
         _order_by: str = None,
         _desc: bool = False,
         reset_changed_props: bool = True,
-    ) -> list[dict[str, Any]]:
+        _fetch_all_as_dict: bool = True,
+    ) -> list[dict[str, Any]] | tuple[dict[str, int], list[list[Any]]]:
         select_cols_str = self.__build_select_cols(select_cols, not_select_cols)
         where_equals, where_vals = self.__build_where_cols(
             where_equals,
@@ -270,7 +271,7 @@ class SQLEntity(ABC):
 
         if not self._sql:
             self._sql = SQL()
-        return self._sql.execute(_query, [*where_vals])
+        return self._sql.execute(_query, [*where_vals], _fetch_as_dict=_fetch_all_as_dict)
 
     def load(
         self,
@@ -329,16 +330,16 @@ class SQLEntity(ABC):
         return True
 
     def __set_values(self, values):
-        validation_on_status = False
-        if hasattr(self, 'get_validation_on_status'):
-            validation_on_status = self.get_validation_on_status()
+        validation_off_status = True
+        if hasattr(self, 'get_validation_off_status'):
+            validation_off_status = self.get_validation_off_status()
         if hasattr(self, 'turn_off_validation'):
             self.turn_off_validation()
 
         for key, value in values.items():
             setattr(self, key, value)
 
-        if hasattr(self, 'turn_on_validation') and validation_on_status:
+        if hasattr(self, 'turn_on_validation') and (not validation_off_status):
             self.turn_on_validation()
 
     def count(
@@ -707,5 +708,5 @@ class SQLEntity(ABC):
         return f'ORDER BY {order_by} {"DESC" if desc else "ASC"}' if order_by else ''
 
     def to_dict(self: SQLEntityChildType, exclude_attr: list[str] = []) -> dict[str, Any]:
-        return {prop: getattr(self, Func.get_attr_custom_storage_name(prop))
+        return {prop: getattr(self, prop)
             for prop in self.all_props if prop not in exclude_attr}
