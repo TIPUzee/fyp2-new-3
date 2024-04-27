@@ -57,9 +57,10 @@ export class FormValidatorsService {
                 return null;
             }
             
-            if (ignoreValues && ignoreValues().includes(value)) {
-                return null;
-            } else if (!value) {
+            if (!value ||
+                (
+                    ignoreValues && ignoreValues().includes(value)
+                )) {
                 return { required: true };
             }
             
@@ -98,6 +99,25 @@ export class FormValidatorsService {
                 return { dateMustBeBefore: true };
             } else {
                 return null;
+            }
+        };
+    }
+    
+    
+    datetimeFormat(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const value = control.value;
+            
+            if (!value) {
+                return null;
+            }
+            
+            const datetimeFormatRegex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]), (0[1-9]|1[0-2]):[0-5][0-9] (AM|PM)$/;
+            
+            if (datetimeFormatRegex.test(value)) {
+                return null;
+            } else {
+                return { datetimeFormat: true };
             }
         };
     }
@@ -191,6 +211,25 @@ export class FormValidatorsService {
     }
     
     
+    imageFile(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const value: File = control.value;
+            
+            if (!value) {
+                return null;
+            }
+            
+            const extension = value.name.split('.').pop();
+            
+            if (extension && ImageExtensions.includes(`.${ extension }`)) {
+                return null;
+            }
+            
+            return { imageFile: true };
+        };
+    }
+    
+    
     isAuthCodeValid(): AsyncValidatorFn {
         return (control: AbstractControl): Promise<ValidationErrors | null> => {
             return new Promise(async (resolve) => {
@@ -258,6 +297,51 @@ export class FormValidatorsService {
     }
     
     
+    max({ maxFunc, max = 0 }: { maxFunc?: () => number, max?: number }): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const value = control.value;
+            let maxValue = maxFunc ? maxFunc() : max;
+            
+            if (value < maxValue) {
+                return null;
+            } else {
+                return { max: true };
+            }
+        };
+    }
+    
+    
+    min({ minFunc, min = 0 }: { minFunc?: () => number, min?: number }): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const value = control.value;
+            let minValue = minFunc ? minFunc() : min;
+            
+            if (value >= minValue) {
+                return null;
+            } else {
+                return { min: true };
+            }
+        };
+    }
+    
+    
+    multipleOf(m: number): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const value = control.value;
+            
+            if (!value) {
+                return null;
+            }
+            
+            if (value % m === 0) {
+                return null;
+            } else {
+                return { multipleOf: true };
+            }
+        };
+    }
+    
+    
     name(): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null => {
             const value = control.value;
@@ -310,49 +394,6 @@ export class FormValidatorsService {
         };
     }
     
-    multipleOf(m: number): ValidatorFn {
-        return (control: AbstractControl): ValidationErrors | null => {
-            const value = control.value;
-            
-            if (!value) {
-                return null;
-            }
-            
-            if (value % m === 0) {
-                return null;
-            } else {
-                return { multipleOf: true };
-            }
-        };
-    }
-    
-    
-    min({ minFunc, min = 0 }: { minFunc?: () => number, min?: number }): ValidatorFn {
-        return (control: AbstractControl): ValidationErrors | null => {
-            const value = control.value;
-            let minValue = minFunc ? minFunc() : min;
-            
-            if (value >= minValue) {
-                return null;
-            } else {
-                return { min: true };
-            }
-        };
-    }
-    
-    
-    max({ maxFunc, max = 0 }: { maxFunc?: () => number, max?: number }): ValidatorFn {
-        return (control: AbstractControl): ValidationErrors | null => {
-            const value = control.value;
-            let maxValue = maxFunc ? maxFunc() : max;
-            
-            if (value < maxValue) {
-                return null;
-            } else {
-                return { max: true };
-            }
-        };
-    }
     
     phoneNumberFormat(): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null => {
@@ -427,25 +468,6 @@ export class FormValidatorsService {
             }
             
             return { videoFile: true };
-        };
-    }
-    
-    
-    imageFile(): ValidatorFn {
-        return (control: AbstractControl): ValidationErrors | null => {
-            const value: File = control.value;
-            
-            if (!value) {
-                return null;
-            }
-            
-            const extension = value.name.split('.').pop();
-            
-            if (extension && ImageExtensions.includes(`.${ extension }`)) {
-                return null;
-            }
-            
-            return { imageFile: true };
         };
     }
     
@@ -528,24 +550,5 @@ export class FormValidatorsService {
                 }
             })
         }
-    }
-    
-
-    datetimeFormat(): ValidatorFn {
-        return (control: AbstractControl): ValidationErrors | null => {
-            const value = control.value;
-            
-            if (!value) {
-                return null;
-            }
-            
-            const datetimeFormatRegex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]), (0[1-9]|1[0-2]):[0-5][0-9] (AM|PM)$/;
-            
-            if (datetimeFormatRegex.test(value)) {
-                return null;
-            } else {
-                return { datetimeFormat: true };
-            }
-        };
     }
 }

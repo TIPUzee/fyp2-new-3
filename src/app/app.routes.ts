@@ -11,56 +11,46 @@ export const routes: Routes = [
         loadComponent: () => import('./d/d.component').then(x => x.DComponent),
         children: [
             {
-                path: 'dash',
-                redirectTo: '',
+                path: '',
+                redirectTo: 'pa',
+                pathMatch: 'full',
             },
             {
-                path: '',
-                loadComponent: () => import('./d/dash/dash.component').then(x => x.DashComponent),
-                children: [
-                    {
-                        path: '',
-                        redirectTo: 'pa',
-                        pathMatch: 'full',
-                    },
-                    {
-                        path: 'p',
-                        loadComponent: () => import('./d/dash/profile/profile.component').then(x => x.ProfileComponent),
-                        data: { animation: 'profile' },
-                    },
-                    {
-                        path: 'p-preview',
-                        loadComponent: () => import('./d/dash/profile-preview/profile-preview.component').then(x => x.ProfilePreviewComponent),
-                        data: { animation: 'previewProfile' },
-                    },
-                    {
-                        path: 'pa',
-                        loadComponent: () => import('./d/dash/pending-appointments/pending-appointments.component').then(
-                            x => x.PendingAppointmentsComponent),
-                        data: { animation: 'pendingAppointments' },
-                    },
-                    {
-                        path: 'ca',
-                        loadComponent: () => import('./d/dash/completed-appointments/completed-appointments.component').then(
-                            x => x.CompletedAppointmentsComponent),
-                        data: { animation: 'completedAppointments' },
-                    },
-                    {
-                        path: 't',
-                        loadComponent: () => import('./d/dash/transactions/transactions.component').then(x => x.TransactionsComponent),
-                        data: { animation: 'transactions' },
-                    },
-                    {
-                        path: 'w',
-                        loadComponent: () => import('./d/dash/withdraw/withdraw.component').then(x => x.WithdrawComponent),
-                        data: { animation: 'withdraw' },
-                    },
-                    {
-                        path: '**',
-                        loadComponent: () => import('./d/dash/page-not-found/page-not-found.component').then(x => x.PageNotFoundComponent),
-                        data: { animation: 'pageNotFound' },
-                    },
-                ],
+                path: 'p',
+                loadComponent: () => import('./d/profile/profile.component').then(x => x.ProfileComponent),
+                data: { animation: 'profile' },
+            },
+            {
+                path: 'p-preview',
+                loadComponent: () => import('./d/profile-preview/profile-preview.component').then(x => x.ProfilePreviewComponent),
+                data: { animation: 'previewProfile' },
+            },
+            {
+                path: 'pa',
+                loadComponent: () => import('./d/pending-appointments/pending-appointments.component').then(
+                    x => x.PendingAppointmentsComponent),
+                data: { animation: 'pendingAppointments' },
+            },
+            {
+                path: 'ca',
+                loadComponent: () => import('./d/completed-appointments/completed-appointments.component').then(
+                    x => x.CompletedAppointmentsComponent),
+                data: { animation: 'completedAppointments' },
+            },
+            {
+                path: 't',
+                loadComponent: () => import('./d/transactions/transactions.component').then(x => x.TransactionsComponent),
+                data: { animation: 'transactions' },
+            },
+            {
+                path: 'w',
+                loadComponent: () => import('./d/withdraw/withdraw.component').then(x => x.WithdrawComponent),
+                data: { animation: 'withdraw' },
+            },
+            {
+                path: '**',
+                loadComponent: () => import('./d/page-not-found/page-not-found.component').then(x => x.PageNotFoundComponent),
+                data: { animation: 'pageNotFound' },
             },
         ],
     },
@@ -70,74 +60,64 @@ export const routes: Routes = [
         loadComponent: () => import('./p/p.component').then(x => x.PComponent),
         children: [
             {
-                path: 'dash',
-                redirectTo: '',
+                path: '',
+                redirectTo: 'a',
+                pathMatch: 'full',
             },
             {
-                path: '',
-                loadComponent: () => import('./p/dash/dash.component').then(x => x.DashComponent),
-                children: [
-                    {
-                        path: '',
-                        redirectTo: 'a',
-                        pathMatch: 'full',
-                    },
-                    {
-                        path: 'p',
-                        loadComponent: () => import('./p/dash/profile/profile.component').then(x => x.ProfileComponent),
-                        data: { animation: 'profile' },
-                    },
-                    {
-                        path: 'doctor',
-                        loadComponent: () => import('./p/dash/doctor-details/doctor-details.component').then(x => x.DoctorDetailsComponent),
-                        data: { animation: 'doctor' },
-                    },
-                    {
-                        path: 'book',
-                        loadComponent: () => import('./p/dash/book/book.component').then(x => x.BookComponent),
-                        data: { animation: 'book' },
-                    },
-                    {
-                        path: 'chat',
-                        loadComponent: () => import('./p/dash/chat/chat.component').then(x => x.ChatComponent),
-                        data: { animation: 'chat' },
-                    },
-                    {
-                        path: 'pay',
-                        loadComponent: () => import('./p/dash/pay/pay.component').then(x => x.PayComponent),
-                        data: { animation: 'pay' },
-                    },
-                    {
-                        path: 'doctors',
-                        loadComponent: () => import('./p/dash/doctors/doctors.component').then(x => x.DoctorsComponent),
-                        data: { animation: 'doctors' },
-                    },
-                    {
-                        path: 'suggested-doctors',
-                        loadComponent: () => import('./p/dash/suggested-doctors/suggested-doctors.component').then(x => x.SuggestedDoctorsComponent),
-                        data: { animation: 'suggested' },
-                    },
-                    {
-                        path: 'a',
-                        loadComponent: () => import('./p/dash/appointments/appointments.component').then(x => x.AppointmentsComponent),
-                        data: { animation: 'appointments' },
-                    },
-                    {
-                        path: 'trans',
-                        loadComponent: () => import('./p/dash/transactions/transactions.component').then(x => x.TransactionsComponent),
-                        data: { animation: 'transactions' },
-                    },
-                    {
-                        path: 'w',
-                        loadComponent: () => import('./p/dash/withdraw/withdraw.component').then(x => x.WithdrawComponent),
-                        data: { animation: 'withdraw' },
-                    },
-                    {
-                        path: '**',
-                        loadComponent: () => import('./p/dash/page-not-found/page-not-found.component').then(x => x.PageNotFoundComponent),
-                        data: { animation: 'pageNotFound' },
-                    },
-                ],
+                path: 'p',
+                loadComponent: () => import('./p/profile/profile.component').then(x => x.ProfileComponent),
+                data: { animation: 'profile' },
+            },
+            {
+                path: 'doctor',
+                loadComponent: () => import('./p/doctor-details/doctor-details.component').then(x => x.DoctorDetailsComponent),
+                data: { animation: 'doctor' },
+            },
+            {
+                path: 'book',
+                loadComponent: () => import('./p/book/book.component').then(x => x.BookComponent),
+                data: { animation: 'book' },
+            },
+            {
+                path: 'chat',
+                loadComponent: () => import('./p/chat/chat.component').then(x => x.ChatComponent),
+                data: { animation: 'chat' },
+            },
+            {
+                path: 'pay',
+                loadComponent: () => import('./p/pay/pay.component').then(x => x.PayComponent),
+                data: { animation: 'pay' },
+            },
+            {
+                path: 'doctors',
+                loadComponent: () => import('./p/doctors/doctors.component').then(x => x.DoctorsComponent),
+                data: { animation: 'doctors' },
+            },
+            {
+                path: 'suggested-doctors',
+                loadComponent: () => import('./p/suggested-doctors/suggested-doctors.component').then(x => x.SuggestedDoctorsComponent),
+                data: { animation: 'suggested' },
+            },
+            {
+                path: 'a',
+                loadComponent: () => import('./p/appointments/appointments.component').then(x => x.AppointmentsComponent),
+                data: { animation: 'appointments' },
+            },
+            {
+                path: 'trans',
+                loadComponent: () => import('./p/transactions/transactions.component').then(x => x.TransactionsComponent),
+                data: { animation: 'transactions' },
+            },
+            {
+                path: 'w',
+                loadComponent: () => import('./p/withdraw/withdraw.component').then(x => x.WithdrawComponent),
+                data: { animation: 'withdraw' },
+            },
+            {
+                path: '**',
+                loadComponent: () => import('./p/page-not-found/page-not-found.component').then(x => x.PageNotFoundComponent),
+                data: { animation: 'pageNotFound' },
             },
         ],
     },
@@ -168,7 +148,7 @@ export const routes: Routes = [
                 children: [
                     {
                         path: 'p',
-                        loadComponent: () => import('./p/dash/doctor-details/doctor-details.component').then(x => x.DoctorDetailsComponent),
+                        loadComponent: () => import('./p/doctor-details/doctor-details.component').then(x => x.DoctorDetailsComponent),
                         data: { animation: 'doctor-details-profile' },
                     },
                 ],
@@ -219,7 +199,7 @@ export const routes: Routes = [
                 path: '**',
                 loadComponent: () => import('./a/page-not-found/page-not-found.component').then(x => x.PageNotFoundComponent),
                 data: { animation: 'pageNotFound' },
-            },
+            }
         ],
     }, {
         path: '',
@@ -243,10 +223,12 @@ export const routes: Routes = [
             {
                 path: 'regis',
                 loadComponent: () => import('./g/regis/regis.component').then(x => x.RegisComponent),
+                canActivate: [NoLoginAuth]
             },
             {
                 path: 'regis/mail',
                 loadComponent: () => import('./g/regis-email/regis-email.component').then(x => x.RegisEmailComponent),
+                canActivate: [NoLoginAuth]
             },
             {
                 path: 'reset',
@@ -311,5 +293,5 @@ export const routes: Routes = [
                 loadComponent: () => import('./g/page-not-found/page-not-found.component').then(x => x.PageNotFoundComponent),
             },
         ],
-    },
-];
+    }
+]

@@ -4,8 +4,8 @@ import { faAngleLeft, faRightFromBracket } from '@fortawesome/free-solid-svg-ico
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { HtmlService } from '../../services/html.service';
 import { UtilFuncService } from "../../services/util-func.service";
-import { FormSubmitButtonComponent } from "../../utils/components/form-submit-button/form-submit-button.component";
-import { ModalComponent } from "../../utils/components/modal/modal.component";
+import { FormSubmitButtonComponent } from "../../components/form-submit-button/form-submit-button.component";
+import { ModalComponent } from "../../components/modal/modal.component";
 
 @Component({
     selector: 'app-sidebar',

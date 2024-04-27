@@ -12,22 +12,22 @@ import {
 import { Subject } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { UtilFuncService } from "../../services/util-func.service";
-import { ModalComponent } from "../../utils/components/modal/modal.component";
-import { FormInputComponent } from "../../utils/components/form-input/form-input.component";
+import { ModalComponent } from "../../components/modal/modal.component";
+import { FormInputComponent } from "../../components/form-input/form-input.component";
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators as vl } from "@angular/forms";
 import { FormValidatorsService } from "../../services/form-validators.service";
-import { FormSelectComponent } from "../../utils/components/form-select/form-select.component";
-import { FormSubmitButtonComponent } from "../../utils/components/form-submit-button/form-submit-button.component";
+import { FormSelectComponent } from "../../components/form-select/form-select.component";
+import { FormSubmitButtonComponent } from "../../components/form-submit-button/form-submit-button.component";
 import { toast } from "ngx-sonner";
 import {
     FormRefreshButtonComponent
-} from "../../utils/components/form-refresh-button/form-refresh-button.component";
+} from "../../components/form-refresh-button/form-refresh-button.component";
 import { RouterLink } from "@angular/router";
-import { FormTextareaComponent } from "../../utils/components/form-textarea/form-textarea.component";
+import { FormTextareaComponent } from "../../components/form-textarea/form-textarea.component";
 import {
     FormDatetimePickerComponent
-} from "../../utils/components/form-datetime-picker/form-datetime-picker.component";
-import { FormFileInputComponent } from "../../utils/components/form-file-input/form-file-input.component";
+} from "../../components/form-datetime-picker/form-datetime-picker.component";
+import { FormFileInputComponent } from "../../components/form-file-input/form-file-input.component";
 
 @Component({
     selector: 'app-patient-withdrawals',

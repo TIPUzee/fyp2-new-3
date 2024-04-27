@@ -97,7 +97,20 @@
                   [routerLink]="utils.getCurrentUser() === 'g' ? '/login' : utils.getCurrentUser()"
                   class="text-dark hover:text-black transition-opacity duration-300"
                >
-                  <span class="align-super">{{ utils.getCurrentUser() === 'g' ? 'Login' : 'Dashboard' }}</span>
+                  <ng-container [ngSwitch]="utils.getCurrentUser() === 'g'">
+                     <ng-container *ngSwitchCase="true">
+                        <div
+                           class="-mt-2 pt-1.5 pb-1.5 px-5 border-2 border-dark rounded-lg text-dark hover:text-white hover:bg-dark transition-colors duration-300">
+                           <div class="">Login</div>
+                        </div>
+                     </ng-container>
+                     <ng-container *ngSwitchDefault>
+                        <div
+                           class="-mt-2.5 px-5 pt-1 pb-1.5 border-2 border-dark rounded-lg text-dark hover:text-white hover:bg-dark transition-colors duration-300">
+                           <fa-icon [icon]="faTerminal" class="text-base"></fa-icon>
+                        </div>
+                     </ng-container>
+                  </ng-container>
                </a>
             </div>
          </div>

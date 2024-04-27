@@ -13,16 +13,16 @@ import { Subject } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { UtilFuncService } from "../../services/util-func.service";
 import { DoctorAccountStatus } from "../../interfaces/interfaces";
-import { ModalComponent } from "../../utils/components/modal/modal.component";
-import { FormInputComponent } from "../../utils/components/form-input/form-input.component";
+import { ModalComponent } from "../../components/modal/modal.component";
+import { FormInputComponent } from "../../components/form-input/form-input.component";
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators as vl } from "@angular/forms";
 import { FormValidatorsService } from "../../services/form-validators.service";
-import { FormSelectComponent } from "../../utils/components/form-select/form-select.component";
-import { FormSubmitButtonComponent } from "../../utils/components/form-submit-button/form-submit-button.component";
+import { FormSelectComponent } from "../../components/form-select/form-select.component";
+import { FormSubmitButtonComponent } from "../../components/form-submit-button/form-submit-button.component";
 import { toast } from "ngx-sonner";
 import {
     FormRefreshButtonComponent
-} from "../../utils/components/form-refresh-button/form-refresh-button.component";
+} from "../../components/form-refresh-button/form-refresh-button.component";
 import { RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
 import { NgxExtendedPdfViewerModule } from "ngx-extended-pdf-viewer";
 

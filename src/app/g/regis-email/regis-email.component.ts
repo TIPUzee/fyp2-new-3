@@ -1,10 +1,10 @@
 import { AfterViewInit, Component } from '@angular/core';
 import { HtmlService } from '../../services/html.service';
 import { Router, RouterLink } from '@angular/router';
-import { FormInputComponent } from "../../utils/components/form-input/form-input.component";
+import { FormInputComponent } from "../../components/form-input/form-input.component";
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators as vl } from "@angular/forms";
 import { FormValidatorsService } from "../../services/form-validators.service";
-import { FormSubmitButtonComponent } from "../../utils/components/form-submit-button/form-submit-button.component";
+import { FormSubmitButtonComponent } from "../../components/form-submit-button/form-submit-button.component";
 import { HTTPService } from "../../services/http.service";
 import { UtilFuncService } from "../../services/util-func.service";
 import { CookieService } from "ngx-cookie-service";
@@ -64,8 +64,6 @@ export class RegisEmailComponent implements AfterViewInit {
             this.regisVerifyEmailForm.waiting = false;
             
             if (!res) {
-                toast.error('Something went wrong. Please try again later.');
-                console.error('Error occurred while sending request to /auth/regis/s2', data, res);
                 return;
             }
             

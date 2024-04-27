@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PComponent } from './p.component';
 
-describe('PComponent', () => {
+describe('DashComponent', () => {
   let component: PComponent;
   let fixture: ComponentFixture<PComponent>;
 

@@ -22,7 +22,7 @@ export class NoLoginAuth implements CanActivate {
         state: RouterStateSnapshot
     ): Observable<boolean> | Promise<boolean> | boolean {
         return new Promise<boolean>(async (resolve) => {
-            if (this.cookies.get('Authorization') !== '') {
+            if (this.cookies.get('Authorization') === '') {
                 resolve(true);
             }
             
@@ -30,15 +30,17 @@ export class NoLoginAuth implements CanActivate {
                 url: '/auth/verify-logins',
                 method: 'GET',
             }) as AuthVerifyLoginsResponse | false;
-            if (res === false) {
+
+            if (!res) {
                 return resolve(true);
             }
             
             this.utils.setCurrentUser(res.userType);
-            if (!res.invalidLogin) {
-                resolve(false);
-            } else {
+            if (res.invalidLogin) {
                 resolve(true);
+            } else {
+                await this.router.navigate([res.userType]);
+                resolve(false);
             }
         });
     }

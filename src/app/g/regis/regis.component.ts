@@ -4,11 +4,11 @@ import { Router, RouterLink } from '@angular/router';
 import { UtilFuncService } from "../../services/util-func.service";
 import { NgOptimizedImage } from "@angular/common";
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators as vl } from '@angular/forms';
-import { FormInputComponent } from "../../utils/components/form-input/form-input.component";
-import { FormSelectComponent } from "../../utils/components/form-select/form-select.component";
+import { FormInputComponent } from "../../components/form-input/form-input.component";
+import { FormSelectComponent } from "../../components/form-select/form-select.component";
 import { FormValidatorsService } from "../../services/form-validators.service";
-import { FormDatePickerComponent } from "../../utils/components/form-date-picker/form-date-picker.component";
-import { FormSubmitButtonComponent } from "../../utils/components/form-submit-button/form-submit-button.component";
+import { FormDatePickerComponent } from "../../components/form-date-picker/form-date-picker.component";
+import { FormSubmitButtonComponent } from "../../components/form-submit-button/form-submit-button.component";
 import { HTTPService } from '../../services/http.service';
 import { AuthRegisS1Response } from "../../interfaces/api-response-interfaces";
 import { toast } from "ngx-sonner";
@@ -34,7 +34,7 @@ export class RegisComponent implements AfterViewInit {
     
     regisForm = {
         fg: this._fb.group({
-            userType: ['', this._fvs.customRequired({ ignoreValues: () => ['-'] })],
+            userType: ['-', this._fvs.customRequired({ ignoreValues: () => ['-'] })],
             name: [
                 '', vl.compose([
                     vl.required, this._fvs.leadingSpaces(), this._fvs.name(), vl.minLength(3), vl.maxLength(32)
@@ -166,7 +166,6 @@ export class RegisComponent implements AfterViewInit {
             }
             
             this.utils.setAuthorizationToken(res.token);
-            this.utils.setCurrentUser(res.userType);
             
             await this.router.navigate(['regis', 'mail']);
         }

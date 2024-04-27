@@ -1,0 +1,304 @@
+<ng-container *ngIf="prevWithdrawalRequest.loading">
+   <div class="absolute text-center w-full top-1/2 -translate-y-1/2">
+      <div>Loading...</div>
+   </div>
+</ng-container>
+<div class="main workspace">
+   <div>
+      <div class="pb-10">
+         <div class="text-dark text-2xl font-semibold mb-4 flex justify-between items-end">
+            Refund Withdrawal Request
+            <div class="text-dark text-opacity-70 font-normal text-base pe-4"></div>
+         </div>
+         <div>
+            <div>
+               <div class="flex justify-end font-normal">
+                  <div class="cursor-default bg-success-600 text-primary-100 px-4 pt-2 pb-1.5 rounded shadow-md border border-primary-100 border-opacity-50">
+                     Total Balance: Rs. {{ profile.details.walletAmount }}
+                  </div>
+               </div>
+            </div>
+         </div>
+         <ng-container
+            [ngSwitch]="
+               prevWithdrawalRequest.details.prevCompleted || prevWithdrawalRequest.details.prevRejected ||
+               prevWithdrawalRequest.details.alreadyRequested
+            "
+         >
+
+            <ng-container *ngSwitchCase="false">
+               <div class="mt-12">
+                  <div class="inner-container mx-auto">
+                     <div class="bg-primary-100 rounded-lg shadow-lg grid grid-cols-2">
+                        <div class="p-20">
+                           <div class="font-semibold text-lg mb-5">Request For Refund Withdrawal</div>
+                           <form [formGroup]="withdrawalRequestForm.fg">
+                              <div class="mb-3">
+                                 <form-input
+                                    [errors]="withdrawalRequestForm.errors.amount"
+                                    controlName="amount"
+                                    label="Withdrawal Amount"
+                                    placeholder="e.g. 10000"
+                                    type="text"
+                                 ></form-input>
+                              </div>
+                              <div class="mb-3">
+                                 <form-input
+                                    [errors]="withdrawalRequestForm.errors.receiverEpNb"
+                                    controlName="receiverEpNb"
+                                    helperText="Exact Number (No mistakes allowed)"
+                                    label="Receiver Easypaisa Number"
+                                    placeholder="e.g. +923012345678"
+                                    type="text"
+                                 ></form-input>
+                              </div>
+                              <div class="mb-3">
+                                 <form-input
+                                    [errors]="withdrawalRequestForm.errors.receiverEpUsername"
+                                    controlName="receiverEpUsername"
+                                    helperText="Exact Username (No mistakes allowed)"
+                                    label="Receiver Easypaisa Username"
+                                    placeholder="e.g. Zeeshan Nadeem"
+                                    type="text"
+                                 ></form-input>
+                              </div>
+                              <div class="mb-3">
+                                 <div class="block min-h-[1.5rem] pl-[1.5rem] select-none">
+                                    <input
+                                       id="checkboxDefault"
+                                       #agreeToTerms
+                                       type="checkbox"
+                                       value=""
+                                       class="relative float-left -ml-[1.5rem] mr-[6px] mt-[3px] h-[1.125rem] w-[1.125rem] appearance-none rounded-[0.25rem] border-[0.125rem] border-solid border-neutral-300 outline-none before:pointer-events-none before:absolute before:h-[0.875rem] before:w-[0.875rem] before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-[0px_0px_0px_13px_transparent] before:content-[''] checked:border-primary checked:bg-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:-mt-px checked:after:ml-[0.25rem] checked:after:block checked:after:h-[0.8125rem] checked:after:w-[0.375rem] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:shadow-none focus:transition-[border-color_0.2s] focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-[0.875rem] focus:after:w-[0.875rem] focus:after:rounded-[0.125rem] focus:after:content-[''] checked:focus:before:scale-100 checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:after:-mt-px checked:focus:after:ml-[0.25rem] checked:focus:after:h-[0.8125rem] checked:focus:after:w-[0.375rem] checked:focus:after:rotate-45 checked:focus:after:rounded-none checked:focus:after:border-[0.125rem] checked:focus:after:border-l-0 checked:focus:after:border-t-0 checked:focus:after:border-solid checked:focus:after:border-white checked:focus:after:bg-transparent"
+                                    />
+                                    <label for="checkboxDefault" class="inline-block pl-[0.15rem] hover:cursor-pointer">
+                                       By checking this, you agree to our
+                                       <a
+                                          href="/terms-and-conditions"
+                                          target="_blank"
+                                          class="underline text-blue-600 text-opacity-80"
+                                       >Terms and Conditions.
+                                       </a>
+                                    </label>
+                                 </div>
+                              </div>
+                              <div class="flex justify-end">
+                                 <form-submit-button
+                                    (click)="withdrawalRequestForm.submit()"
+                                    [disableOnStart]="true"
+                                    [disabled]="withdrawalRequestForm.loading || !agreeToTerms.checked"
+                                    [waiting]="withdrawalRequestForm.loading"
+                                    label="Request Withdrawal"
+                                 ></form-submit-button>
+                              </div>
+                           </form>
+                        </div>
+                        <div class="bg-gradient-dark-300 rounded-e-lg flex justify-center items-center">
+                           <div class="max-w-[380px]">
+                              <div class="text-2xl font-semibold mb-3 text-primary-100">Simple Refund Process</div>
+                              <div
+                                 class="max-w-sm text-primary-100 text-opacity-70"
+                              >Take control of your refunds effortlessly with our straightforward refund process. Access
+                               the
+                               ease of managing refunded amounts
+                               securely and efficiently. Our system ensures a hassle-free and reliable refund mechanism,
+                               allowing you to effortlessly access your
+                               refunds for any canceled transactions. Prioritizing your convenience, we ensure a
+                               seamless
+                               experience in managing your financial
+                               reimbursements.
+                              </div
+                              >
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </ng-container>
+
+            <ng-container *ngSwitchCase="true">
+               <div class="mt-12">
+                  <div class="inner-container mx-auto">
+                     <div class="bg-primary-100 rounded-lg shadow-lg grid grid-cols-2">
+                        <div class="p-20">
+                           <div class="font-semibold text-lg mb-4">Refund Withdrawal Request</div>
+                           <div>
+                              <div class="mb-4 pointer-events-none">
+                                 <div data-te-input-wrapper-init class="relative mb-3 max-w-[unset]">
+                                    <input
+                                       id="prevRefundAmount"
+                                       [value]="prevWithdrawalRequest.details.requestDetails.amount"
+                                       placeholder="e.g. 10000"
+                                       type="text"
+                                       class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:peer-focus:text-primary [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
+                                    />
+                                    <label
+                                       for="prevRefundAmount"
+                                       class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
+                                    >
+                                       Withdrawal Amount
+                                    </label>
+                                 </div>
+                              </div>
+                              <div class="mb-4 pointer-events-none">
+                                 <div data-te-input-wrapper-init class="relative mb-3 max-w-[unset]">
+                                    <input
+                                       id="prevRefundReceiverEpNb"
+                                       [value]="prevWithdrawalRequest.details.requestDetails.receiverEpNb"
+                                       placeholder="e.g. +923012345678"
+                                       type="text"
+                                       class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:peer-focus:text-primary [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
+                                    />
+                                    <label
+                                       for="prevRefundReceiverEpNb"
+                                       class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
+                                    >
+                                       Receiver Easypaisa Number
+                                    </label>
+                                 </div>
+                              </div>
+                              <div class="mb-4 pointer-events-none">
+                                 <div data-te-input-wrapper-init class="relative mb-3 max-w-[unset]">
+                                    <input
+                                       id="prevRefundReceiverEpUsername"
+                                       [value]="prevWithdrawalRequest.details.requestDetails.receiverEpUsername"
+                                       placeholder="e.g. Zeeshan Nadeem"
+                                       type="text"
+                                       class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:peer-focus:text-primary [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
+                                    />
+                                    <label
+                                       for="prevRefundReceiverEpUsername"
+                                       class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
+                                    >
+                                       Receiver Easypaisa Username
+                                    </label>
+                                 </div>
+                              </div>
+
+                              <ng-container *ngIf="prevWithdrawalRequest.details.prevCompleted">
+                                 <div class="mb-4 pointer-events-none">
+                                    <div data-te-input-wrapper-init class="relative mb-3 max-w-[unset]">
+                                       <input
+                                          id="prevRefundSenderEpNb"
+                                          [value]="prevWithdrawalRequest.details.requestDetails.senderEpNb"
+                                          placeholder="e.g. +923012345678"
+                                          type="text"
+                                          class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:peer-focus:text-primary [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
+                                       />
+                                       <label
+                                          for="prevRefundSenderEpNb"
+                                          class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
+                                       >
+                                          Sender Easypaisa Number
+                                       </label>
+                                    </div>
+                                 </div>
+                                 <div class="mb-4 pointer-events-none">
+                                    <div data-te-input-wrapper-init class="relative mb-3 max-w-[unset]">
+                                       <input
+                                          id="prevRefundSenderEpUsername"
+                                          [value]="prevWithdrawalRequest.details.requestDetails.senderEpUsername"
+                                          placeholder="e.g. Zeeshan Nadeem"
+                                          type="text"
+                                          class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:peer-focus:text-primary [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
+                                       />
+                                       <label
+                                          for="prevRefundSenderEpUsername"
+                                          class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
+                                       >
+                                          Sender Easypaisa Username
+                                       </label>
+                                    </div>
+                                 </div>
+                              </ng-container>
+
+                              <div class="mb-4 pointer-events-none">
+                                 <div data-te-input-wrapper-init class="relative mb-3">
+                                     <textarea
+                                        id="exampleFormControlTextarea1"
+                                        [rows]="5"
+                                        placeholder="Description"
+                                        rows="5"
+                                        class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
+                                     >{{
+                                           prevWithdrawalRequest.details.requestDetails.status === 'REQUESTED' ?
+                                              'Your withdrawal request will be reviewed and processed accordingly. In case ' +
+                                              'of any issues, you can contact our support team for further assistance.' :
+                                              (prevWithdrawalRequest.details.requestDetails.status === 'REJECTED' ?
+                                                    'Your withdrawal request has been rejected due to the following reason: ' :
+                                                    'Your withdrawal request has been processed successfully. The amount has been ' +
+                                                    'transferred to the provided Easypaisa account. For any queries, you can ' +
+                                                    'contact our support team for further assistance.'
+                                              ) + (prevWithdrawalRequest.details.requestDetails.rejectionReason)
+                                        }}</textarea>
+                                    <label
+                                       for="exampleFormControlTextarea1"
+                                       class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
+                                    >
+                                       Description
+                                    </label>
+                                 </div>
+                              </div>
+                              <ng-container *ngIf="!prevWithdrawalRequest.details.alreadyRequested">
+                                 <div class="flex justify-end">
+                                    <form-submit-button
+                                       (click)="prevWithdrawalRequest.resetWithdrawalRequest();"
+                                       btnStyle="btn-red btn-shadow"
+                                       label="Another Request"
+                                    ></form-submit-button>
+                                 </div>
+                              </ng-container>
+                           </div>
+                        </div>
+                        <div class="bg-gradient-dark-300 rounded-e-lg flex justify-center items-center">
+                           <div class="max-w-[380px]">
+                              <div class="text-2xl font-semibold mb-3 text-primary-100">Simple Refund Process</div>
+                              <div
+                                 class="max-w-sm text-primary-100 text-opacity-70"
+                              >Take control of your refunds effortlessly with our straightforward refund process. Access
+                               the
+                               ease of managing refunded amounts
+                               securely and efficiently. Our system ensures a hassle-free and reliable refund mechanism,
+                               allowing you to effortlessly access your
+                               refunds for any canceled transactions. Prioritizing your convenience, we ensure a
+                               seamless
+                               experience in managing your financial
+                               reimbursements.
+                              </div
+                              >
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </ng-container>
+
+         </ng-container>
+      </div>
+   </div>
+</div>
+
+<!-- Cancel Previous Withdrawal request and submit a new request - Modal -->
+<app-modal #cancelPrevRefundRequestModal>
+   <div title>
+      Cancel Previous Withdrawal Request
+   </div>
+   <div body>
+      Are you sure you want to cancel the previous withdrawal request and submit a new request?
+   </div>
+   <div bottom>
+      <div class="flex justify-end gap-x-1">
+         <form-submit-button
+            (click)="cancelPrevRefundRequestModal.close()"
+            btnStyle="btn-primary-100 btn-shadow"
+            label="Close"
+         ></form-submit-button>
+         <form-submit-button
+            (click)="prevWithdrawalRequest.resetWithdrawalRequest(); cancelPrevRefundRequestModal.close()"
+            btnStyle="btn-red btn-shadow"
+            label="Cancel Request"
+         ></form-submit-button>
+      </div>
+   </div>
+</app-modal>
+<!-- Cancel Previous Withdrawal request and submit a new request - Modal -->

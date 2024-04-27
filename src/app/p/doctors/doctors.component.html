@@ -1,0 +1,69 @@
+<div class="main workspace">
+   <div class="rounded-lg px-3 py-5 relative">
+      <div class="mb-3">
+         <div class="relative mb-4 w-full items-stretch">
+            <div class="mb-4 text-xl font-semibold text-dark">Book Appointment With Doctors</div>
+
+            <div class="bg-primary-100 bg-opacity-90 p-3 pb-4 rounded-lg shadow-lg">
+               <div class="w-full">
+                  <label for="selected_language" class="mb-1 block">Preferred Language</label>
+                  <select
+                     #languageSelector
+                     id="selected_language"
+                     data-te-select-init
+                     (change)="selectedLanguage.select(languageSelector.value)"
+                  >
+                     <option value="-1">All languages</option>
+                     <ng-container *ngFor="let lan of languages">
+                        <option
+
+                           [value]="lan.id"
+                        >
+                           {{ lan.title }}
+                        </option>
+                     </ng-container>
+                  </select>
+               </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-x-5 gap-y-20 mt-16">
+               <ng-container *ngFor="let doc of doctors.list">
+                  <ng-container
+                     *ngIf="selectedLanguage.id === -1 || doctors.containsLanguage(doc.id, selectedLanguage.id)"
+                  >
+                     <a [routerLink]="['../', 'doctor']" [queryParams]="{d: doc.id}" class="cursor-pointer block">
+                        <div class="rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 bg-primary-100 bg-opacity-90 p-4">
+                           <div class="px-0 mb-2 -mt-12 relative">
+                              <img
+                                 alt=""
+                                 [src]="doc.profilePicFilename"
+                                 class="w-full aspect-[16/11] object-cover rounded-lg shadow-lg"
+                              >
+                           </div>
+                           <div>
+                              <div class="flex justify-between">
+                                 <div>{{ doc.name }}</div>
+                                 <div>
+<!--                                     <app-rating-stars></app-rating-stars> -->
+                                 </div>
+                              </div>
+                              <div class="flex justify-between">
+                                 <div class="text-base text-dark text-opacity-90">
+                                    <ng-container *ngFor="let spec of specializations">
+                                       <ng-container *ngIf="doc.specializationCategoryId === spec.id">
+                                          {{ spec.title }}
+                                       </ng-container>
+                                    </ng-container>
+                                 </div>
+                                 <div class="text-sm text-dark text-opacity-60">Rs. {{ doc.appointmentCharges }}</div>
+                              </div>
+                           </div>
+                        </div>
+                     </a>
+                  </ng-container>
+               </ng-container>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>

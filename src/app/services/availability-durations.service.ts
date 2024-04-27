@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HTTPService } from "./http.service";
-import { NotificationService } from "../utils/components/notification/notification.service";
+import { NotificationService } from "../components/notification/notification.service";
 import { UtilFuncService } from "./util-func.service";
 
 @Injectable({

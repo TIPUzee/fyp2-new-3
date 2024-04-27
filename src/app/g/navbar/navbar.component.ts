@@ -1,8 +1,8 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { ViewportScroller } from '@angular/common';
+import { NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault, ViewportScroller } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faFacebookF, faTwitter } from '@fortawesome/free-brands-svg-icons';
-import { faBars, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faXmark, faTerminal } from '@fortawesome/free-solid-svg-icons';
 import anime from 'animejs/lib/anime.es.js';
 import { AnimeInstance } from 'animejs';
 import { HtmlService } from '../../services/html.service';
@@ -12,15 +12,18 @@ import { UtilFuncService } from "../../services/util-func.service";
 @Component({
     selector: 'app-navbar',
     standalone: true,
-    imports: [FontAwesomeModule, RouterLink],
+    imports: [FontAwesomeModule, RouterLink, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault],
     templateUrl: './navbar.component.html',
     styleUrl: './navbar.component.scss',
 })
 export class NavbarComponent implements AfterViewInit {
+    //
+    // Icons
     faTwitter = faTwitter;
     faFacebookF = faFacebookF;
     faBars = faBars;
     faXmark = faXmark;
+    faTerminal = faTerminal;
     
     @ViewChild('navbar') navbar!: ElementRef<HTMLDivElement>;
     @ViewChild('navbar_popup') navbarPopup!: ElementRef<HTMLDivElement>;
