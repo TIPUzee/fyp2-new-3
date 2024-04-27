@@ -2,10 +2,10 @@ import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { faAngleLeft, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { HtmlService } from '../../../services/html.service';
-import { UtilFuncService } from "../../../services/util-func.service";
-import { FormSubmitButtonComponent } from "../../../utils/components/form-submit-button/form-submit-button.component";
-import { ModalComponent } from "../../../utils/components/modal/modal.component";
+import { HtmlService } from '../../services/html.service';
+import { UtilFuncService } from "../../services/util-func.service";
+import { FormSubmitButtonComponent } from "../../utils/components/form-submit-button/form-submit-button.component";
+import { ModalComponent } from "../../utils/components/modal/modal.component";
 
 @Component({
     selector: 'app-sidebar',

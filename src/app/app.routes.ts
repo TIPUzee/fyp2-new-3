@@ -39,7 +39,7 @@ export const routes: Routes = [
                             x => x.PendingAppointmentsComponent),
                         data: { animation: 'pendingAppointments' },
                     },
-                {
+                    {
                         path: 'ca',
                         loadComponent: () => import('./d/dash/completed-appointments/completed-appointments.component').then(
                             x => x.CompletedAppointmentsComponent),
@@ -147,93 +147,78 @@ export const routes: Routes = [
         loadComponent: () => import('./a/a.component').then(x => x.AComponent),
         children: [
             {
-                path: 'dash',
+                path: 'home',
                 redirectTo: '',
+                pathMatch: 'full',
             },
             {
                 path: '',
-                loadComponent: () => import('./a/dash/dash.component').then(x => x.DashComponent),
+                loadComponent: () => import('./a/home/home.component').then(x => x.HomeComponent),
+                data: { animation: 'home' },
+            },
+            {
+                path: 'p',
+                loadComponent: () => import('./a/patients/patients.component').then(x => x.PatientsComponent),
+                data: { animation: 'p' },
+            },
+            {
+                path: 'd',
+                loadComponent: () => import('./a/all-doctors/all-doctors.component').then(x => x.AllDoctorsComponent),
+                data: { animation: 'd' },
                 children: [
                     {
-                        path: 'home',
-                        redirectTo: '',
-                        pathMatch: 'full',
-                    },
-                    {
-                        path: '',
-                        loadComponent: () => import('./a/dash/home/home.component').then(x => x.HomeComponent),
-                        data: { animation: 'home' },
-                    },
-                    {
                         path: 'p',
-                        loadComponent: () => import('./a/dash/patients/patients.component').then(x => x.PatientsComponent),
-                        data: { animation: 'p' },
-                    },
-                    {
-                        path: 'd',
-                        loadComponent: () => import('./a/dash/all-doctors/all-doctors.component').then(x => x.AllDoctorsComponent),
-                        data: { animation: 'd' },
-                        children: [
-                            {
-                                path: 'p',
-                                loadComponent: () => import('./p/dash/doctor-details/doctor-details.component').then(x => x.DoctorDetailsComponent),
-                                data: { animation: 'doctor-details-profile' },
-                            },
-                        ],
-                    },
-                    {
-                        path: 'appo',
-                        loadComponent: () => import('./a/dash/appointments/appointments.component').then(x => x.AppointmentsComponent),
-                        data: { animation: 'all-appointments' },
-                    },
-                    {
-                        path: 'd-w',
-                        loadComponent: () =>
-                            import('././a/dash/doctor-withdrawals/doctor-withdrawals.component').then(x => x.DoctorWithdrawalsComponent),
-                        data: { animation: 'doctor-withdrawals' },
-                    },
-                    {
-                        path: 'p-w',
-                        loadComponent: () =>
-                            import('././a/dash/patient-withdrawals/patient-withdrawals.component').then(x => x.PatientWithdrawalsComponent),
-                        data: { animation: 'patient-withdrawals' },
-                    },
-                    {
-                        path: 's-c',
-                        loadComponent: () => import('././a/dash/all-specialization-categories/all-specialization-categories.component').then(
-                            x => x.AllSpecializationCategoriesComponent),
-                        data: { animation: 'specialization-categories' },
-                    },
-                    {
-                        path: 'spec',
-                        loadComponent: () => import('./a/dash/doctors-specializations/doctors-specializations.component').then(
-                            x => x.DoctorsSpecializationsComponent),
-                        data: { animation: 'specializations' },
-                    },
-                    {
-                        path: 'spec-disease-map',
-                        loadComponent: () =>
-                            import('./a/dash/specialization-category-and-disease-mapping/specialization-category-and-disease-mapping.component').then(
-                                x => x.SpecializationCategoryAndDiseaseMappingComponent,
-                            ),
-                        data: { animation: 'specialization-and-disease-mapping' },
-                    },
-                    {
-                        path: 'l',
-                        loadComponent: () => import('././a/dash/all-languages/all-languages.component').then(x => x.AllLanguagesComponent),
-                        data: { animation: 'languages' },
-                    },
-                    {
-                        path: 'lang',
-                        loadComponent: () => import('./a/dash/languages/languages.component').then(x => x.LanguagesComponent),
-                        data: { animation: 'languages' },
-                    },
-                    {
-                        path: '**',
-                        loadComponent: () => import('./a/dash/page-not-found/page-not-found.component').then(x => x.PageNotFoundComponent),
-                        data: { animation: 'pageNotFound' },
+                        loadComponent: () => import('./p/dash/doctor-details/doctor-details.component').then(x => x.DoctorDetailsComponent),
+                        data: { animation: 'doctor-details-profile' },
                     },
                 ],
+            },
+            {
+                path: 'appo',
+                loadComponent: () => import('./a/appointments/appointments.component').then(x => x.AppointmentsComponent),
+                data: { animation: 'all-appointments' },
+            },
+            {
+                path: 'd-w',
+                loadComponent: () =>
+                    import('././a/doctor-withdrawals/doctor-withdrawals.component').then(x => x.DoctorWithdrawalsComponent),
+                data: { animation: 'doctor-withdrawals' },
+            },
+            {
+                path: 'p-w',
+                loadComponent: () =>
+                    import('././a/patient-withdrawals/patient-withdrawals.component').then(x => x.PatientWithdrawalsComponent),
+                data: { animation: 'patient-withdrawals' },
+            },
+            {
+                path: 's-c',
+                loadComponent: () => import('././a/all-specialization-categories/all-specialization-categories.component').then(
+                    x => x.AllSpecializationCategoriesComponent),
+                data: { animation: 'specialization-categories' },
+            },
+            {
+                path: 'spec',
+                loadComponent: () => import('./a/doctors-specializations/doctors-specializations.component').then(
+                    x => x.DoctorsSpecializationsComponent),
+                data: { animation: 'specializations' },
+            },
+            {
+                path: 'spec-disease-map',
+                loadComponent: () =>
+                    import('./a/specialization-category-and-disease-mapping/specialization-category-and-disease-mapping.component').then(
+                        x => x.SpecializationCategoryAndDiseaseMappingComponent,
+                    ),
+                data: { animation: 'specialization-and-disease-mapping' },
+            },
+            {
+                path: 'l',
+                loadComponent: () => import('././a/all-languages/all-languages.component').then(x => x.AllLanguagesComponent),
+                data: { animation: 'languages' },
+            },
+            {
+                path: '**',
+                loadComponent: () => import('./a/page-not-found/page-not-found.component').then(x => x.PageNotFoundComponent),
+                data: { animation: 'pageNotFound' },
             },
         ],
     }, {

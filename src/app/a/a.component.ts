@@ -1,23 +1,33 @@
 import { AfterViewInit, Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { HtmlService } from '../services/html.service';
-import { UtilFuncService } from '../services/util-func.service';
+import { SidebarComponent } from './sidebar/sidebar.component';
+import { ChildrenOutletContexts, RouterOutlet } from '@angular/router';
+import { LoadingBarRouterModule } from '@ngx-loading-bar/router';
+import { blurTransformAnimation } from '../services/animations';
+import { HtmlService } from "../services/html.service";
 
 @Component({
     selector: 'app-a',
     standalone: true,
-    imports: [RouterOutlet],
+    imports: [SidebarComponent, RouterOutlet, LoadingBarRouterModule],
     templateUrl: './a.component.html',
     styleUrl: './a.component.scss',
+    animations: [blurTransformAnimation],
 })
 export class AComponent implements AfterViewInit {
-    constructor(private htmlService: HtmlService, public utilsService: UtilFuncService) {
-    }
+    constructor(
+        private html: HtmlService,
+        private contexts: ChildrenOutletContexts
+    ) {}
     
     
     ngAfterViewInit(): void {
-        this.htmlService.body().classList.remove('lg:pt-[142px]');
-        this.htmlService.body().classList.remove('pt-[100px]');
-        this.htmlService.body().classList.remove('bg-primarys');
+        this.html.body().classList.remove('lg:pt-[142px]');
+        this.html.body().classList.remove('pt-[100px]');
+        this.html.body().classList.remove('bg-primarys');
+    }
+    
+    
+    getRouteAnimationData() {
+        return this.contexts.getContext('primary')?.route?.snapshot?.data?.['animation'];
     }
 }

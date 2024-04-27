@@ -1,31 +1,29 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { HtmlService } from '../../../services/html.service';
+import { HtmlService } from '../../services/html.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCloudArrowUp, faArrowRotateRight } from '@fortawesome/free-solid-svg-icons';
 import { CommonModule } from '@angular/common';
-import { OffcanvasService } from '../../../utils/components/offcanvas/offcanvas.service';
-import { HTTPService } from "../../../services/http.service";
+import { HTTPService } from "../../services/http.service";
 import {
     AdminApprovePatientNotJoinedRequestResponse,
     AdminGetAppointmentsResponse,
     AdminGetPatientNotJoinedProofVideosResponse,
     AdminRejectPatientNotJoinedRequestResponse,
-    AdminUpdatePatientResponse
-} from "../../../interfaces/api-response-interfaces";
+} from "../../interfaces/api-response-interfaces";
 import { Subject } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { UtilFuncService } from "../../../services/util-func.service";
-import { AppointmentStatus, PatientAccountStatus } from "../../../interfaces/interfaces";
-import { ModalComponent } from "../../../utils/components/modal/modal.component";
-import { FormInputComponent } from "../../../utils/components/form-input/form-input.component";
+import { UtilFuncService } from "../../services/util-func.service";
+import { AppointmentStatus } from "../../interfaces/interfaces";
+import { ModalComponent } from "../../utils/components/modal/modal.component";
+import { FormInputComponent } from "../../utils/components/form-input/form-input.component";
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators as vl } from "@angular/forms";
-import { FormValidatorsService } from "../../../services/form-validators.service";
-import { FormSelectComponent } from "../../../utils/components/form-select/form-select.component";
-import { FormSubmitButtonComponent } from "../../../utils/components/form-submit-button/form-submit-button.component";
+import { FormValidatorsService } from "../../services/form-validators.service";
+import { FormSelectComponent } from "../../utils/components/form-select/form-select.component";
+import { FormSubmitButtonComponent } from "../../utils/components/form-submit-button/form-submit-button.component";
 import { toast } from "ngx-sonner";
 import {
     FormRefreshButtonComponent
-} from "../../../utils/components/form-refresh-button/form-refresh-button.component";
+} from "../../utils/components/form-refresh-button/form-refresh-button.component";
 import { RouterLink } from "@angular/router";
 import { VgCoreModule } from '@videogular/ngx-videogular/core';
 import { VgControlsModule } from '@videogular/ngx-videogular/controls';
@@ -421,7 +419,6 @@ export class AppointmentsComponent implements AfterViewInit {
     
     constructor(
         private html: HtmlService,
-        public offcanvas: OffcanvasService,
         private http: HTTPService,
         private utils: UtilFuncService,
         private _fb: FormBuilder,
@@ -457,75 +454,6 @@ export class AppointmentsComponent implements AfterViewInit {
     
     
     initDataTable(): void {
-        const rows = [
-            [1, 'John Doe', 'johndoe@example.com', '1990-05-15', 'password123', '+1234567890', '2023-12-06T10:00:00Z'],
-            [
-                2, 'Jane Smith', 'janesmith@example.com', '1988-09-20', 'securepass', '+1987654321',
-                '2023-12-06T11:30:00Z'
-            ],
-            [1, 'John Doe', 'johndoe@example.com', '1990-05-15', 'password123', '+1234567890', '2023-12-06T10:00:00Z'],
-            [
-                2, 'Jane Smith', 'janesmith@example.com', '1988-09-20', 'securepass', '+1987654321',
-                '2023-12-06T11:30:00Z'
-            ],
-            [1, 'John Doe', 'johndoe@example.com', '1990-05-15', 'password123', '+1234567890', '2023-12-06T10:00:00Z'],
-            [
-                2, 'Jane Smith', 'janesmith@example.com', '1988-09-20', 'securepass', '+1987654321',
-                '2023-12-06T11:30:00Z'
-            ],
-            [1, 'John Doe', 'johndoe@example.com', '1990-05-15', 'password123', '+1234567890', '2023-12-06T10:00:00Z'],
-            [
-                2, 'Jane Smith', 'janesmith@example.com', '1988-09-20', 'securepass', '+1987654321',
-                '2023-12-06T11:30:00Z'
-            ],
-            [1, 'John Doe', 'johndoe@example.com', '1990-05-15', 'password123', '+1234567890', '2023-12-06T10:00:00Z'],
-            [
-                2, 'Jane Smith', 'janesmith@example.com', '1988-09-20', 'securepass', '+1987654321',
-                '2023-12-06T11:30:00Z'
-            ],
-            [1, 'John Doe', 'johndoe@example.com', '1990-05-15', 'password123', '+1234567890', '2023-12-06T10:00:00Z'],
-            [
-                2, 'Jane Smith', 'janesmith@example.com', '1988-09-20', 'securepass', '+1987654321',
-                '2023-12-06T11:30:00Z'
-            ],
-            [1, 'John Doe', 'johndoe@example.com', '1990-05-15', 'password123', '+1234567890', '2023-12-06T10:00:00Z'],
-            [
-                2, 'Jane Smith', 'janesmith@example.com', '1988-09-20', 'securepass', '+1987654321',
-                '2023-12-06T11:30:00Z'
-            ],
-            [1, 'John Doe', 'johndoe@example.com', '1990-05-15', 'password123', '+1234567890', '2023-12-06T10:00:00Z'],
-            [
-                2, 'Jane Smith', 'janesmith@example.com', '1988-09-20', 'securepass', '+1987654321',
-                '2023-12-06T11:30:00Z'
-            ],
-            [1, 'John Doe', 'johndoe@example.com', '1990-05-15', 'password123', '+1234567890', '2023-12-06T10:00:00Z'],
-            [
-                2, 'Jane Smith', 'janesmith@example.com', '1988-09-20', 'securepass', '+1987654321',
-                '2023-12-06T11:30:00Z'
-            ],
-            [1, 'John Doe', 'johndoe@example.com', '1990-05-15', 'password123', '+1234567890', '2023-12-06T10:00:00Z'],
-            [
-                2, 'Jane Smith', 'janesmith@example.com', '1988-09-20', 'securepass', '+1987654321',
-                '2023-12-06T11:30:00Z'
-            ],
-            [1, 'John Doe', 'johndoe@example.com', '1990-05-15', 'password123', '+1234567890', '2023-12-06T10:00:00Z'],
-            [
-                2, 'Jane Smith', 'janesmith@example.com', '1988-09-20', 'securepass', '+1987654321',
-                '2023-12-06T11:30:00Z'
-            ],
-            [1, 'John Doe', 'johndoe@example.com', '1990-05-15', 'password123', '+1234567890', '2023-12-06T10:00:00Z'],
-            [2, 'Zeeshan', 'janesmith@example.com', '1988-09-20', 'securepass', '+1987654321', '2023-12-06T11:30:00Z'],
-            [1, 'John Doe', 'zeeshan@example.com', '1990-05-15', 'password123', '+1234567890', '2023-12-06T10:00:00Z'],
-            [
-                2, 'Jane Smith', 'janesmith@example.com', '1988-09-20', 'securepass', '+1987654321',
-                '2023-12-06T11:30:00Z'
-            ],
-            [1, 'John Doe', 'johndoe@example.com', '1990-05-15', 'password123', '+1234567890', '2023-12-06T10:00:00Z'],
-            [
-                2, 'Jane Smith', 'janesmith@example.com', '1988-09-20', 'securepass', '+1987654321',
-                '2023-12-06T11:30:00Z'
-            ],
-        ];
         this.dataTableInstance = this.html.createDataTable(
             this.dataTableContainer.nativeElement,
             this.columns,

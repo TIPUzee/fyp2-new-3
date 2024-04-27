@@ -1,18 +1,18 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { HtmlService } from '../../../services/html.service';
+import { HtmlService } from '../../services/html.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowLeft, faCloudArrowUp } from '@fortawesome/free-solid-svg-icons';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
-    selector: 'app-specialization-category-and-disease-mapping',
+    selector: 'app-doctors-specializations',
     standalone: true,
     imports: [FontAwesomeModule, RouterLink, CommonModule, RouterOutlet, RouterLinkActive],
-    templateUrl: './specialization-category-and-disease-mapping.component.html',
-    styleUrl: './specialization-category-and-disease-mapping.component.scss',
+    templateUrl: './doctors-specializations.component.html',
+    styleUrl: './doctors-specializations.component.scss',
 })
-export class SpecializationCategoryAndDiseaseMappingComponent implements AfterViewInit {
+export class DoctorsSpecializationsComponent implements AfterViewInit {
     @ViewChild('dataTableContainer') dataTableContainer!: ElementRef<HTMLDivElement>;
     @ViewChild('dataTableSearch') dataTableSearch!: ElementRef<HTMLInputElement>;
     @ViewChild('searchBtnsContainer') searchBtnsContainer!: ElementRef<HTMLDivElement>;
@@ -35,12 +35,11 @@ export class SpecializationCategoryAndDiseaseMappingComponent implements AfterVi
             width: 65,
         },
         {
-            label: 'Specialization Category Title',
-            field: 'specialization category title',
+            label: 'Title',
+            field: 'title',
         },
         {
-            label: 'Predictable Disease Title',
-            field: 'predictable disease title',
+            label: 'Total No. of Doctors',
         },
     ];
     
@@ -59,37 +58,37 @@ export class SpecializationCategoryAndDiseaseMappingComponent implements AfterVi
     //
     initDataTable(): void {
         const rows = [
-            [1, 'Cardiology', 'Drug Reaction'],
-            [2, 'Dermatology', 'Dengue'],
-            [1, 'Cardiology', 'Drug Reaction'],
-            [2, 'Dermatology', 'Dengue'],
-            [1, 'Cardiology', 'Drug Reaction'],
-            [2, 'Dermatology', 'Dengue'],
-            [1, 'Cardiology', 'Drug Reaction'],
-            [2, 'Dermatology', 'Dengue'],
-            [1, 'Cardiology', 'Drug Reaction'],
-            [2, 'Dermatology', 'Dengue'],
-            [1, 'Cardiology', 'Drug Reaction'],
-            [2, 'Dermatology', 'Dengue'],
-            [1, 'Cardiology', 'Drug Reaction'],
-            [2, 'Dermatology', 'Dengue'],
-            [1, 'Cardiology', 'Drug Reaction'],
-            [2, 'Dermatology', 'Dengue'],
-            [1, 'Cardiology', 'Drug Reaction'],
-            [2, 'Dermatology', 'Dengue'],
-            [1, 'Cardiology', 'Drug Reaction'],
-            [2, 'Dermatology', 'Dengue'],
-            [1, 'Cardiology', 'Drug Reaction'],
-            [2, 'Dermatology', 'Dengue'],
-            [1, 'Cardiology', 'Drug Reaction'],
-            [2, 'Urology', 'Chicken pox'],
-            [1, 'Radiology', 'Malaria'],
-            [2, 'Dermatology', 'Dengue'],
-            [1, 'Cardiology', 'Drug Reaction'],
-            [2, 'Dermatology', 'Dengue'],
+            [1, 'Cardiology', 302],
+            [2, 'Dermatology', 43],
+            [1, 'Cardiology', 302],
+            [2, 'Dermatology', 43],
+            [1, 'Cardiology', 302],
+            [2, 'Dermatology', 43],
+            [1, 'Cardiology', 302],
+            [2, 'Dermatology', 43],
+            [1, 'Cardiology', 302],
+            [2, 'Dermatology', 43],
+            [1, 'Cardiology', 302],
+            [2, 'Dermatology', 43],
+            [1, 'Cardiology', 302],
+            [2, 'Dermatology', 43],
+            [1, 'Cardiology', 302],
+            [2, 'Dermatology', 43],
+            [1, 'Cardiology', 302],
+            [2, 'Dermatology', 43],
+            [1, 'Cardiology', 302],
+            [2, 'Dermatology', 43],
+            [1, 'Cardiology', 302],
+            [2, 'Dermatology', 43],
+            [1, 'Cardiology', 302],
+            [2, 'Urology', 29],
+            [1, 'Radiology', 78],
+            [2, 'Dermatology', 43],
+            [1, 'Cardiology', 302],
+            [2, 'Dermatology', 43],
         ];
         this.dataTableInstance = this.htmlService.createDataTable(
-            this.dataTableSearch.nativeElement,
+            this.dataTableContainer.nativeElement,
             this.columns,
             undefined,
         );

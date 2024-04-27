@@ -1,36 +1,33 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { HtmlService } from '../../../services/html.service';
+import { HtmlService } from '../../services/html.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCloudArrowUp, faArrowRotateRight } from '@fortawesome/free-solid-svg-icons';
 import { CommonModule } from '@angular/common';
-import { OffcanvasService } from '../../../utils/components/offcanvas/offcanvas.service';
-import { HTTPService } from "../../../services/http.service";
+import { HTTPService } from "../../services/http.service";
 import {
     AdminCompletePatientWithdrawalRequestResponse,
     AdminGetPatientWithdrawalsResponse, AdminRejectPatientWithdrawalRequestResponse,
     AdminUpdatePatientResponse,
-    GetAllPatientsResponse
-} from "../../../interfaces/api-response-interfaces";
+} from "../../interfaces/api-response-interfaces";
 import { Subject } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { UtilFuncService } from "../../../services/util-func.service";
-import { PatientAccountStatus } from "../../../interfaces/interfaces";
-import { ModalComponent } from "../../../utils/components/modal/modal.component";
-import { FormInputComponent } from "../../../utils/components/form-input/form-input.component";
+import { UtilFuncService } from "../../services/util-func.service";
+import { ModalComponent } from "../../utils/components/modal/modal.component";
+import { FormInputComponent } from "../../utils/components/form-input/form-input.component";
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators as vl } from "@angular/forms";
-import { FormValidatorsService } from "../../../services/form-validators.service";
-import { FormSelectComponent } from "../../../utils/components/form-select/form-select.component";
-import { FormSubmitButtonComponent } from "../../../utils/components/form-submit-button/form-submit-button.component";
+import { FormValidatorsService } from "../../services/form-validators.service";
+import { FormSelectComponent } from "../../utils/components/form-select/form-select.component";
+import { FormSubmitButtonComponent } from "../../utils/components/form-submit-button/form-submit-button.component";
 import { toast } from "ngx-sonner";
 import {
     FormRefreshButtonComponent
-} from "../../../utils/components/form-refresh-button/form-refresh-button.component";
+} from "../../utils/components/form-refresh-button/form-refresh-button.component";
 import { RouterLink } from "@angular/router";
-import { FormTextareaComponent } from "../../../utils/components/form-textarea/form-textarea.component";
+import { FormTextareaComponent } from "../../utils/components/form-textarea/form-textarea.component";
 import {
     FormDatetimePickerComponent
-} from "../../../utils/components/form-datetime-picker/form-datetime-picker.component";
-import { FormFileInputComponent } from "../../../utils/components/form-file-input/form-file-input.component";
+} from "../../utils/components/form-datetime-picker/form-datetime-picker.component";
+import { FormFileInputComponent } from "../../utils/components/form-file-input/form-file-input.component";
 
 @Component({
     selector: 'app-patient-withdrawals',
@@ -448,7 +445,6 @@ export class PatientWithdrawalsComponent implements AfterViewInit {
     
     constructor(
         private html: HtmlService,
-        public offcanvas: OffcanvasService,
         private http: HTTPService,
         private utils: UtilFuncService,
         private _fb: FormBuilder,
