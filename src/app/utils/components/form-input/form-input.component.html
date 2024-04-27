@@ -22,6 +22,7 @@
             [ngClass]="{ 'opacity-50 pointer-events-none': disabled }"
             [placeholder]="placeholder"
             [type]="type"
+            (focusout)="updateErrorEvent()"
             class="peer form-input---input {{ inputEleClasses }}"
          >
          <label

@@ -180,11 +180,11 @@ export class UtilFuncService {
     
     
     markAllFormControlsAsTouched(form: FormGroup) {
-        form.patchValue(form.value);
         Object.values(form.controls).forEach((control) => {
             control.markAllAsTouched();
             control.markAsDirty();
         });
+        form.patchValue(form.value);
         return form;
     }
     
@@ -301,5 +301,4 @@ export class UtilFuncService {
             throw new Error('API url must start with /');
         }
     }
-    
 }

@@ -6,7 +6,7 @@ import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faEye as faEyeSolid } from "@fortawesome/free-solid-svg-icons";
 import { faEye as faEyeRegular } from "@fortawesome/free-regular-svg-icons";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { MonoTypeOperatorFunction } from "rxjs";
+import { MonoTypeOperatorFunction, shareReplay } from "rxjs";
 
 @Component({
     selector: 'form-input',
@@ -57,6 +57,9 @@ export class FormInputComponent implements AfterViewInit, OnInit {
     
     ngOnInit() {
         this.formGroup = this.rootFormGroup.control;
+        this.formGroup.get(this.controlName)?.statusChanges.pipe(shareReplay(1)).subscribe(() => {
+            this.updateErrorEvent();
+        });
         this.formGroup.get(this.controlName)?.valueChanges.pipe(this.takeUntilDestroyed).subscribe(() => {
             this.updateErrorEvent();
         })

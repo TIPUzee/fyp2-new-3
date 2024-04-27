@@ -100,6 +100,7 @@ def _(user: Patient | Doctor, code: int):
     user.m_email = user.m_email
     user.m_password = user.m_password
     user.m_registration_time = Func.get_current_time()
+
     user.insert(load_inserted_id_to=user.key.m_id)
     user.commit()
     user_type = 'p' if isinstance(user, Patient) else 'd'

@@ -105,22 +105,28 @@ export class ProfileComponent implements AfterViewInit {
         
         toTimeLessThanFromTimeValidator: (): ValidatorFn => {
             return (control: AbstractControl) => {
-                    // "from" time: 08:00 AM and "to" time: 12:00 AM - Error
-                    // "from" time: 08:00 AM and "to" time: 08:00 AM - Error
-                    // "from" time: 08:00 AM and "to" time: 07:00 AM - Error
-                    // "from" time: 08:00 PM and "to" time: 12:59 AM - No Error
-                    // "from" time: 08:00 PM and "to" time: 00:00 AM - Error
-                    // "from" time: 08:00 AM and "to" time: 08:15 AM - No Error
-                    if (control.parent?.get('from')?.value && control.parent?.get('to')?.value) {
-                        let from = this.utils.getTimeInMinutes(control.parent?.get('from')?.value);
-                        let to = this.utils.getTimeInMinutes(control.parent?.get('to')?.value);
-                        console.log('from', control.parent?.get('from')?.value, from, 'to', control.parent?.get('to')?.value, to);
-                        if (from >= to) {
-                            return { toTimeLessThanFromTime: true };
-                        }
-                        
-                        
-                        return null;
+                // "from" time: 08:00 AM and "to" time: 12:00 AM - Error
+                // "from" time: 08:00 AM and "to" time: 08:00 AM - Error
+                // "from" time: 08:00 AM and "to" time: 07:00 AM - Error
+                // "from" time: 08:00 PM and "to" time: 12:59 AM - No Error
+                // "from" time: 08:00 PM and "to" time: 00:00 AM - Error
+                // "from" time: 08:00 AM and "to" time: 08:15 AM - No Error
+                if (control.parent?.get('from')?.value && control.parent?.get('to')?.value) {
+                    let from = this.utils.getTimeInMinutes(control.parent?.get('from')?.value);
+                    let to = this.utils.getTimeInMinutes(control.parent?.get('to')?.value);
+                    console.log(
+                        'from',
+                        control.parent?.get('from')?.value,
+                        from,
+                        'to',
+                        control.parent?.get('to')?.value,
+                        to
+                    );
+                    if (from >= to) {
+                        return { toTimeLessThanFromTime: true };
+                    }
+                    
+                    return null;
                 }
                 
                 return null;
@@ -176,7 +182,7 @@ export class ProfileComponent implements AfterViewInit {
             
             if (res.alreadyApproved) {
                 toast.error('Your account is already approved');
-                await this.profile.loadFromServer();
+                await this.profile.load();
                 
             } else if (res.noFilesUploaded) {
                 toast.error('Please upload PDFs');
@@ -185,7 +191,7 @@ export class ProfileComponent implements AfterViewInit {
                 toast.success('Approval request submitted');
                 this.accountApprovalRequestModal.close();
                 this.accountApprovalRequestForm.fg.reset();
-                await this.profile.loadFromServer();
+                await this.profile.load();
             }
         }
     }
@@ -533,7 +539,7 @@ export class ProfileComponent implements AfterViewInit {
                 toast.error('Please select your languages again');
             } else if (res.profileUpdated) {
                 toast.success('Profile updated');
-                await this.profile.loadFromServer();
+                await this.profile.load();
             } else {
                 toast.error('Failed to update profile, please try again');
             }
@@ -620,7 +626,7 @@ export class ProfileComponent implements AfterViewInit {
         waiting: false,
         submit: async () => {
             this.profileRefreshForm.waiting = true;
-            let res = await this.profile.loadFromServer();
+            let res = await this.profile.load();
             this.profileRefreshForm.waiting = false;
             if (!res) {
                 toast.error('Failed to fetch profile');
@@ -694,13 +700,10 @@ export class ProfileComponent implements AfterViewInit {
     ) {
         this.takeUntilDestroyed = takeUntilDestroyed();
         
-    }
-    
-    
-    ngAfterViewInit(): void {
         this.clearAllExperiences();
+        
         this.profileUpdateForm.refreshValues();
-        this.profile.change$.pipe(this.takeUntilDestroyed).subscribe(async () => {
+        this.profile.change$.pipe(takeUntilDestroyed()).subscribe(async () => {
             this.profileUpdateForm.refreshValues();
             this.html.initTailwindElements();
         })
@@ -709,14 +712,21 @@ export class ProfileComponent implements AfterViewInit {
         this.specCategories.change$.pipe(this.takeUntilDestroyed).subscribe(() => {
             this.initSpecializationCategoryOptions();
         })
-
-        this.removeExperienceFromProfile(0);
+        
+        if (this.profile.details.id === -1) {
+            this.removeExperienceFromProfile(0);
+        }
         
         this.initProfileAvailabilityDurationsDateChangeEvent();
         
         this.initDynamicImageFileComponents();
         
         this.html.initTailwindElements();
+    }
+    
+    
+    ngAfterViewInit(): void {
+        this.profile.load();
         this.loadDynamicImagesFromServer();
     }
     
@@ -774,14 +784,16 @@ export class ProfileComponent implements AfterViewInit {
                     this.profile.details.coverPicFilename));
             }
         })
-        this.profileUpdateForm.fg.controls.profilePic.valueChanges.pipe(this.takeUntilDestroyed).pipe(this.takeUntilDestroyed).subscribe(() => {
-            if (this.profileUpdateForm.fg.controls.profilePic.value) {
-                this.profilePicImage?.loadLocalImageFile(this.profileUpdateForm.fg.controls.profilePic.value);
-            } else {
-                this.profilePicImage?.loadURLImageFile(this.utils.makeOwnServerUrl('/api/file/' +
-                    this.profile.details.profilePicFilename));
-            }
-        })
+        this.profileUpdateForm.fg.controls.profilePic.valueChanges.pipe(this.takeUntilDestroyed)
+            .pipe(this.takeUntilDestroyed)
+            .subscribe(() => {
+                if (this.profileUpdateForm.fg.controls.profilePic.value) {
+                    this.profilePicImage?.loadLocalImageFile(this.profileUpdateForm.fg.controls.profilePic.value);
+                } else {
+                    this.profilePicImage?.loadURLImageFile(this.utils.makeOwnServerUrl('/api/file/' +
+                        this.profile.details.profilePicFilename));
+                }
+            })
     }
     
     
@@ -843,7 +855,7 @@ export class ProfileComponent implements AfterViewInit {
     
     
     async reloadProfile() {
-        let res = await this.profile.loadFromServer();
+        let res = await this.profile.load();
         if (!res) {
             toast.error('Failed to fetch profile');
         } else {

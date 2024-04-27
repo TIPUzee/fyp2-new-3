@@ -1,27 +1,31 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { RatingStarsComponent } from '../../compo/rating-stars/rating-stars.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CommonService } from '../../../services/common.service';
 import { HtmlService } from '../../../services/html.service';
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { PatientProfileService } from "../../../services/patient-profile.service";
 import {
-    GetAppointmentTransactionsResponse,
-    GetPatientRefundTransactionsResponse
+    PatientGetAppointmentTransactionsResponse,
+    GetWithdrawalTransactionsResponse
 } from "../../../interfaces/api-response-interfaces";
 import { HTTPService } from "../../../services/http.service";
 import { DatetimePipe } from "../../../pipes/datetime.pipe";
 import { AppointmentDurationPipe } from "../../../pipes/appointment-duration.pipe";
+import { ModalComponent } from "../../../utils/components/modal/modal.component";
+import { UtilFuncService } from "../../../services/util-func.service";
 
-type AppointmentTransaction = GetAppointmentTransactionsResponse['transactions'][0] & { type: 'APPOINTMENT' };
-type RefundTransaction = GetPatientRefundTransactionsResponse['refundTransactions'][0] & { type: 'REFUND' };
+type AppointmentTransaction = PatientGetAppointmentTransactionsResponse['transactions'][0] & { type: 'APPOINTMENT' };
+type RefundTransaction = GetWithdrawalTransactionsResponse['refundTransactions'][0] & { type: 'REFUND' };
 
 @Component({
     selector: 'app-transactions',
     standalone: true,
-    imports: [CommonModule, RouterLink, RatingStarsComponent, FontAwesomeModule, DatetimePipe, AppointmentDurationPipe],
+    imports: [
+        CommonModule, RouterLink, FontAwesomeModule, DatetimePipe, AppointmentDurationPipe,
+        ModalComponent
+    ],
     templateUrl: './transactions.component.html',
     styleUrl: './transactions.component.scss',
 })
@@ -29,9 +33,11 @@ export class TransactionsComponent implements AfterViewInit, OnInit {
     faArrowUpRightFromSquare = faArrowUpRightFromSquare;
     //
     // transactions
+    selectedTransactionIndex = 0;
+    selectedTransactionSS = '';
     transactions: (AppointmentTransaction | RefundTransaction)[] = [];
     appointmentTransactions = this.initAppointmentTransactions();
-    refundTransactions = this.initRefundTransactions();
+    withdrawalTransactions = this.initRefundTransactions();
     
     
     constructor(
@@ -39,20 +45,25 @@ export class TransactionsComponent implements AfterViewInit, OnInit {
         private html: HtmlService,
         protected profile: PatientProfileService,
         private http: HTTPService,
+        private utils: UtilFuncService,
     ) {}
     
     
-    async ngAfterViewInit(): Promise<void> {
-        console.info('transactions', this.transactions);
+    async ngOnInit() {
+        this.initTransactions();
     }
     
     
-    async ngOnInit() {
+    async ngAfterViewInit(): Promise<void> {
+    }
+    
+    async initTransactions() {
         await this.appointmentTransactions.load();
-        await this.refundTransactions.load();
+        await this.withdrawalTransactions.load();
         this.transactions = this.getCombinedTransactions();
         this.html.initTailwindElements();
     }
+    
     
     getCombinedTransactions() {
         // merge appointment and refund transactions
@@ -64,7 +75,7 @@ export class TransactionsComponent implements AfterViewInit, OnInit {
             transactions.push({ ...t, type: 'APPOINTMENT' });
         });
         
-        this.refundTransactions.list.forEach(t => {
+        this.withdrawalTransactions.list.forEach(t => {
             transactions.push({ ...t, type: 'REFUND' });
         });
         
@@ -87,9 +98,9 @@ export class TransactionsComponent implements AfterViewInit, OnInit {
     
     initAppointmentTransactions() {
         const _ = {
-            loading: false,
+            loading: true,
             errorLoading: false,
-            list: [] as GetAppointmentTransactionsResponse['transactions'],
+            list: [] as PatientGetAppointmentTransactionsResponse['transactions'],
             load: async () => {}
         }
         
@@ -100,7 +111,7 @@ export class TransactionsComponent implements AfterViewInit, OnInit {
             const res = await this.http.sendRequest({
                 url: '/appointments/transactions',
                 method: 'GET',
-            }) as GetAppointmentTransactionsResponse | false;
+            }) as PatientGetAppointmentTransactionsResponse | false;
             
             _.loading = false;
             
@@ -128,9 +139,9 @@ export class TransactionsComponent implements AfterViewInit, OnInit {
     
     initRefundTransactions() {
         const _ = {
-            loading: false,
+            loading: true,
             errorLoading: false,
-            list: [] as GetPatientRefundTransactionsResponse['refundTransactions'],
+            list: [] as GetWithdrawalTransactionsResponse['refundTransactions'],
             load: async () => {}
         }
         
@@ -139,9 +150,9 @@ export class TransactionsComponent implements AfterViewInit, OnInit {
             _.errorLoading = false;
             
             const res = await this.http.sendRequest({
-                url: '/withdraw/refund-transactions',
+                url: '/withdrawal/all',
                 method: 'GET',
-            }) as GetPatientRefundTransactionsResponse | false;
+            }) as GetWithdrawalTransactionsResponse | false;
             
             _.loading = false;
             
@@ -157,6 +168,7 @@ export class TransactionsComponent implements AfterViewInit, OnInit {
                         ...t,
                         requestTime: new Date(t.requestTime),
                         trxTime: new Date(t.trxTime),
+                        ss: this.utils.makeOwnServerUrl(this.utils.makeApiUrl('/file/' + t.ss))
                     });
                 });
             } else {

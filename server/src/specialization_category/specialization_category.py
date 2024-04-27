@@ -1,10 +1,14 @@
-from utils import SQLEntity, Validator as vld
+from typing import Optional
+from datetime import datetime
+
+from utils import SQLEntity, Validator as Vld
 
 
-class SpecializationCategory(SQLEntity, vld.PropertyTypeValidatorEntity):
+class SpecializationCategory(SQLEntity, Vld.PropertyTypeValidatorEntity):
     def __init__(self):
-        self.m_id = vld.validatable(vld.And(vld.Int(), vld.MinVal(0)))
-        self.m_title = vld.validatable(vld.And(vld.Str(), vld.MinLen(3), vld.MaxLen(64)))
+        self.m_id: Optional[int] = Vld.validatable(Vld.And(Vld.Int(), Vld.MinVal(0)))
+        self.m_title: Optional[str] = Vld.validatable(Vld.And(Vld.Str(), Vld.MinLen(3), Vld.MaxLen(64)))
+        self.m_creation_time: Optional[datetime] = Vld.validatable(Vld.DateTimeObject())
         super().__init__()
         self.turn_on_validation()
 

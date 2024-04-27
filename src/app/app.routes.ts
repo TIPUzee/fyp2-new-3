@@ -34,23 +34,12 @@ export const routes: Routes = [
                         data: { animation: 'previewProfile' },
                     },
                     {
-                        path: 'ar',
-                        loadComponent: () => import('./d/dash/requested-appointments/requested-appointments.component').then(
-                            x => x.RequestedAppointmentsComponent),
-                        data: { animation: 'requestedAppointments' },
-                    },
-                    {
-                        path: 'ua',
-                        loadComponent: () => import('./d/dash/unpaid-appointments/unpaid-appointments.component').then(x => x.UnpaidAppointmentsComponent),
-                        data: { animation: 'unpaidAppointments' },
-                    },
-                    {
                         path: 'pa',
                         loadComponent: () => import('./d/dash/pending-appointments/pending-appointments.component').then(
                             x => x.PendingAppointmentsComponent),
                         data: { animation: 'pendingAppointments' },
                     },
-                    {
+                {
                         path: 'ca',
                         loadComponent: () => import('./d/dash/completed-appointments/completed-appointments.component').then(
                             x => x.CompletedAppointmentsComponent),
@@ -62,7 +51,7 @@ export const routes: Routes = [
                         data: { animation: 'transactions' },
                     },
                     {
-                        path: 'withdraw',
+                        path: 'w',
                         loadComponent: () => import('./d/dash/withdraw/withdraw.component').then(x => x.WithdrawComponent),
                         data: { animation: 'withdraw' },
                     },
@@ -139,7 +128,7 @@ export const routes: Routes = [
                         data: { animation: 'transactions' },
                     },
                     {
-                        path: 'withdraw',
+                        path: 'w',
                         loadComponent: () => import('./p/dash/withdraw/withdraw.component').then(x => x.WithdrawComponent),
                         data: { animation: 'withdraw' },
                     },
@@ -193,69 +182,27 @@ export const routes: Routes = [
                         ],
                     },
                     {
-                        path: 'docs-approval-req',
-                        loadComponent: () =>
-                            import('./a/dash/doctors-approval-requests/doctors-approval-requests.component').then(x => x.DoctorsApprovalRequestsComponent),
-                        data: { animation: 'doctors-approval-requests' },
-                        children: [
-                            {
-                                path: 'profile',
-                                loadComponent: () => import('./p/dash/doctor-details/doctor-details.component').then(x => x.DoctorDetailsComponent),
-                                data: { animation: 'doctor-details-profile' },
-                            },
-                        ],
-                    },
-                    {
                         path: 'appo',
                         loadComponent: () => import('./a/dash/appointments/appointments.component').then(x => x.AppointmentsComponent),
                         data: { animation: 'all-appointments' },
                     },
                     {
-                        path: 'fail-appo',
-                        loadComponent: () => import('./a/dash/failed-appointments/failed-appointments.component').then(x => x.FailedAppointmentsComponent),
-                        data: { animation: 'failed-appointments' },
-                    },
-                    {
-                        path: 'active-appo',
-                        loadComponent: () => import('./a/dash/active-appointments/active-appointments.component').then(x => x.ActiveAppointmentsComponent),
-                        data: { animation: 'active-appointments' },
-                    },
-                    {
-                        path: 'appo-actions',
+                        path: 'd-w',
                         loadComponent: () =>
-                            import('./a/dash/pending-appointments-actions/pending-appointments-actions.component').then(
-                                x => x.PendingAppointmentsActionsComponent),
-                        data: { animation: 'pending-appointments-actions' },
+                            import('././a/dash/doctor-withdrawals/doctor-withdrawals.component').then(x => x.DoctorWithdrawalsComponent),
+                        data: { animation: 'doctor-withdrawals' },
                     },
                     {
-                        path: 'appo-pays',
-                        loadComponent: () => import('./a/dash/appointment-payments/appointment-payments.component').then(
-                            x => x.AppointmentPaymentsComponent),
-                        data: { animation: 'appointment-payments' },
-                    },
-                    {
-                        path: 'doc-w-trxs',
+                        path: 'p-w',
                         loadComponent: () =>
-                            import('./a/dash/doctor-drawal-transactions/doctor-drawal-transactions.component').then(x => x.DoctorDrawalTransactionsComponent),
-                        data: { animation: 'doctor-details-withdrawal-transactions' },
+                            import('././a/dash/patient-withdrawals/patient-withdrawals.component').then(x => x.PatientWithdrawalsComponent),
+                        data: { animation: 'patient-withdrawals' },
                     },
                     {
-                        path: 'doc-w-req',
-                        loadComponent: () => import('./a/dash/doctor-drawal-requests/doctor-drawal-requests.component').then(
-                            x => x.DoctorDrawalRequestsComponent),
-                        data: { animation: 'doctor-details-withdrawal-requests' },
-                    },
-                    {
-                        path: 'pat-w-trxs',
-                        loadComponent: () =>
-                            import('./a/dash/patient-drawal-transactions/patient-drawal-transactions.component').then(x => x.PatientDrawalTransactionsComponent),
-                        data: { animation: 'patient-withdrawal-transactions' },
-                    },
-                    {
-                        path: 'pat-w-req',
-                        loadComponent: () => import('./a/dash/patient-drawal-requests/patient-drawal-requests.component').then(
-                            x => x.PatientDrawalRequestsComponent),
-                        data: { animation: 'patient-withdrawal-requests' },
+                        path: 's-c',
+                        loadComponent: () => import('././a/dash/all-specialization-categories/all-specialization-categories.component').then(
+                            x => x.AllSpecializationCategoriesComponent),
+                        data: { animation: 'specialization-categories' },
                     },
                     {
                         path: 'spec',
@@ -272,6 +219,11 @@ export const routes: Routes = [
                         data: { animation: 'specialization-and-disease-mapping' },
                     },
                     {
+                        path: 'l',
+                        loadComponent: () => import('././a/dash/all-languages/all-languages.component').then(x => x.AllLanguagesComponent),
+                        data: { animation: 'languages' },
+                    },
+                    {
                         path: 'lang',
                         loadComponent: () => import('./a/dash/languages/languages.component').then(x => x.LanguagesComponent),
                         data: { animation: 'languages' },
@@ -284,8 +236,7 @@ export const routes: Routes = [
                 ],
             },
         ],
-    },
-    {
+    }, {
         path: '',
         loadComponent: () => import('./g/g.component').then(x => x.GComponent),
         children: [

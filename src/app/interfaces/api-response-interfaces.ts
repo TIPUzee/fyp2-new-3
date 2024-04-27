@@ -11,7 +11,11 @@ import {
     DoctorAppointmentSlot,
     Doctor,
     PayfastPaymentGatewayParams,
-    PatientRefundTransactionRequest, AppointmentStatus, PatientAccountStatus, DoctorAccountStatus
+    WithdrawalTransactionRequest,
+    AppointmentStatus,
+    PatientAccountStatus,
+    DoctorAccountStatus,
+    WithdrawalTransactionRequestStatus, DoctorWithdrawalTransactionRequestStatus
 } from "./interfaces";
 
 export interface LoadPatientProfileResponse {
@@ -220,22 +224,40 @@ export interface SubmitPatientReviewResponse {
     reviewedSuccessfully: boolean,
 }
 
-export interface SubmitPatientRefundTransactionRequestResponse {
+export interface SubmitWithdrawalTransactionRequestResponse {
     minAmount: number,
     minAmountNotMet: boolean,
+    insufficientAmountInAccount: boolean,
     alreadyRequested: boolean,
     success: boolean,
 }
 
-export interface GetPrevPatientRefundTransactionRequestResponse {
+export interface GetPrevWithdrawalTransactionRequestResponse {
     neverRequested: boolean,
     alreadyRequested: boolean,
     prevRejected: boolean,
     prevCompleted: boolean,
-    requestDetails: PatientRefundTransactionRequest,
+    requestDetails: WithdrawalTransactionRequest,
 }
 
-export type GetAppointmentTransactionsResponse = {
+export type DoctorGetAppointmentTransactionsResponse = {
+    transactions: {
+        patient: {
+            id: number,
+            name: string
+        },
+        patientId: number,
+        id: number,
+        paidAmount: number,
+        refundedAmount: number,
+        paymentTime: Date,
+        status: AppointmentStatus,
+        timeFrom: Date,
+        timeTo: Date,
+    }[]
+}
+
+export type PatientGetAppointmentTransactionsResponse = {
     transactions: {
         doctor: {
             id: number,
@@ -252,7 +274,7 @@ export type GetAppointmentTransactionsResponse = {
     }[]
 }
 
-export type GetPatientRefundTransactionsResponse = {
+export type GetWithdrawalTransactionsResponse = {
     noTransactions: false,
     refundTransactions:
         {
@@ -265,7 +287,8 @@ export type GetPatientRefundTransactionsResponse = {
             senderEpNb: string,
             senderEpUsername: string,
             trxId: string,
-            trxTime: Date
+            trxTime: Date,
+            ss: string,
         }[]
 }
 
@@ -351,8 +374,128 @@ export interface AdminRejectPatientNotJoinedRequestResponse {
     markedAsPatientNotJoinedReject: boolean,
 }
 
+export interface AdminApprovePatientNotJoinedRequestResponse {
+    appointmentNotExists: boolean,
+    statusNotChangeable: boolean,
+    alreadyMarkedAsPatientNotJoined: boolean,
+    markedAsPatientNotJoined: boolean,
+}
+
 export interface AdminGetPatientNotJoinedProofVideosResponse {
     appointmentNotExists: boolean,
     statusNotSuitable: boolean,
     videos: string[],
+}
+
+export interface AdminGetPatientWithdrawalsResponse {
+    withdrawals: {
+        amount: number,
+        id: number,
+        patientId: number,
+        receiverEpNb: string,
+        receiverEpUsername: string,
+        rejectionReason: string,
+        requestTime: Date,
+        senderEpNb: string,
+        senderEpUsername: string,
+        status: WithdrawalTransactionRequestStatus,
+        trxId: string,
+        trxTime: Date
+    }[],
+}
+
+export interface AdminGetDoctorWithdrawalsResponse {
+    withdrawals: {
+        amount: number,
+        id: number,
+        doctorId: number,
+        receiverEpNb: string,
+        receiverEpUsername: string,
+        rejectionReason: string,
+        requestTime: Date,
+        senderEpNb: string,
+        senderEpUsername: string,
+        status: WithdrawalTransactionRequestStatus,
+        trxId: string,
+        trxTime: Date
+    }[],
+}
+
+export interface AdminCompletePatientWithdrawalRequestResponse {
+    withdrawalNotFound: boolean,
+    alreadyResponded: boolean,
+    withdrawalCurrentStatus: WithdrawalTransactionRequestStatus,
+    withdrawalCompleted: boolean,
+}
+
+export interface AdminCompleteDoctorWithdrawalRequestResponse {
+    withdrawalNotFound: boolean,
+    alreadyResponded: boolean,
+    withdrawalCurrentStatus: WithdrawalTransactionRequestStatus,
+    withdrawalCompleted: boolean,
+}
+
+export interface AdminRejectPatientWithdrawalRequestResponse {
+    withdrawalNotFound: boolean,
+    alreadyResponded: boolean,
+    withdrawalCurrentStatus: DoctorWithdrawalTransactionRequestStatus,
+    withdrawalRejected: boolean,
+}
+
+export interface AdminRejectDoctorWithdrawalRequestResponse {
+    withdrawalNotFound: boolean,
+    alreadyResponded: boolean,
+    withdrawalCurrentStatus: DoctorWithdrawalTransactionRequestStatus,
+    withdrawalRejected: boolean,
+}
+
+export interface AdminGetLanguagesResponse {
+    languages: {
+        creationTime: Date,
+        id: number,
+        title: string
+    }[],
+}
+
+export interface AdminCreateNewLanguageResponse {
+    titleAlreadyExists: boolean,
+    existsAsId: number,
+    languageCreated: boolean,
+}
+
+export interface AdminUpdateLanguageResponse {
+    languageDoesNotExist: boolean,
+    titleAlreadyExists: boolean,
+    updated: boolean,
+}
+
+export interface AdminDeleteLanguageResponse {
+    languageDoesNotExist: boolean,
+    languageDeleted: boolean,
+}
+
+
+export interface AdminGetSpecializationCategoriesResponse {
+    specializationCategories: {
+        creationTime: Date,
+        id: number,
+        title: string
+    }[],
+}
+
+export interface AdminCreateNewSpecializationCategoryResponse {
+    titleAlreadyExists: boolean,
+    existsAsId: number,
+    specializationCategoryCreated: boolean,
+}
+
+export interface AdminUpdateSpecializationCategoryResponse {
+    specializationCategoryDoesNotExist: boolean,
+    titleAlreadyExists: boolean,
+    updated: boolean,
+}
+
+export interface AdminDeleteSpecializationCategoryResponse {
+    specializationCategoryDoesNotExist: boolean,
+    specializationCategoryDeleted: boolean,
 }

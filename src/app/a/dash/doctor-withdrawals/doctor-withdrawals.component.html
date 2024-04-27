@@ -1,0 +1,242 @@
+<div class="main workspace !pt-4 !pb-1">
+   <div class="w-full mb-0 mt-0">
+      <div class="text-xl text-center mb-2 text-black text-opacity-60">Doctor Withdrawals</div>
+   </div>
+   <div class="bg-white rounded-lg px-5 pb-3 pt-5 shadow-xl relative">
+      <div class="">
+         <div class="relative flex w-full flex-col justify-stretch">
+            <div class="flex mb-2">
+               <input
+                  id="datatable-search-input"
+                  #dataTableSearch
+                  (input)="mainClass.searched.search(dataTableSearch.value)"
+                  (keyup)="mainClass.searched.search(dataTableSearch.value)"
+                  [value]="mainClass.searched.query"
+                  aria-describedby="button-addon1"
+                  aria-label="Search"
+                  placeholder="Search"
+                  type="search"
+                  class="w-full relative m-0 -mr-0.5 block min-w-0 flex-auto rounded border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary-400 focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary-400"
+               />
+               <div class="ms-2">
+                  <form-refresh-button
+                     (click)="load({ force: true })"
+                     [disabled]="mainClass.loading"
+                     [loading]="mainClass.loading"
+                  ></form-refresh-button>
+               </div>
+            </div>
+            <div>
+               <div #searchButtonsContainer class="flex gap-x-2 overflow-x-auto pb-1">
+                  <ng-container *ngFor="let column of columns; let i = index">
+                     <ng-container *ngIf="column.field">
+                        <div>
+                           <div
+                              (click)="mainClass.searched.selectKey(column.field);"
+                              [attr.data-column-field]="column['field']"
+                              [ngClass]="{'active': mainClass.searched.list.includes(column.field)}"
+                              class="searchBtn whitespace-nowrap [&.active]:bg-dark [&.active]:text-primary-100 relative px-4 pb-1 pt-1.5 border border-dark text-dark text-opacity-70 hover:text-opacity-90 text-sm rounded cursor-pointer"
+                           >
+                              {{ column['label'] }}
+                           </div>
+                        </div>
+                     </ng-container>
+                  </ng-container>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div
+         id="dataTableContainer"
+         #dataTableContainer
+         data-te-fixed-header="true"
+         class="[&_tr:hover]:bg-primary-300 [&_tr:hover]:bg-opacity-30 [&_tr]:transition-colors [&_tr]:duration-200 whitespace-nowrap scroll-auto [&_*]:scroll-auto max-w-full [&_tbody_tr]:opacity-0 [&>[data-te-datatable-inner-ref]]:max-h-[calc(100vh-255px)] [&_td]:py-2"
+      >
+      </div>
+   </div>
+</div>
+
+<a
+   data-te-ripple-color="light"
+   data-te-ripple-init
+   data-te-target="#possibleActions"
+   data-te-toggle="modal"
+   type="button"
+   class="hidden cursor-pointer shake-top text-center w-fit rounded bg-blue-500 text-neutral-50 shadow-[0_4px_9px_-4px_rgba(51,45,45,0.7)] hover:bg-blue-600 hover:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] focus:bg-blue-800 focus:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] active:bg-blue-700 active:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal transition duration-150 ease-in-out focus:outline-none focus:ring-0"
+>
+   Possible Actions Hidden Button
+</a>
+
+<!-- Modal - Possible Actions -->
+<app-modal #possibleActionsModal (onClose)="rejectForm.opened=false; completeForm.opened=false;">
+   <div title>
+      Possible Actions
+      <span class="text-dark text-opacity-70 font-normal text-base">
+         ID: {{ selectedObj.id }}
+      </span>
+   </div>
+   <div body>
+      <div [ngClass]="{'hidden': selectedObj.status !== 'REQUESTED'}">
+         <div class="text-black font-semibold text-base mb-3">Response to the Request</div>
+         <div class="mb-3">
+            <div data-te-input-wrapper-init class="relative mb-3">
+               <input
+                  id="receiverEpUsername"
+                  [value]="selectedObj.receiverEpUsername"
+                  placeholder="e.g. Zeeshan Nadeem"
+                  type="text"
+                  class="peer form-input---input"
+               />
+               <label
+                  for="receiverEpUsername"
+                  class="form-input---label"
+               >
+                  Receiver Easypaisa Username
+               </label>
+            </div>
+         </div>
+         <div class="mb-3">
+            <div data-te-input-wrapper-init class="relative mb-3">
+               <input
+                  id="receiverEpNb"
+                  [value]="selectedObj.receiverEpNb"
+                  placeholder="e.g. +923012345678"
+                  type="text"
+                  class="peer form-input---input"
+               />
+               <label
+                  for="receiverEpNb"
+                  class="form-input---label"
+               >
+                  Receiver Easypaisa Number
+               </label>
+            </div>
+         </div>
+         <div
+            [ngClass]="{ '!grid-rows-[1fr]': !rejectForm.opened && !completeForm.opened }"
+            class="grid grid-rows-[0fr] transition-all duration-200 ease-in-out"
+         >
+            <div class="overflow-hidden">
+               <div class="flex justify-end gap-x-1">
+                  <form-submit-button
+                     (click)="rejectForm.opened=true; selectedObjectForm.submit()"
+                     btnStyle="btn-red btn-shadow"
+                     label="Reject"
+                  ></form-submit-button>
+                  <form-submit-button
+                     (click)="completeForm.opened=true; selectedObjectForm.submit()"
+                     btnStyle="btn-blue btn-shadow"
+                     label="Complete"
+                  ></form-submit-button>
+               </div>
+            </div>
+         </div>
+         <div
+            [ngClass]="{ '!grid-rows-[1fr] pointer-events-auto opacity-100': completeForm.opened }"
+            class="grid grid-rows-[0fr] transition-all duration-200 ease-in-out pointer-events-none opacity-0"
+         >
+            <div class="overflow-hidden -mt-4">
+               <form class="pt-4" [formGroup]="completeForm.fg">
+                  <div class="mb-3">
+                     <form-input
+                        [errors]="completeForm.errors.senderEpUsername"
+                        controlName="senderEpUsername"
+                        label="Sender Easypaisa Username"
+                        placeholder="e.g. Zeeshan Nadeem"
+                        type="text"
+                     ></form-input>
+                  </div>
+                  <div class="mb-3">
+                     <form-input
+                        [errors]="completeForm.errors.senderEpNb"
+                        controlName="senderEpNb"
+                        label="Sender Easypaisa Number"
+                        placeholder="e.g. +923012345678"
+                        type="text"
+                     ></form-input>
+                  </div>
+                  <div class="mb-3">
+                     <form-input
+                        [errors]="completeForm.errors.trxId"
+                        controlName="trxId"
+                        label="Transaction/Trx Id"
+                        placeholder="e.g. +923012345678"
+                        type="text"
+                     ></form-input>
+                  </div>
+                  <div class="mb-3">
+                     <form-datetime-picker
+                        [errors]="completeForm.errors.trxTime"
+                        controlName="trxTime"
+                        label="Transaction/Trx Time"
+                        placeholder="e.g. 25/04/2024, 04:20 PM"
+                        type="text"
+                     ></form-datetime-picker>
+                  </div>
+                  <div class="mb-3 -mt-3">
+                     <form-file-input
+                        [errors]="completeForm.errors.ss"
+                        controlName="ss"
+                        label="Transaction Screenshot"
+                     ></form-file-input>
+                  </div>
+                  <div class="flex justify-end gap-x-1">
+                     <form-submit-button
+                        (click)="completeForm.opened=false;"
+                        btnStyle="btn-primary-100"
+                        label="No"
+                     ></form-submit-button>
+                     <form-submit-button
+                        (click)="completeForm.opened=true; completeForm.submit()"
+                        btnStyle="btn-blue btn-shadow"
+                        label="Complete"
+                     ></form-submit-button>
+                  </div>
+               </form>
+            </div>
+         </div>
+         <div
+            [ngClass]="{ '!grid-rows-[1fr] pointer-events-auto opacity-100': rejectForm.opened }"
+            class="grid grid-rows-[0fr] transition-all duration-200 ease-in-out pointer-events-none opacity-0"
+         >
+            <div class="overflow-hidden -mt-4">
+               <form class="pt-4" [formGroup]="rejectForm.fg">
+                  <div class="mb-3">
+                     <form-textarea
+                        [errors]="rejectForm.errors.reason"
+                        [rows]="5"
+                        controlName="reason"
+                        label="Rejection Reason"
+                        placeholder="e.g. Your information does not match"
+                        type="text"
+                     ></form-textarea>
+                  </div>
+                  <div class="flex justify-end gap-x-1">
+                     <form-submit-button
+                        (click)="rejectForm.opened=false;"
+                        btnStyle="btn-primary-100"
+                        label="No"
+                     ></form-submit-button>
+                     <form-submit-button
+                        (click)="rejectForm.opened=true; rejectForm.submit()"
+                        btnStyle="btn-red btn-shadow"
+                        label="Reject"
+                     ></form-submit-button>
+                  </div>
+               </form>
+            </div>
+         </div>
+      </div>
+
+      <div [ngClass]="{'hidden': selectedObj.status === 'REQUESTED'}">...</div>
+   </div>
+   <div bottom>
+      <a
+         [queryParams]="{ id: selectedObj.doctorId }" [routerLink]="['../', 'd']"
+         class="btn btn-primary-100 text-blue-700 w-full text-center"
+      >
+         View Doctor
+      </a>
+   </div>
+</app-modal>
+<!-- Modal - Possible Actions -->

@@ -535,8 +535,6 @@ def _(user: None, doctor_id: int) -> None:
     access_control='All'
 )
 def _(user: None, doctor_id: int) -> None:
-    import time
-    time.sleep(3)
     request_response = {
         'doctor_not_found':  False,
         'doctor_not_active': False,
@@ -572,8 +570,6 @@ def _(user: Admin, id: int):
 
 
 def get_doctors(user: Admin, id: int = None):
-    import time
-    time.sleep(0.5)
     request_response = {
         'doctors': []
     }

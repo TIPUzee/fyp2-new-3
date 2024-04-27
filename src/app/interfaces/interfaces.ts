@@ -194,19 +194,20 @@ export interface PayfastPaymentGatewayParams {
     items: PayfastPaymentGatewayParamItem[],
 }
 
-export type PatientRefundTransactionRequestStatus = 'REQUESTED' | 'REJECTED' | 'COMPLETED';
+export type WithdrawalTransactionRequestStatus = 'REQUESTED' | 'REJECTED' | 'COMPLETED';
 
-export interface PatientRefundTransactionRequest {
+export type DoctorWithdrawalTransactionRequestStatus = 'REQUESTED' | 'REJECTED' | 'COMPLETED';
+
+export type WithdrawalTransactionRequest = {
     amount: number,
     id: number,
-    patientId: number,
     receiverEpNb: string,
     receiverEpUsername: string,
     rejectionReason: string,
     requestTime: Date,
     senderEpNb: string,
     senderEpUsername: string,
-    status: PatientRefundTransactionRequestStatus,
+    status: WithdrawalTransactionRequestStatus,
     trxId: string,
     trxTime: Date | null
-}
+} & ({ patientId: number } | { doctorId: number });

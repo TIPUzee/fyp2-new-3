@@ -1,8 +1,8 @@
 <button
-   [disabled]="disabled || waiting"
+   [disabled]="disabled || waiting || currentCountDown !== 0"
    [ngClass]="{
       'shadow-[0_4px_9px_-4px_rgba(51,45,45,0.7)] hover:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)]': shadow,
-      'cursor-default': disabled || waiting,
+      'cursor-default': disabled || waiting || currentCountDown !== 0,
    }"
    data-te-ripple-color="light"
    data-te-ripple-init
@@ -26,5 +26,8 @@
          </span>
       </div>
    </div>
+   <ng-container *ngIf="currentCountDown !== 0">
+      <span class="mr-2">{{ currentCountDown }}</span>
+   </ng-container>
    {{ label }}
 </button>

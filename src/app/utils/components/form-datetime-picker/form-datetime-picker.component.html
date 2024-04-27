@@ -1,0 +1,50 @@
+<div [formGroup]="formGroup">
+
+   <!---TE-Input--->
+   <div>
+      <div
+         #datePickerEle
+         (click)="markAsTouched()"
+         [attr.data-command-2]="updateInputStateActive()"
+         [ngClass]="{'form-input---invalid': toShowError()}"
+         data-te-input-wrapper-init
+         class="relative"
+      >
+         <input
+            #datePickerInputEle
+            [attr.data-command-1]="
+               !!defaultValue ? datePickerInputEle.setAttribute('data-te-input-state-active', 'true') : null
+            "
+            [formControlName]="controlName"
+            [id]="controlName + id"
+            [ngClass]="{ 'opacity-50 pointer-events-none': disabled }"
+            [placeholder]="placeholder"
+            type="text"
+            class="peer form-date-picker---input"
+         />
+         <label
+            [for]="controlName + id"
+            style="margin-left: 0;"
+            class="form-date-picker---label"
+         >
+            {{ label }}
+         </label>
+      </div>
+   </div>
+   <!---TE-Input--->
+
+   <!---Errors--->
+   <div>
+      <div
+         [ngClass]="{'': updateError(),  '!grid-rows-[1fr] !opacity-100': currentError !== ''}"
+         class="form---error"
+      >
+         <div
+         >
+            {{ currentError }}
+         </div>
+      </div>
+   </div>
+   <!---Errors--->
+
+</div>

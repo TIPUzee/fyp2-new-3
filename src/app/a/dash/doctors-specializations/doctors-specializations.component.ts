@@ -88,7 +88,7 @@ export class DoctorsSpecializationsComponent implements AfterViewInit {
             [2, 'Dermatology', 43],
         ];
         this.dataTableInstance = this.htmlService.createDataTable(
-            this.dataTableSearch.nativeElement,
+            this.dataTableContainer.nativeElement,
             this.columns,
             undefined,
         );

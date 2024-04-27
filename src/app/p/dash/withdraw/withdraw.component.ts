@@ -6,8 +6,8 @@ import { FormValidatorsService } from "../../../services/form-validators.service
 import { toast } from "ngx-sonner";
 import { HTTPService } from "../../../services/http.service";
 import {
-    GetPrevPatientRefundTransactionRequestResponse,
-    SubmitPatientRefundTransactionRequestResponse
+    GetPrevWithdrawalTransactionRequestResponse,
+    SubmitWithdrawalTransactionRequestResponse
 } from "../../../interfaces/api-response-interfaces";
 import { UtilFuncService } from "../../../services/util-func.service";
 import { FormInputComponent } from "../../../utils/components/form-input/form-input.component";
@@ -17,7 +17,7 @@ import { ModalComponent } from "../../../utils/components/modal/modal.component"
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 @Component({
-    selector: 'app-withdraw',
+    selector: 'app-withdraw-1',
     standalone: true,
     imports: [
         FormInputComponent,
@@ -89,7 +89,7 @@ export class WithdrawComponent implements AfterViewInit {
                 method: 'POST',
                 url: '/withdraw/refund-request',
                 jsonData: this.refundRequestForm.fg.value,
-            }) as SubmitPatientRefundTransactionRequestResponse | false;
+            }) as SubmitWithdrawalTransactionRequestResponse | false;
             
             this.refundRequestForm.loading = false;
             
@@ -113,6 +113,8 @@ export class WithdrawComponent implements AfterViewInit {
                     description: 'An error occurred while submitting your refund request. Please try again later.',
                 });
             }
+            
+            await this.prevRefundRequest.load();
         },
     }
     //
@@ -120,7 +122,7 @@ export class WithdrawComponent implements AfterViewInit {
     prevRefundRequest = {
         loading: false,
         errorLoading: false,
-        details: {} as GetPrevPatientRefundTransactionRequestResponse,
+        details: {} as GetPrevWithdrawalTransactionRequestResponse,
         resetWithdrawalRequest: () => {
             this.prevRefundRequest.details.alreadyRequested = false;
             this.prevRefundRequest.details.neverRequested = true;
@@ -134,7 +136,7 @@ export class WithdrawComponent implements AfterViewInit {
             const res = await this.http.sendRequest({
                 method: 'GET',
                 url: '/withdraw/prev-refund-request',
-            }) as GetPrevPatientRefundTransactionRequestResponse | false;
+            }) as GetPrevWithdrawalTransactionRequestResponse | false;
             
             this.prevRefundRequest.loading = false;
             
@@ -144,9 +146,7 @@ export class WithdrawComponent implements AfterViewInit {
             } else if (res.neverRequested) {
                 toast.warning('You have never requested a refund');
             } else if (res.alreadyRequested) {
-                toast.info('Refund request already submitted', {
-                    description: 'You have already submitted a refund request. Please wait for it to be processed.',
-                });
+                // do not show toast
             } else if (res.prevRejected) {
                 toast.error('Your previous refund request was rejected', {
                     description: res.requestDetails.rejectionReason,
@@ -160,6 +160,7 @@ export class WithdrawComponent implements AfterViewInit {
             }
             
             this.prevRefundRequest.details = res;
+            this.html.initTailwindElements();
         }
     }
     
@@ -176,6 +177,8 @@ export class WithdrawComponent implements AfterViewInit {
         this.profile.change$.pipe(takeUntilDestroyed()).subscribe(() => {
             this.resetRefundAmount();
         });
+        
+        this.profile.load();
     }
     
     

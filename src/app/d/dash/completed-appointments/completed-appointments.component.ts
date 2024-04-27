@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component } from '@angular/core';
-import { CommonService } from '../../../services/common.service';
 import { RouterLink } from '@angular/router';
 import { HtmlService } from '../../../services/html.service';
 import { RatingStarsComponent } from '../../../utils/components/rating-stars/rating-stars.component';
@@ -34,18 +33,18 @@ export class CompletedAppointmentsComponent implements AfterViewInit {
     
     
     constructor(
-        public commonService: CommonService,
         private html: HtmlService,
         private allAppointments: AppointmentService,
-    ) {}
-    
-    
-    ngAfterViewInit(): void {
+    ) {
         this.appointments = this.allAppointments.list.filter(appointment => appointment.status === 'COMPLETED');
         this.allAppointments.change$.pipe(takeUntilDestroyed()).subscribe(() => {
             this.appointments = this.allAppointments.list.filter(appointment => appointment.status === 'COMPLETED');
+            this.html.initTailwindElements();
         })
-        
+    }
+    
+    
+    ngAfterViewInit(): void {
         this.html.initTailwindElements();
     }
 }

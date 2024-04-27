@@ -355,6 +355,22 @@ class Validator:
         return _
 
     @staticmethod
+    def ListLike(validator_func: Optional[Callable[[Any], bool]] = None):
+        def _(val: Any) -> bool:
+            try:
+                _iter = iter(val)
+            except:
+                return False
+            if validator_func:
+                for v in val:
+                    if not validator_func(v):
+                        return False
+            return True
+
+        _.__custom_str_format__ = f'ListLike({validator_func.__custom_str_format__})' if validator_func else 'ListLike()'
+        return _
+
+    @staticmethod
     def MinVal(min_val: int):
         """
         Checks if the value is greater than or equal to a minimum value.
@@ -763,13 +779,11 @@ class Validator:
             >>> p.m_phone = '+923001234567' # True
         """
 
+        pattern = r'^\+[1-9]\d{9,13}$'
         def _(val: str) -> bool:
-            if not val.startswith('+'):
-                return False
-            try:
-                return carrier._is_mobile(number_type(phonenumbers.parse(val, None)))
-            except phonenumbers.phonenumberutil.NumberParseException:
-                return False
+            if re.match(pattern, val):
+                return True
+            return False
 
         _.__custom_str_format__ = f'Phone(+XXXXXXXXXXXX)'
         return _

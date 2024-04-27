@@ -57,7 +57,7 @@ export class ProfileComponent implements AfterViewInit {
         waiting: false,
         submit: async () => {
             this.profileReloadForm.waiting = true;
-            await this.profile.loadFromServer();
+            await this.profile.load();
             this.profileReloadForm.waiting = false;
             toast.info('Profile reloaded');
         }
@@ -207,7 +207,7 @@ export class ProfileComponent implements AfterViewInit {
             
             toast.success('Profile updated');
             this.updateProfileModal.close();
-            await this.profile.loadFromServer();
+            await this.profile.load();
         },
         ValidateAndNotify: () => {
             this.profileUpdateForm.fg.markAllAsTouched();

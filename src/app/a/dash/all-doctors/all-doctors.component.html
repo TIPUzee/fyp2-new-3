@@ -121,7 +121,7 @@
             </div>
             <div>
                <button
-                  (click)="doctorDocuments.load()"
+                  (click)="doctorDocuments.load(); doctorDocuments.toShow=true; currentDocumentSelectedIndex=0;"
                   [ngClass]="{'hidden': selectedObj.status !== 'ACCOUNT_APPROVED' &&
                   selectedObj.status !== 'APPROVAL_REQUESTED'}"
                   data-te-ripple-color="light"
@@ -185,6 +185,7 @@
                </span>
             </h5>
             <button
+               (click)="doctorDocuments.toShow=false;"
                aria-label="Close"
                data-te-modal-dismiss
                type="button"
@@ -208,7 +209,8 @@
                <div class="border-b py-3 flex flex-col gap-y-2">
                   <ng-container *ngFor="let file of doctorDocuments.list; let i = index">
                      <div
-                        (click)="currentDocumentSelectedIndex = i"
+                        (click)="doctorDocuments.toShow=false; currentDocumentSelectedIndex=i;
+                        doctorDocuments.lateShow();"
                         [ngClass]="currentDocumentSelectedIndex == i ? 'active' : ''"
                         class="searchBtn whitespace-nowrap [&.active]:bg-dark [&.active]:text-primary-100 relative px-4 pb-1 pt-1.5 border border-dark text-dark text-opacity-70 hover:text-opacity-90 text-sm rounded cursor-pointer"
                      >
@@ -218,11 +220,13 @@
                </div>
                <!-- Form -->
                <div class="py-3 flex-grow">
-                  <ngx-extended-pdf-viewer
-                     [height]="'calc(100vh - 85px)'"
-                     [src]="doctorDocuments.list[currentDocumentSelectedIndex]"
-                     class="rounded-md"
-                  ></ngx-extended-pdf-viewer>
+                  <ng-container *ngIf="doctorDocuments.toShow">
+                     <ngx-extended-pdf-viewer
+                        [height]="'calc(100vh - 85px)'"
+                        [src]="doctorDocuments.list[currentDocumentSelectedIndex]"
+                        class="rounded-md"
+                     ></ngx-extended-pdf-viewer>
+                  </ng-container>
                </div>
             </div>
          </div>

@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { OffcanvasService } from '../../../utils/components/offcanvas/offcanvas.service';
 import { HTTPService } from "../../../services/http.service";
 import {
+    AdminApprovePatientNotJoinedRequestResponse,
     AdminGetAppointmentsResponse,
     AdminGetPatientNotJoinedProofVideosResponse,
     AdminRejectPatientNotJoinedRequestResponse,
@@ -26,6 +27,10 @@ import {
     FormRefreshButtonComponent
 } from "../../../utils/components/form-refresh-button/form-refresh-button.component";
 import { RouterLink } from "@angular/router";
+import { VgCoreModule } from '@videogular/ngx-videogular/core';
+import { VgControlsModule } from '@videogular/ngx-videogular/controls';
+import { VgOverlayPlayModule } from '@videogular/ngx-videogular/overlay-play';
+import { VgBufferingModule } from '@videogular/ngx-videogular/buffering';
 
 @Component({
     selector: 'app-appointments',
@@ -33,7 +38,7 @@ import { RouterLink } from "@angular/router";
     imports: [
         FontAwesomeModule, CommonModule, ModalComponent, FormInputComponent,
         ReactiveFormsModule, FormSelectComponent, FormSubmitButtonComponent, FormRefreshButtonComponent, FormsModule,
-        RouterLink
+        RouterLink, VgCoreModule, VgControlsModule, VgOverlayPlayModule, VgBufferingModule
     ],
     templateUrl: './appointments.component.html',
     styleUrl: './appointments.component.scss',
@@ -281,20 +286,22 @@ export class AppointmentsComponent implements AfterViewInit {
             { label: 'Suspended', value: 'ACCOUNT_SUSPENDED' },
             { label: 'Active', value: 'ACCOUNT_NOT_SUSPENDED' }
         ],
+        rejectionLoading: false,
+        acceptanceLoading: false,
         reject: async () => {
             if (this.selectedObjectForm.loading) return;
             if (!this.selectedObj.id) {
                 toast.warning('Please select an appointment first');
                 return;
             }
-            this.selectedObjectForm.loading = true;
+            this.selectedObjectForm.rejectionLoading = true;
             
             const res = await this.http.sendRequest({
                 method: 'PUT',
                 url: `/a/appointment/${ this.selectedObj.id }/patient-not-joined/reject`,
             }) as AdminRejectPatientNotJoinedRequestResponse | false;
             
-            this.selectedObjectForm.loading = false;
+            this.selectedObjectForm.rejectionLoading = false;
             
             if (!res) {
                 return;
@@ -313,12 +320,52 @@ export class AppointmentsComponent implements AfterViewInit {
                 this.possibleActionsModal.close();
             } else {
                 toast.error('An error occurred', {
-                    description: 'An error occurred while updating the patient. Please try again.'
+                    description: 'An error occurred while updating the request. Please try again.'
                 });
                 this.possibleActionsModal.close();
             }
             await this.load({ id: Number(this.selectedObj.id) });
-        }
+        },
+        approve: async () => {
+            if (this.selectedObjectForm.loading) return;
+            if (!this.selectedObj.id) {
+                toast.warning('Please select an appointment first');
+                return;
+            }
+            this.selectedObjectForm.acceptanceLoading = true;
+            
+            const res = await this.http.sendRequest({
+                method: 'PUT',
+                url: `/a/appointment/${ this.selectedObj.id }/patient-not-joined/approve`,
+            }) as AdminApprovePatientNotJoinedRequestResponse | false;
+            
+            this.selectedObjectForm.acceptanceLoading = false;
+            
+            if (!res) {
+                return;
+            } else if (res.alreadyMarkedAsPatientNotJoined) {
+                toast.success('Already accepted the request');
+            } else if (res.appointmentNotExists) {
+                toast.error('Appointment not found', {
+                    description: 'The appointment you are trying to approve the patient not joined request for does' +
+                        ' not exist.'
+                })
+            } else if (res.statusNotChangeable) {
+                toast.error('Cannot perform this action', {
+                    description: 'The request might have already been approved or rejected.'
+                })
+            } else if (res.markedAsPatientNotJoined) {
+                toast.success('Successfully approved the request');
+                this.possibleActionsModal.close();
+            } else {
+                toast.error('An error occurred', {
+                    description: 'An error occurred while approving the request. Please try again.'
+                });
+                this.possibleActionsModal.close();
+            }
+            await this.load({ id: Number(this.selectedObj.id) });
+        },
+        
     };
     //
     // Proof Videos
@@ -327,9 +374,6 @@ export class AppointmentsComponent implements AfterViewInit {
         list: [] as string[],
         selectedVideoIndex: 0,
         playVideo: false,
-        canplay: () => {
-            console.info('canplay');
-        },
         selectIndex: (i: number) => {
             this.proofVideos.playVideo = false;
             this.proofVideos.selectedVideoIndex = i;
@@ -361,7 +405,8 @@ export class AppointmentsComponent implements AfterViewInit {
                 });
             } else {
                 // transform the video names to video URLs
-                res.videos = res.videos.map(v => this.utils.makeOwnServerUrl(this.utils.makeApiUrl(`/file/${ v }`)));
+                res.videos = res.videos.map(v => this.utils.makeOwnServerUrl(this.utils.makeApiUrl(`/video/${ v }`)));
+                // res.videos = res.videos.map(v => `/assets/vid/${ v }`);
                 this.proofVideos.list = res.videos;
                 if (this.proofVideos.list.length === 0) {
                     toast.info('No proof videos found');
@@ -386,10 +431,18 @@ export class AppointmentsComponent implements AfterViewInit {
             this.updateDataTable();
         })
         AppointmentsComponent.searched.changeSearch$.pipe(takeUntilDestroyed()).subscribe(() => {
+            let list = AppointmentsComponent.searched.list.map(l => l);
+            if (list.length === 0) {
+                for (const col of this.columns) {
+                    if (col?.field) {
+                        list.push(col.field);
+                    }
+                }
+            }
             this.html.dataTableSearch(
                 this.dataTableInstance,
                 AppointmentsComponent.searched.query,
-                AppointmentsComponent.searched.list
+                list
             );
         })
     }

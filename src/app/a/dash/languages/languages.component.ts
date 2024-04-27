@@ -88,7 +88,7 @@ export class LanguagesComponent implements AfterViewInit {
             [2, 'English', 43],
         ];
         this.dataTableInstance = this.htmlService.createDataTable(
-            this.dataTableSearch.nativeElement,
+            this.dataTableContainer.nativeElement,
             this.columns,
             undefined,
         );

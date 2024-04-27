@@ -14,12 +14,12 @@ class SavedFile:
     def exists(self):
         return os.path.exists(os.path.join('uploads', self.file_name))
 
-    def return_file(self, as_attachment: bool = False, download_name: str = None):
+    def return_file(self, as_attachment: bool = False, download_name: str = None, mimetype: str = None):
         if not self.exists():
             raise Res.server_error(f'File {self.file_name} does not exist')
         raise Res.send_file(
             send_file(os.path.join('uploads', self.file_name), as_attachment=as_attachment,
-                      download_name=download_name), Res.HTTPCode.OK)
+                      download_name=download_name, mimetype=mimetype, max_age=2), Res.HTTPCode.OK)
 
     def delete(self):
         if not self.exists():

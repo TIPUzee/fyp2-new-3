@@ -56,8 +56,6 @@ def _(user: Admin, id: int):
 
 
 def get_patients(user: Admin, id: int = None):
-    import time
-    time.sleep(0.5)
     request_response = {
         'patients': []
     }

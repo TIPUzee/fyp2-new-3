@@ -28,11 +28,11 @@ export class PatientProfileService {
         private http: HTTPService,
         private utils: UtilFuncService,
     ) {
-        this.loadFromServer();
+        this.load();
     }
     
     
-    async loadFromServer() {
+    async load() {
         let res = await this.http.sendRequest({
             url: '/profile',
             method: 'GET'
@@ -41,7 +41,7 @@ export class PatientProfileService {
         if (res === false) {
             toast.error('Failed to load some data');
             setTimeout(() => {
-                this.loadFromServer();
+                this.load();
             }, 5000);
             return;
         }

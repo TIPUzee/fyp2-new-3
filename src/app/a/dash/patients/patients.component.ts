@@ -89,17 +89,40 @@ export class PatientsComponent implements AfterViewInit {
         loading: false,
         fg: this._fb.group({
             id: [0, [vl.required]],
-            email: ['', [vl.required, vl.email]],
-            password: ['', [vl.required]],
+            email: [
+                '', vl.compose([
+                    vl.required,
+                    this._fvs.email()
+                ]),
+                vl.composeAsync([
+                    this._fvs.emailMustNotExist(() => [this.selectedObj.email])
+                ])
+            ],
+            password: [
+                '', vl.compose([
+                    vl.minLength(8),
+                    vl.maxLength(32),
+                    this._fvs.atLeastMustContainAlphaNumeric(),
+                    this._fvs.atLeastOneLowercaseAndOneUppercase(),
+                    this._fvs.noSpecialCharactersOtherThanDefinedForPassword()
+                ])
+            ],
             status: ['ACCOUNT_NOT_SUSPENDED', [vl.required]],
         }),
         errors: {
             email: {
                 required: 'Email is required',
-                email: 'Invalid email',
+                email: 'Invalid email format',
+                emailMustNotExist: 'Email has already taken',
+                tryAgain: 'Something went wrong. Please try again later.',
             },
             password: {
                 required: 'Password is required',
+                minlength: 'Password must be at least 8 characters long',
+                maxlength: 'Password must be at most 32 characters long',
+                atLeastMustContainAlphaNumeric: 'Password must contain at least 1 alphabet and 1 number',
+                atLeastOneLowercaseAndOneUppercase: 'Password must contain at least 1 lowercase and 1 uppercase alphabet',
+                noSpecialCharactersOtherThanDefinedForPassword: 'Password must not contain any special characters other than !, @, $, %, &, *, _ and _',
             },
             status: {
                 required: 'Status is required',
@@ -229,10 +252,18 @@ export class PatientsComponent implements AfterViewInit {
             this.updateDataTable();
         })
         PatientsComponent.searched.changeSearch$.pipe(takeUntilDestroyed()).subscribe(() => {
+            let list = PatientsComponent.searched.list.map(l => l);
+            if (list.length === 0) {
+                for (const col of this.columns) {
+                    if (col?.field) {
+                        list.push(col.field);
+                    }
+                }
+            }
             this.html.dataTableSearch(
                 this.dataTableInstance,
                 PatientsComponent.searched.query,
-                PatientsComponent.searched.list
+                list
             );
         })
     }

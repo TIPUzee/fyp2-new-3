@@ -106,13 +106,22 @@
                   </a>
                </ng-container>
             </div>
-            <div class="flex justify-end">
+            <div class="flex justify-end gap-x-1">
                <form-submit-button
                   (click)="selectedObjectForm.reject()"
-                  [disabled]="selectedObjectForm.loading"
-                  [waiting]="selectedObjectForm.loading"
+                  [disabled]="selectedObjectForm.loading || selectedObjectForm.acceptanceLoading ||
+                  selectedObjectForm.rejectionLoading"
+                  [waiting]="selectedObjectForm.rejectionLoading"
                   btnStyle="btn-red btn-shadow"
                   label="Reject"
+               ></form-submit-button>
+               <form-submit-button
+                  (click)="selectedObjectForm.approve()"
+                  [disabled]="selectedObjectForm.loading || selectedObjectForm.acceptanceLoading ||
+                  selectedObjectForm.rejectionLoading"
+                  [waiting]="selectedObjectForm.acceptanceLoading"
+                  btnStyle="btn-blue btn-shadow"
+                  label="Approve"
                ></form-submit-button>
             </div>
          </form>
@@ -130,7 +139,7 @@
          View Doctor
       </a>
       <a
-         [queryParams]="{ id: selectedObj.doctorId }" [routerLink]="['../', 'p']"
+         [queryParams]="{ id: selectedObj.patientId }" [routerLink]="['../', 'p']"
          class="btn btn-primary-100 text-blue-700 w-full text-center"
       >
          View Patient
@@ -145,15 +154,26 @@
       Review Attempt {{ proofVideos.selectedVideoIndex + 1 }} Recording
    </div>
    <div body>
-      <div class="text-center">
+      <div>
          <ng-container *ngIf="proofVideos.list.length && proofVideos.playVideo">
             <video
                autoplay
                controls
-               (canplay)="proofVideos.canplay()"
+               playsinline
+               preload="metadata"
+               class="w-full rounded-lg"
             >
-               <source [src]="proofVideos.list[proofVideos.selectedVideoIndex]">
+               <source [src]="proofVideos.list[proofVideos.selectedVideoIndex]" type="video/mp4">
             </video>
+            <div class="mt-3">
+               <div class="text-dark text-opacity-70">
+                  If the video does not play, you can download it by
+                  <a
+                     [href]="proofVideos.list[proofVideos.selectedVideoIndex]" download
+                     class="text-blue-600 underline underline-offset-2"
+                  > clicking here! </a>
+               </div>
+            </div>
          </ng-container>
       </div>
    </div>

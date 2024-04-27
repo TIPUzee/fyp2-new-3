@@ -40,11 +40,11 @@ export class DoctorProfileService {
     constructor(
         private http: HTTPService,
     ) {
-        this.loadFromServer();
+        this.load();
     }
     
     
-    async loadFromServer() {
+    async load() {
         let res = await this.http.sendRequest({
             url: '/profile',
             method: 'GET'
