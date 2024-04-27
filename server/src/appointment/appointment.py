@@ -90,8 +90,6 @@ class _BookClientLogin(AccessControlledEntity):
         a = Appointment.Request()
         a.turn_off_validation()
         a.m_id = payload['m_id']
-        if not a.load():
-            return False
         return a
 
 

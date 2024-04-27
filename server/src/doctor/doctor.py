@@ -163,6 +163,7 @@ class Doctor(SQLEntity, Vld.PropertyTypeValidatorEntity):
         for weekSlots in self.get_appointment_slots(_filter=False):
             for daySlots in weekSlots:
                 for slot in daySlots:
+                    print('slot:', slot['time_from'], slot['time_to'])
                     if slot['time_from'] == time_from and slot['time_to'] == time_to:
                         return True
         return False

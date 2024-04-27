@@ -3,7 +3,7 @@ from datetime import timedelta, datetime
 from utils import App, SavedFile, Validator as Vld, Func, UploadedFiles, SavedFilesZip
 from src import (
     Appointment, Doctor, AvailabilityDuration, SpecializationCategory, MixedUserUtil,
-    DoctorLanguage, DoctorExperience, ApprovalDocument, Language, Admin
+    DoctorLanguage, DoctorExperience, ApprovalDocument, Language, Admin,
 )
 
 
@@ -20,7 +20,7 @@ def _(
     user: Doctor, specialization_category_id, email, password, old_password, name, dob, whatsapp_number,
     max_meeting_duration, appointment_charges, specialization, availability_durations,
     languages, experiences, profile_pic: UploadedFiles, cover_pic: UploadedFiles
-    ) -> None:
+) -> None:
     request_response = {
         'email_already_exists':               False,
         'whatsapp_number_already_exists':     False,
@@ -585,8 +585,8 @@ def get_doctors(user: Admin, id: int = None):
 def _(user: Admin, id, email: str, password, status):
     request_response = {
         'email_already_exists': False,
-        'doctor_not_found':    False,
-        'doctor_updated':      False
+        'doctor_not_found':     False,
+        'doctor_updated':       False
     }
 
     d = Doctor()
@@ -612,12 +612,14 @@ def _(user: Admin, id, email: str, password, status):
     return App.Res.ok(**request_response)
 
 
-@App.api_route('/a/doctor/<id>/documents', path_params_pre_conversion={'id': int},
-               path_params_validators={'id': Vld.Int()}, method='GET', access_control=[Admin.Login])
+@App.api_route(
+    '/a/doctor/<id>/documents', path_params_pre_conversion={'id': int},
+    path_params_validators={'id': Vld.Int()}, method='GET', access_control=[Admin.Login]
+    )
 def _(user: Admin, id: int):
     request_response = {
-            'doctor_not_found': False,
-            'docs':            [],
+        'doctor_not_found': False,
+        'docs':             [],
     }
 
     ad = ApprovalDocument()
