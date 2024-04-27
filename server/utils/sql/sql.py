@@ -11,11 +11,12 @@ from ..env import Env
 
 class SQL:
     def __init__(self):
-        host = Env.get('DEV_MYSQL_HOST') if Env.get('PROD_MODE') else Env.get('PROD_MYSQL_HOST')
-        user = Env.get('DEV_MYSQL_USER') if Env.get('PROD_MODE') else Env.get('PROD_MYSQL_USER')
-        password = Env.get('DEV_MYSQL_PASSWORD') if Env.get('PROD_MODE') else Env.get('PROD_MYSQL_PASSWORD')
+        host = Env.get('PROD_MYSQL_HOST') if Env.get('PROD_MODE') == '1' else Env.get('DEV_MYSQL_HOST')
+        user = Env.get('PROD_MYSQL_USER') if Env.get('PROD_MODE') == '1' else Env.get('DEV_MYSQL_USER')
+        password = Env.get('PROD_MYSQL_PASSWORD') if Env.get('PROD_MODE') == '1' else Env.get('DEV_MYSQL_PASSWORD')
+        database = Env.get('PROD_MYSQL_DB') if Env.get('PROD_MODE') == '1' else Env.get('DEV_MYSQL_DB')
         try:
-            database = Env.get('DEV_MYSQL_DB') if Env.get('PROD_MODE') else Env.get('PROD_MYSQL_DB')
+            self.db_name = database
             self.connection = connector.connect(
                 host=host,
                 user=user,
