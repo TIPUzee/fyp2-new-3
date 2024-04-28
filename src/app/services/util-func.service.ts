@@ -191,18 +191,18 @@ export class UtilFuncService {
     
     setAuthorizationToken(token: string): void {
         if (this.cookie.check('Authorization')) {
-            this.cookie.delete('Authorization', '/', 'localhost');
+            this.cookie.delete('Authorization', '/');
         }
-        this.cookie.set('Authorization', token, 365, '/', 'localhost');
+        this.cookie.set('Authorization', token, 365, '/');
     }
     
     
     setCurrentUser(userType: 'g' | 'p' | 'd' | 'a'): void {
         this.currentUser = userType;
         if (this.cookie.check('userType')) {
-            this.cookie.delete('userType', '/', 'localhost');
+            this.cookie.delete('userType', '/');
         }
-        this.cookie.set('userType', userType, 365, '/', 'localhost');
+        this.cookie.set('userType', userType, 365, '/');
     }
     
     

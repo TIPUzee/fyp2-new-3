@@ -279,9 +279,9 @@ export class BookComponent implements AfterViewInit {
                     description: 'To confirm your appointment booking',
                 });
                 if (this.cookies.check('AppointmentBookingTempAuthorization')) {
-                    this.cookies.delete('AppointmentBookingTempAuthorization', '/', 'localhost');
+                    this.cookies.delete('AppointmentBookingTempAuthorization', '/');
                 }
-                this.cookies.set('AppointmentBookingTempAuthorization', res.appointmentToken, 1, '/', 'localhost');
+                this.cookies.set('AppointmentBookingTempAuthorization', res.appointmentToken, 1, '/');
                 await this.router.navigate(['p', 'pay'], { queryParams: { d: this.doctorId } });
                 return true;
             } else {
