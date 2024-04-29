@@ -14,6 +14,8 @@ from ..uploaded_file import UploadedFiles
 
 
 class App:
+    platform_name = 'AI-Disease Predictor'
+    platform_slogan = 'Empower Health Tomorrow, Today!'
     App: Flask = None
     Res: Res = Res
 

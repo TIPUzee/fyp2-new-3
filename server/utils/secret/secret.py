@@ -25,3 +25,13 @@ class Secret:
     @staticmethod
     def gen_random_code(length: int = 6) -> int:
         return int(''.join(secrets.choice('123456789') for _ in range(length)))
+
+    @staticmethod
+    def gen_random_code_str(length: int = 6, english_letters_indices: list[int] = None) -> str:
+        _ = ''.join(secrets.choice('123456789') for _ in range(length))
+        if english_letters_indices:
+            _ = list(_)
+            for i in english_letters_indices:
+                _[i] = secrets.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+            return ''.join(_)
+        return _

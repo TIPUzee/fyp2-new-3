@@ -169,6 +169,10 @@ export class UtilFuncService {
     }
     
     
+    makeOwnSiteUrl(url: string): string {
+        return env.siteURL + url;
+    }
+    
     makeUrlQueryString(url: string, urlParams: Record<string, any>): string {
         const queryString = Object.entries(urlParams)
             .map(([key, value]) => `${ key }=${ value }`).join('&');

@@ -38,14 +38,14 @@ export class AppComponent implements AfterViewInit {
     
     redirectToHomeOnUnexpectedReload() {
         if (this.location.isCurrentPathEqualTo('/')) {
-            // this.router.navigate(['/home']); return;
-            if (this.utils.getCurrentUser() === 'd') {
-                this.router.navigate(['/d/p-preview']);
-            } else if (this.utils.getCurrentUser() === 'p') {
-                this.router.navigate(['/p/pay'], { queryParams: { d: 5 } });
-            } else {
-                this.router.navigate(['/home']);
-            }
+            this.router.navigate(['/home']); return;
+            // if (this.utils.getCurrentUser() === 'd') {
+            //     this.router.navigate(['/d/p-preview']);
+            // } else if (this.utils.getCurrentUser() === 'p') {
+            //     this.router.navigate(['/p/pay'], { queryParams: { d: 5 } });
+            // } else {
+            //     this.router.navigate(['/home']);
+            // }
         }
     }
     

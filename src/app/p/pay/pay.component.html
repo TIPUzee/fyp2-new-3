@@ -1,53 +1,6 @@
 <div class="main workspace">
    <div class="mt-6">
 
-      <!-- PayFast Payment Form -->
-      <form
-         id="payfast-form"
-         action="https://ipguat.apps.net.pk/Ecommerce/api/Transaction/PostTransaction"
-         enctype="application/x-www-form-urlencoded"
-         method="post"
-         name="PayFast-payment-form"
-         target="_blank"
-      >
-         <input [value]="payfastGateway.params.currencyCode" name="CURRENCY_CODE" type="TEXT"/>
-         <input [value]="payfastGateway.params.merchantId" name="MERCHANT_ID" type="TEXT"/>
-         <input [value]="payfastGateway.params.merchantName" name="MERCHANT_NAME" type="TEXT"/>
-
-         <input [value]="payfastGateway.params.successUrl" name="SUCCESS_URL" type="TEXT"/>
-         <input [value]="payfastGateway.params.failureUrl" name="FAILURE_URL" type="TEXT"/>
-         <input [value]="payfastGateway.params.checkoutUrl" name="CHECKOUT_URL" type="TEXT"/>
-
-         <input [value]="payfastGateway.params.customerEmailAddress" name="CUSTOMER_EMAIL_ADDRESS" type="TEXT">
-         <input [value]="payfastGateway.params.customerMobileNo" name="CUSTOMER_MOBILE_NO" type="TEXT">
-
-         <input [value]="payfastGateway.params.txnamt" name="TXNAMT" type="TEXT"/>
-         <input [value]="payfastGateway.params.basketId" name="BASKET_ID" type="TEXT"/>
-         <input [value]="payfastGateway.params.signature" name="SIGNATURE" type="TEXT"/>
-         <input [value]="payfastGateway.params.version" name="VERSION" type="TEXT"/>
-
-         <input [value]="payfastGateway.params.txndesc" name="TXNDESC" type="TEXT"/>
-         <input [value]="payfastGateway.params.procCode" name="PROCCODE" type="TEXT"/>
-         <input [value]="payfastGateway.params.tranType" name="TRAN_TYPE" type="TEXT"/>
-
-         <!--    <input [value]="payfastGateway.params.orderDate" name="ORDER_DATE" type="TEXT"/> -->
-         <input [value]="payfastGateway.params.token" name="TOKEN" type="TEXT"/>
-
-         <ng-container *ngFor="let item of payfastGateway.params.items; let itemIndex = index;">
-            <input [name]="'ITEMS[' + itemIndex + '][SKU]'" [value]="item.sku" type="HIDDEN"/>
-            <input [name]="'ITEMS[' + itemIndex + '][NAME]'" [value]="item.name" type="HIDDEN"/>
-            <input [name]="'ITEMS[' + itemIndex + '][PRICE]'" [value]="item.price" type="HIDDEN"/>
-            <input [name]="'ITEMS[' + itemIndex + '][QTY]'" [value]="item.qty" type="HIDDEN"/>
-         </ng-container>
-
-         <div class="row">
-            <div style="text-align: center" class="col-md-12">
-               <input id="submitBtn" #payfastProceedBtn type="submit" value="Submit"/>
-            </div>
-         </div>
-      </form>
-      <!-- PayFast Payment Form -->
-
       <div class="inner-container mx-auto">
          <div class="rounded-lg shadow-lg bg-primary-100 bg-opacity-90 p-7">
             <div class="mb-5">
@@ -61,7 +14,7 @@
                               class="bg-primary-100 w-[180px] object-cover aspect-square rounded-lg shadow-lg ring ring-dark"
                            />
                            <div class="mt-1 -mb-1 w-fit">
-<!--                               <app-rating-stars></app-rating-stars> -->
+                              <!--                               <app-rating-stars></app-rating-stars> -->
                            </div>
                         </div>
                      </div>
@@ -92,9 +45,9 @@
                   Cancel
                </a>
                <form-submit-button
-                  (click)="payfastGateway.load()"
-                  [disabled]="book.waiting || payfastGateway.waiting"
-                  [waiting]="payfastGateway.waiting"
+                  (click)="stripe.redirect()"
+                  [disabled]="book.waiting || stripe.waiting"
+                  [waiting]="stripe.waiting"
                   btnStyle="btn-blue bg-blue-600 hover:bg-blue-700 active:bg-blue-800"
                   label="Proceed to Pay"
                ></form-submit-button>
@@ -133,3 +86,51 @@
       </div>
    </div>
 </div>
+
+<!-- PayFast Payment Form -->
+<form
+   id="payfast-form"
+   action="https://ipguat.apps.net.pk/Ecommerce/api/Transaction/PostTransaction"
+   enctype="application/x-www-form-urlencoded"
+   method="post"
+   name="PayFast-payment-form"
+   target="_blank"
+   class="hidden"
+>
+   <input [value]="payfastGateway.params.currencyCode" name="CURRENCY_CODE" type="TEXT"/>
+   <input [value]="payfastGateway.params.merchantId" name="MERCHANT_ID" type="TEXT"/>
+   <input [value]="payfastGateway.params.merchantName" name="MERCHANT_NAME" type="TEXT"/>
+
+   <input [value]="payfastGateway.params.successUrl" name="SUCCESS_URL" type="TEXT"/>
+   <input [value]="payfastGateway.params.failureUrl" name="FAILURE_URL" type="TEXT"/>
+   <input [value]="payfastGateway.params.checkoutUrl" name="CHECKOUT_URL" type="TEXT"/>
+
+   <input [value]="payfastGateway.params.customerEmailAddress" name="CUSTOMER_EMAIL_ADDRESS" type="TEXT">
+   <input [value]="payfastGateway.params.customerMobileNo" name="CUSTOMER_MOBILE_NO" type="TEXT">
+
+   <input [value]="payfastGateway.params.txnamt" name="TXNAMT" type="TEXT"/>
+   <input [value]="payfastGateway.params.basketId" name="BASKET_ID" type="TEXT"/>
+   <input [value]="payfastGateway.params.signature" name="SIGNATURE" type="TEXT"/>
+   <input [value]="payfastGateway.params.version" name="VERSION" type="TEXT"/>
+
+   <input [value]="payfastGateway.params.txndesc" name="TXNDESC" type="TEXT"/>
+   <input [value]="payfastGateway.params.procCode" name="PROCCODE" type="TEXT"/>
+   <input [value]="payfastGateway.params.tranType" name="TRAN_TYPE" type="TEXT"/>
+
+   <!--    <input [value]="payfastGateway.params.orderDate" name="ORDER_DATE" type="TEXT"/> -->
+   <input [value]="payfastGateway.params.token" name="TOKEN" type="TEXT"/>
+
+   <ng-container *ngFor="let item of payfastGateway.params.items; let itemIndex = index;">
+      <input [name]="'ITEMS[' + itemIndex + '][SKU]'" [value]="item.sku" type="HIDDEN"/>
+      <input [name]="'ITEMS[' + itemIndex + '][NAME]'" [value]="item.name" type="HIDDEN"/>
+      <input [name]="'ITEMS[' + itemIndex + '][PRICE]'" [value]="item.price" type="HIDDEN"/>
+      <input [name]="'ITEMS[' + itemIndex + '][QTY]'" [value]="item.qty" type="HIDDEN"/>
+   </ng-container>
+
+   <div class="row">
+      <div style="text-align: center" class="col-md-12">
+         <input id="submitBtn" #payfastProceedBtn type="submit" value="Submit"/>
+      </div>
+   </div>
+</form>
+<!-- PayFast Payment Form -->

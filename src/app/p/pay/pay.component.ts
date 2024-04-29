@@ -8,7 +8,9 @@ import { CookieService } from "ngx-cookie-service";
 import { toast } from "ngx-sonner";
 import { HTTPService } from "../../services/http.service";
 import {
-    GetAppointmentBookingPaymentParamsResponse, GetDoctorDetailsResponse,
+    GetAppointmentBookingPaymentParamsResponse,
+    GetAppointmentBookingStripePaymentLinkResponse,
+    GetDoctorDetailsResponse,
     VerifyAppointmentBookingTokenResponse
 } from "../../interfaces/api-response-interfaces";
 import { FormSubmitButtonComponent } from "../../components/form-submit-button/form-submit-button.component";
@@ -236,6 +238,85 @@ export class PayComponent implements AfterViewInit {
             return false;
         }
     }
+    //
+    // Stripe
+    stripe = {
+        waiting: false,
+        redirect: async () => {
+            this.stripe.waiting = true;
+            
+            if (!await this.book.verifyToken()) {
+                this.stripe.waiting = false;
+                return false;
+            }
+            
+            const res = await this.http.sendRequest({
+                url: '/appointment/book-via-stripe/create-payment-link/v1',
+                method: 'POST',
+                headers: {
+                    TempAuthorization: this.cookies.get('AppointmentBookingTempAuthorization')
+                },
+                jsonData: {
+                    successUrl: this.utils.makeOwnSiteUrl(`/p/a?err_code=00`),
+                    failureUrl: this.utils.makeOwnSiteUrl(`/p/book?d=${ this.doctorId }`),
+                }
+            }) as GetAppointmentBookingStripePaymentLinkResponse | false;
+            
+            this.stripe.waiting = false;
+            
+            if (!res) {
+                return false;
+            }
+            
+            if (res.invalidToken) {
+                toast.error('Please rebook the appointment', {
+                    description: 'Your appointment session has expired',
+                });
+                await this.router.navigate(['../', 'book?d=' + this.doctorId]);
+            } else if (res.doctorNotExists) {
+                toast.error('Doctor not found', {
+                    description: 'Please rebook the appointment or try again later',
+                });
+                await this.router.navigate(['../', 'doctors']);
+            } else if (res.doctorNotActive) {
+                toast.error('Doctor not active', {
+                    description: 'Please rebook the appointment or try again later',
+                });
+                await this.router.navigate(['../', 'doctors']);
+            } else if (res.invalidSlot) {
+                toast.error('Something went wrong', {
+                    description: 'Please select your slot again',
+                });
+                await this.router.navigate(['../', 'book?d=' + this.doctorId]);
+            } else if (res.slotClash) {
+                toast.error('Someone else booked the slot', {
+                    description: 'Please select another slot',
+                });
+                await this.router.navigate(['../', 'book?d=' + this.doctorId]);
+            } else if (res.appointmentAlreadyBooked) {
+                toast.error('Appointment already booked');
+                await this.router.navigate(['../', 'a']);
+            } else if (!res.verified) {
+                toast.error('Please rebook the appointment', {
+                    description: 'Your session has expired',
+                });
+                await this.router.navigate(['../', 'book?d=' + this.doctorId]);
+            } else if (res.paymentLinkCreated) {
+                toast.loading('Redirecting to Stripe', {
+                    duration: 3000,
+                });
+                setTimeout(() => {
+                    window.open(res.paymentLink, '_blank');
+                }, 3250);
+            } else {
+                toast.error('Something went wrong', {
+                    description: 'Please try again later',
+                });
+            }
+            
+            return false;
+        }
+    }
     
     
     constructor(
@@ -258,7 +339,7 @@ export class PayComponent implements AfterViewInit {
             toast.error('Please rebook the appointment.', {
                 description: 'Your session has expired.',
             })
-            this.location.back();
+            this.router.navigate(['../', 'book?d=' + this.doctorId]);
         }
         
         this.doctor.load();

@@ -206,6 +206,19 @@ export interface GetAppointmentBookingPaymentParamsResponse {
     payfastParams: PayfastPaymentGatewayParams,
 }
 
+export interface GetAppointmentBookingStripePaymentLinkResponse {
+    appointmentNotExists: boolean,
+    doctorNotExists: boolean,
+    doctorNotActive: boolean,
+    invalidSlot: boolean,
+    slotClash: boolean,
+    appointmentAlreadyBooked: boolean,
+    verified: boolean,
+    invalidToken: boolean,
+    paymentLinkCreated: boolean,
+    paymentLink: string,
+}
+
 export interface RescheduleAppointmentResponse {
     appointmentNotExists: boolean,
     notReschedulable: boolean,
@@ -473,7 +486,6 @@ export interface AdminDeleteLanguageResponse {
     languageDoesNotExist: boolean,
     languageDeleted: boolean,
 }
-
 
 export interface AdminGetSpecializationCategoriesResponse {
     specializationCategories: {

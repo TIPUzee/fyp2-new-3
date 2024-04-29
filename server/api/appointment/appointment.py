@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from utils import App, Func, UploadedFiles, SavedFile, Env, Validator as Vld
+from utils import App, Func, UploadedFiles, SavedFile, Env, Validator as Vld, Secret
 from src import (
     Doctor, Patient, Appointment, Calc, SystemDetails,
     Payfast, Admin,
@@ -503,15 +503,7 @@ def _(user: Patient):
         return App.Res.client_error(**request_response)
 
     if not ar.load():
-        a = Appointment()
-        a.m_time_from = ar.m_time_from
-        a.m_time_to = ar.m_time_to
-        a.m_doctor_id = ar.m_doctor_id
-        a.m_patient_id = ar.m_patient_id
-        if a.exists():
-            request_response['appointment_already_booked'] = True
-        else:
-            request_response['invalid_token'] = True
+        request_response['invalid_token'] = True
         return App.Res.client_error(**request_response)
 
     d = Doctor()
@@ -635,7 +627,6 @@ def _(user: Patient):
 
     request_response['payfast_params'] = payfast_param
     request_response['params_generated'] = True
-    print('payfast_param', payfast_param)
     return App.Res.ok(**request_response)
 
 
@@ -652,8 +643,6 @@ def _(user: None):
     'time_from', 'time_to'
 )
 def _(user: Patient, appointment_id: int, time_from: str, time_to: str) -> None:
-    print('time_from', time_from, 'time_to', time_to)
-
     request_response = {
         'appointment_not_exists': False,
         'not_reschedulable':      False,
@@ -753,8 +742,6 @@ def _(user: Patient, appointment_id: int, rating: int, review: str) -> None:
 
     a.m_patient_review = review
     a.m_rating = rating
-
-    print('a.m_rating', a.m_rating)
 
     a.update()
     a.commit()
@@ -942,4 +929,297 @@ def _(user: Admin, id: int):
     videos = cv.select(select_cols=['m_filename'])
 
     request_response['videos'] = [i['m_filename'] for i in videos]
+    return App.Res.ok(**request_response)
+
+
+@App.api_route(
+    '/appointment/book-via-stripe/create-payment-intent/v1',
+    method='POST', access_control=[Patient.Login]
+)
+def _(user: Patient):
+    request_response = {
+        'appointment_not_exists':     False,
+        'invalid_token':              False,
+        'appointment_already_booked': False,
+        'doctor_not_exists':          False,
+        'payment_intent_created':     False,
+        'client_secret':              False,
+    }
+
+    token = Appointment.BookClientLogin.fetch_token()
+    if not token:
+        request_response['invalid_token'] = True
+        return App.Res.client_error(**request_response)
+
+    payload = Appointment.BookClientLogin.parse_token(token)
+    if not payload:
+        request_response['invalid_token'] = True
+        return App.Res.client_error(**request_response)
+
+    ar = Appointment.BookClientLogin.get_user(payload)
+
+    if not ar:
+        request_response['invalid_token'] = True
+        return App.Res.client_error(**request_response)
+
+    if not ar.load():
+        a = Appointment()
+        a.m_time_from = ar.m_time_from
+        a.m_time_to = ar.m_time_to
+        a.m_doctor_id = ar.m_doctor_id
+        a.m_patient_id = ar.m_patient_id
+        if a.exists():
+            request_response['appointment_already_booked'] = True
+        else:
+            request_response['invalid_token'] = True
+        return App.Res.client_error(**request_response)
+
+    d = Doctor()
+    d.m_id = ar.m_doctor_id
+    if not d.load(select_cols=['m_status', 'm_active_for_appointments', 'm_max_meeting_duration', 'm_name']):
+        request_response['doctor_not_exists'] = True
+        return App.Res.client_error(**request_response)
+
+    amount = int(ar.m_payable_amount) * 100
+    currency = 'PKR'
+    patient_name = user.m_name
+    doctor_name = d.m_name
+    specialization = d.m_specialization
+    platform_title = App.platform_name
+    platform_slogan = 'Health1st'
+
+    import stripe
+    stripe.api_key = Env.get('STRIPE_SECRET_KEY')
+    payment_intent = stripe.PaymentIntent.create(
+        amount=amount,
+        currency=currency,
+        description=f"Appointment booking for {patient_name} with Dr. {doctor_name} ({specialization})",
+        metadata={
+            'platform_title':  platform_title,
+            'platform_slogan': platform_slogan
+        }
+    )
+
+    request_response['payment_intent_created'] = True
+    request_response['client_secret'] = payment_intent.client_secret
+    return App.Res.ok(**request_response)
+
+
+@App.api_route(
+    '/appointment/book-via-stripe/create-payment-link/v1',
+    method='POST', access_control=[Patient.Login]
+)
+@App.json_inputs(
+    'success_url', 'failure_url'
+)
+def _(user: Patient, success_url: str, failure_url: str):
+    request_response = {
+        'appointment_not_exists':     False,
+        'doctor_not_exists':          False,
+        'doctor_not_active':          False,
+        'invalid_slot':               False,
+        'slot_clash':                 False,
+        'appointment_already_booked': False,
+        'verified':                   False,
+        'invalid_token':              False,
+        'payment_link_created':       False,
+        'payment_link':               False,
+    }
+
+    token = Appointment.BookClientLogin.fetch_token()
+    if not token:
+        request_response['invalid_token'] = True
+        return App.Res.client_error(**request_response)
+
+    payload = Appointment.BookClientLogin.parse_token(token)
+    if not payload:
+        request_response['invalid_token'] = True
+        return App.Res.client_error(**request_response)
+
+    ar = Appointment.BookClientLogin.get_user(payload)
+
+    if not ar:
+        request_response['invalid_token'] = True
+        return App.Res.client_error(**request_response)
+
+    if not ar.load():
+        a = Appointment()
+        a.m_time_from = ar.m_time_from
+        a.m_time_to = ar.m_time_to
+        a.m_doctor_id = ar.m_doctor_id
+        a.m_patient_id = ar.m_patient_id
+        if a.exists():
+            request_response['appointment_already_booked'] = True
+        else:
+            request_response['invalid_token'] = True
+        return App.Res.client_error(**request_response)
+
+    d = Doctor()
+    d.m_id = ar.m_doctor_id
+    if not d.load(
+            select_cols=[
+                'm_status', 'm_active_for_appointments', 'm_max_meeting_duration', 'm_name', 'm_profile_pic_filename'
+            ]
+    ):
+        request_response['doctor_not_exists'] = True
+        return App.Res.client_error(**request_response)
+
+    if d.m_status != d.AccountStatusEnum.ACCOUNT_APPROVED or not d.m_active_for_appointments:
+        request_response['doctor_not_active'] = True
+        return App.Res.client_error(**request_response)
+
+    if not d.is_valid_slot(ar.m_time_from, ar.m_time_to):
+        request_response['invalid_slot'] = True
+        return App.Res.client_error(**request_response)
+
+    if d.any_slot_clash(ar.m_time_from, ar.m_time_to):
+        request_response['slot_clash'] = True
+        return App.Res.client_error(**request_response)
+
+    request_response['verified'] = True
+
+    amount = int(ar.m_payable_amount) * 100
+    currency = 'PKR'
+    patient_name = user.m_name
+    doctor_name = d.m_name
+    specialization = d.m_specialization
+    platform_title = App.platform_name
+    platform_slogan = 'Health1st'
+
+    import stripe
+    stripe.api_key = Env.get('STRIPE_SECRET_KEY')
+    payment_link = stripe.checkout.Session.create(
+        payment_method_types=['card'],
+        line_items=[{
+            'price_data': {
+                'currency':     currency,
+                'product_data': {
+                    'name':   f'Appointment with Dr. {doctor_name}',
+                    'images': [Env.get('SERVER_IP_WITH_PORT') + '/api/file/' + d.m_profile_pic_filename],
+                },
+                'unit_amount':  amount,
+            },
+            'quantity':   1,
+        }],
+        mode='payment',
+        success_url=success_url,
+        cancel_url=failure_url,
+        client_reference_id=ar.m_patient_id,
+        metadata={
+            'patient_name':      patient_name,
+            'doctor_name':       doctor_name,
+            'specialization':    specialization,
+            'platform_title':    platform_title,
+            'platform_slogan':   platform_slogan,
+            'ar_id':             ar.m_id,
+            'ar_time_from':      Func.get_defined_datetime_str(ar.m_time_from),
+            'ar_time_to':        Func.get_defined_datetime_str(ar.m_time_to),
+            'ar_payable_amount': ar.m_payable_amount,
+            'ar_doctor_id':      ar.m_doctor_id,
+            'ar_patient_id':     ar.m_patient_id,
+        },
+    )
+
+    request_response['payment_link_created'] = True
+    request_response['payment_link'] = payment_link.url
+    return App.Res.ok(**request_response)
+
+
+@App.api_route('/webhook/stripe/appointment-booked', method='POST', access_control='All')
+def _(user: None):
+    request_response = {
+        'invalid_payload':            False,
+        'invalid_signature':          False,
+        'appointment_already_booked': False,
+        'slot_clash':                 False,
+        'appointment_booked':         False,
+        'booked_appointment_id':      0,
+    }
+
+    from flask import request
+    import stripe
+
+    try:
+        payload = request.get_data(as_text=True)
+        sig_header = request.headers.get('Stripe-Signature')
+
+        try:
+            event = stripe.Webhook.construct_event(
+                payload, sig_header, Env.get('STRIPE_WEBHOOK_APPOINTMENT_BOOKED_SECRET')
+            )
+        except ValueError as e:
+            request_response['invalid_payload'] = True
+            return App.Res.client_error(**request_response)
+        except stripe.error.SignatureVerificationError as e:
+            request_response['invalid_signature'] = True
+            return App.Res.client_error(**request_response)
+
+        if event['type'] == 'checkout.session.completed':
+            obj = event['data']['object']
+            metadata = obj['metadata']
+            p_id = int(obj['client_reference_id'])
+            total_amount = float(obj['amount_total']) / 100
+            time_from = metadata['ar_time_from']
+            time_to = metadata['ar_time_to']
+            doctor_id = int(metadata['ar_doctor_id'])
+            patient_id = int(metadata['ar_patient_id'])
+            ar_id = int(metadata['ar_id'])
+
+        else:
+            request_response['invalid_payload'] = True
+            return App.Res.client_error(**request_response)
+    except App.Res as e:
+        raise e
+
+    ar = Appointment.Request()
+    ar.m_time_from = time_from
+    ar.m_time_to = time_to
+    ar.m_doctor_id = doctor_id
+    ar.m_patient_id = patient_id
+    if not ar.load():
+        a = Appointment()
+        a.m_time_from = time_from
+        a.m_time_to = time_to
+        a.m_doctor_id = doctor_id
+        a.m_patient_id = patient_id
+        if a.exists():
+            request_response['appointment_already_booked'] = True
+        else:
+            request_response['invalid_payload'] = True
+        return App.Res.client_error(**request_response)
+
+    d = Doctor()
+    d.m_id = ar.m_doctor_id
+    if not d.load(select_cols=['m_max_meeting_duration']):
+        request_response['doctor_not_exists'] = True
+        return App.Res.client_error(**request_response)
+
+    if d.any_slot_clash(ar.m_time_from, ar.m_time_to):
+        request_response['slot_clash'] = True
+
+    curr_time = Func.get_current_time()
+    secret_code = Secret.gen_random_code_str(5, [1, 4])
+
+    a = Appointment()
+    a.m_time_from = ar.m_time_from
+    a.m_time_to = ar.m_time_to
+    a.m_doctor_id = ar.m_doctor_id
+    a.m_patient_id = ar.m_patient_id
+    a.m_status = a.StatusEnum.SLOT_CLASH if request_response['slot_clash'] else a.StatusEnum.PENDING
+    a.m_payment_time = curr_time
+    a.m_status_change_time = curr_time
+    a.m_paid_amount = total_amount
+    a.m_secret_code = secret_code
+    a.m_symptom_description = ar.m_symptom_description
+
+    a.insert(load_inserted_id_to='m_id')
+
+    ar.delete()
+
+    a.commit()
+    ar.commit()
+
+    request_response['appointment_booked'] = True
+    request_response['booked_appointment_id'] = a.m_id
+
     return App.Res.ok(**request_response)

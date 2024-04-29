@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { CommonService } from '../../services/common.service';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { HtmlService } from '../../services/html.service';
 import { RatingStarsComponent } from '../../components/rating-stars/rating-stars.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -189,17 +189,38 @@ export class AppointmentsComponent implements AfterViewInit {
         private utils: UtilFuncService,
         private _fb: FormBuilder,
         private _fvs: FormValidatorsService,
+        private router: Router,
     ) {
         this.appointments = this.sortAppointmentsByDate(this.makeAppointmentsWithSlots(this.allAppointments.list))
         this.allAppointments.change$.pipe(takeUntilDestroyed()).subscribe(() => {
             this.appointments = this.sortAppointmentsByDate(this.makeAppointmentsWithSlots(this.allAppointments.list));
             this.html.initTailwindElements();
         })
+        
+        this.checkForStripeTransactionMsg();
     }
     
     
     ngAfterViewInit(): void {
         this.html.initTailwindElements();
+    }
+    
+    
+    checkForStripeTransactionMsg() {
+        let params = this.router.parseUrl(this.router.url).queryParams;
+        if (params.hasOwnProperty('err_code')) {
+            const err_code = params['err_code'] as string;
+            if (err_code === '00') {
+                toast.success('Transaction successful', {
+                    description: 'If your appointment does not show up in the list, please refresh the page ' +
+                        'in a few minutes.',
+                });
+            } else {
+                toast.error('Transaction failed', {
+                    description: 'Please try again later',
+                });
+            }
+        }
     }
     
     
@@ -489,4 +510,5 @@ export class AppointmentsComponent implements AfterViewInit {
             }
         }
     }
+    
 }

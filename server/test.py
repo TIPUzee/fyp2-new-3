@@ -1,15 +1,8 @@
-import mysql.connector
+from utils import Secret
 
-mydb = mysql.connector.connect(
-  host="sql6.freesqldatabase.com",
-  user="sql6702453",
-  password="YZX8yckxlW",  # Remember to replace with your actual password (not recommended to store in code)
-  database="sql6702453"  # Optional, if connecting to a specific database
-)
+secret_code: str = str(Secret.gen_random_code(5))
+# convert 2nd and 5th character to its ascii upper case
+print(secret_code)
+secret_code = secret_code[:1] + chr(int(secret_code[1]) + 64) + secret_code[2:4] + secret_code[4].upper() + secret_code[5:]
 
-mycursor = mydb.cursor()
-
-# Your database operations here
-
-mycursor.close()
-mydb.close()
+print(secret_code)
