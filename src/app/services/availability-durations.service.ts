@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HTTPService } from "./http.service";
-import { NotificationService } from "../components/notification/notification.service";
 import { UtilFuncService } from "./util-func.service";
+import { toast} from "ngx-sonner";
 
 @Injectable({
     providedIn: 'root'
@@ -10,7 +10,6 @@ export class AvailabilityDurationsService {
     
     constructor(
         private http: HTTPService,
-        private notifications: NotificationService,
         private utils: UtilFuncService
     ) { }
     
