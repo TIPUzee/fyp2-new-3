@@ -201,7 +201,8 @@ export const routes: Routes = [
                 data: { animation: 'pageNotFound' },
             }
         ],
-    }, {
+    },
+    {
         path: '',
         loadComponent: () => import('./g/g.component').then(x => x.GComponent),
         children: [
@@ -255,22 +256,21 @@ export const routes: Routes = [
                 loadComponent: () => import('./g/disclaimer/disclaimer.component').then(x => x.DisclaimerComponent),
             },
             {
-                path: 'm/d',
+                path: 'm/d-p',
                 loadComponent: () => import('./g/disease/disease.component').then(x => x.DiseaseComponent),
                 children: [
                     {
-                        path: 'a',
-                        loadComponent: () => import('./g/disease/advance/advance.component').then(x => x.AdvanceComponent),
-                        children: [
-                            {
-                                path: 'i',
-                                loadComponent: () => import('./g/disease/advance/options/options.component').then(x => x.OptionsComponent),
-                            },
-                            {
-                                path: 'r',
-                                loadComponent: () => import('./g/disease/advance/results/results.component').then(x => x.ResultsComponent),
-                            },
-                        ],
+                        path: '',
+                        redirectTo: 'i',
+                        pathMatch: 'full',
+                    },
+                    {
+                        path: 'i',
+                        loadComponent: () => import('./g/disease/options/options.component').then(x => x.OptionsComponent),
+                    },
+                    {
+                        path: 'r',
+                        loadComponent: () => import('./g/disease/results/results.component').then(x => x.ResultsComponent),
                     },
                 ],
             },

@@ -1,4 +1,4 @@
-const DiseaseSymptomsData = [
+export const DiseaseSymptoms = [
     {
         field: 'itching',
         title: 'Itching',
@@ -577,91 +577,86 @@ const DiseaseSymptomsData = [
     {
         field: 'distention_of_abdomen',
         title: 'Distention of Abdomen',
-        img: 'distention_of_abdomen.'
+        img: 'distention_of_abdomen.png'
     },
     {
         field: 'history_of_alcohol_consumption',
         title: 'History of Alcohol Consumption',
-        img: 'history_of_alcohol_consumption.'
+        img: 'history_of_alcohol_consumption.jpg'
     },
     {
         field: 'fluid_overload',
         title: 'Fluid Overload',
-        img: 'fluid_overload.'
+        img: 'fluid_overload.png'
     },
     {
         field: 'blood_in_sputum',
         title: 'Blood in Sputum',
-        img: 'blood_in_sputum.'
+        img: 'blood_in_sputum.png'
     },
     {
         field: 'prominent_veins_on_calf',
         title: 'Prominent Veins on Calf',
-        img: 'prominent_veins_on_calf.'
+        img: 'prominent_veins_on_calf.png'
     },
     {
         field: 'palpitations',
         title: 'Palpitations',
-        img: 'palpitations.'
+        img: 'palpitations.png'
     },
     {
         field: 'painful_walking',
         title: 'Painful Walking',
-        img: 'painful_walking.'
+        img: 'painful_walking.png'
     },
     {
         field: 'pus_filled_pimples',
         title: 'Pus Filled Pimples',
-        img: 'pus_filled_pimples.'
+        img: 'pus_filled_pimples.png'
     },
     {
         field: 'blackheads',
         title: 'Blackheads',
-        img: 'blackheads.'
+        img: 'blackheads.png'
     },
     {
         field: 'scurring',
         title: 'Scurring',
-        img: 'scurring.'
+        img: 'scurring.jpg'
     },
     {
         field: 'skin_peeling',
         title: 'Skin Peeling',
-        img: 'skin_peeling.'
+        img: 'skin_peeling.png'
     },
     {
         field: 'silver_like_dusting',
         title: 'Silver Like Dusting',
-        img: 'silver_like_dusting.'
+        img: 'silver_like_dusting.png'
     },
     {
         field: 'small_dents_in_nails',
         title: 'Small Dents in Nails',
-        img: 'small_dents_in_nails.'
+        img: 'small_dents_in_nails.png'
     },
     {
         field: 'inflammatory_nails',
         title: 'Inflammatory Nails',
-        img: 'inflammatory_nails.'
+        img: 'inflammatory_nails.png'
     },
     {
         field: 'blister',
         title: 'Blister',
-        img: 'blister.'
+        img: 'blister.png'
     },
     {
         field: 'red_sore_around_nose',
         title: 'Red Sore Around Nose',
-        img: 'red_sore_around_nose.'
+        img: 'red_sore_around_nose.png'
     },
     {
         field: 'yellow_crust_ooze',
         title: 'Yellow Crust Ooze',
-        img: 'yellow_crust_ooze.'
-    },
-    {
-        field: 'prognosis',
-        title: 'Prognosis',
-        img: 'prognosis.'
+        img: 'yellow_crust_ooze.png'
     },
 ];

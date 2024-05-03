@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component } from '@angular/core';
-import { CommonService } from '../../../../services/common.service';
-import { HtmlService } from '../../../../services/html.service';
+import { CommonService } from '../../../services/common.service';
+import { HtmlService } from '../../../services/html.service';
 import anime from 'animejs/lib/anime.es.js';
 import { RouterLink } from '@angular/router';
 
