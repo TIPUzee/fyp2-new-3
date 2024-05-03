@@ -5,7 +5,6 @@ from typing import Any, Callable, Literal
 import json
 
 from flask import Flask, request
-from mypyc.transform.exceptions import primitive_call
 
 from .response import Response as Res
 from ..access_controlled_entity import AccessControlledEntity
