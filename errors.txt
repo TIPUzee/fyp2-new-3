@@ -1,3 +1,4 @@
 Pending - Registration form should not submit until validated
 Pending - Whatsapp number on registration form - format not validated correctly
 Pending - Nouman Branch
+Done - Zeeshan Pull
