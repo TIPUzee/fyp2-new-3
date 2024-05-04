@@ -87,7 +87,7 @@ export class WithdrawComponent implements AfterViewInit {
             
             const res = await this.http.sendRequest({
                 method: 'POST',
-                url: '/withdraw/refund-request',
+                url: '/withdrawal',
                 jsonData: this.refundRequestForm.fg.value,
             }) as SubmitWithdrawalTransactionRequestResponse | false;
             
@@ -135,7 +135,7 @@ export class WithdrawComponent implements AfterViewInit {
             
             const res = await this.http.sendRequest({
                 method: 'GET',
-                url: '/withdraw/prev-refund-request',
+                url: '/withdrawal',
             }) as GetPrevWithdrawalTransactionRequestResponse | false;
             
             this.prevRefundRequest.loading = false;
