@@ -14,3 +14,4 @@ from .system_details import SystemDetails
 from .payfast import Payfast
 from .patient_refund_transaction import PatientRefundTransaction
 from .doctor_withdrawal_transaction import DoctorWithdrawalTransaction
+from .disease_predictor import DiseasePredictorMLModel

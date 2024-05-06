@@ -4,6 +4,8 @@ import { CommonService } from '../../../services/common.service';
 import { HtmlService } from '../../../services/html.service';
 import anime from 'animejs/lib/anime.es.js';
 import { RouterLink } from '@angular/router';
+import { DiseasePredictorService } from "../service/disease-predictor.service";
+import { toast } from "ngx-sonner";
 
 @Component({
     selector: 'app-results',
@@ -32,17 +34,23 @@ export class ResultsComponent implements AfterViewInit {
         'Always follow the guidance provided by healthcare professionals and seek medical attention for severe or persistent drug reactions.',
     ];
     
-
-    constructor(public commonService: CommonService, private htmlService: HtmlService) {}
     
-
+    constructor(
+        public common: CommonService,
+        private html: HtmlService,
+        private diseaseService: DiseasePredictorService,
+    ) {}
+    
+    
     ngAfterViewInit(): void {
         setTimeout(() => {
-            this.htmlService.scrollToTop();
+            this.html.scrollToTop();
         }, 1);
         setTimeout(() => {
             this.animateChunks();
         }, 50);
+        
+        this.showPrecautions();
     }
     
     
@@ -58,15 +66,15 @@ export class ResultsComponent implements AfterViewInit {
             easing: 'easeInOutQuad',
             delay: (el, i) => {
                 if (i == nextBreak) {
-                    nextBreak += this.commonService.getRandomNumber(40, 80);
-                    currentDelay = this.commonService.getRandomNumber(200, 1500);
+                    nextBreak += this.common.getRandomNumber(40, 80);
+                    currentDelay = this.common.getRandomNumber(200, 1500);
                     prevResult += currentDelay;
                 }
-                currentSpeed = this.commonService.getRandomNumber(5, 40);
+                currentSpeed = this.common.getRandomNumber(5, 40);
                 prevResult += currentSpeed;
                 return prevResult;
             },
-            complete: a => {
+            complete: () => {
                 anime({
                     targets: '.animate-spin',
                     opacity: 0,
@@ -74,6 +82,18 @@ export class ResultsComponent implements AfterViewInit {
                     easing: 'easeInOutQuad',
                 });
             },
+        });
+    }
+    
+    
+    showPrecautions(): void {
+        if (!this.diseaseService.res) {
+            toast.error('No disease prediction data found');
+            return;
+        }
+        
+        toast.success('Precautions displayed', {
+            description: this.diseaseService.res.disease,
         });
     }
 }

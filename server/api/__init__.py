@@ -9,3 +9,4 @@ from .test import _
 from .public_utils import _
 from .appointment import _
 from .withdrawal import _
+from .ml_model import _

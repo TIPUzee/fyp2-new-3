@@ -50,6 +50,7 @@ export class RegisComponent implements AfterViewInit {
                     vl.required,
                     vl.minLength(10),
                     vl.maxLength(15),
+                    this._fvs.phoneNumberFormat(),
                 ]),
                 vl.composeAsync([
                     this._fvs.whatsappNumberMustNotExist()
@@ -102,6 +103,7 @@ export class RegisComponent implements AfterViewInit {
                 required: 'Whatsapp Number is required',
                 minlength: 'Whatsapp Number must be at least 10 characters long',
                 maxlength: 'Whatsapp Number must be at most 15 characters long',
+                phoneNumberFormat: 'Whatsapp Number must be in the format +92XXXXXXXXXX',
                 whatsappNumberMustNotExist: 'Whatsapp Number has already taken',
             },
             email: {
@@ -126,9 +128,11 @@ export class RegisComponent implements AfterViewInit {
         waiting: false,
         agreementChecked: false,
         submit: async () => {
+            console.info('Form validation', this.regisForm.fg.valid);
             this.utils.markAllFormControlsAsTouched(this.regisForm.fg);
-            if (this.regisForm.fg.invalid) {
-                toast.error('Please fill in the form correctly');
+            console.info('Form validation', this.regisForm.fg.valid);
+            if (!this.regisForm.fg.valid) {
+                toast.warning('Please fill in the form correctly');
                 return;
             }
             let formData: Record<string, any> = this.regisForm.fg.value;

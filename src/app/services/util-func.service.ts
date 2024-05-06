@@ -184,11 +184,9 @@ export class UtilFuncService {
     
     
     markAllFormControlsAsTouched(form: FormGroup) {
-        Object.values(form.controls).forEach((control) => {
-            control.markAllAsTouched();
-            control.markAsDirty();
-        });
+        form.markAllAsTouched();
         form.patchValue(form.value);
+        form.updateValueAndValidity();
         return form;
     }
     

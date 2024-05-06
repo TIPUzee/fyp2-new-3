@@ -29,15 +29,16 @@
             <ng-container *ngFor="let ds of diseaseSymptoms">
                <div
                   (click)="toggleSymptomSelection(ds.field)"
-                  [ngClass]="{'shadow-[0px_44px_15px_-35px_rgba(0,0,0,0.3)]': selectedSymptoms.includes(ds.field)}"
+                  [ngClass]="{'shadow-[0px_44px_15px_-35px_rgba(0,0,0,0.3)]':
+                  class.selectedSymptoms.includes(ds.field)}"
                   class="relative h-min transition-shadow duration-500 cursor-pointer"
                >
                   <div
-                     [ngClass]="{'bg-gradient-primary-300':  selectedSymptoms.includes(ds.field)}"
+                     [ngClass]="{'bg-gradient-primary-300':  class.selectedSymptoms.includes(ds.field)}"
                      class="p-2 bg-white bg-opacity-100 relative rounded-lg shadow-lg card"
                   >
                      <div
-                        [ngClass]="{'!opacity-100':  selectedSymptoms.includes(ds.field)}"
+                        [ngClass]="{'!opacity-100':  class.selectedSymptoms.includes(ds.field)}"
                         class="opacity-70 rounded-md relative z-0 bg-white text-dark text-opacity-70 flex justify-normal items-center"
                      >
                         <img
@@ -47,11 +48,11 @@
                      </div>
                   </div>
                   <div
-                     [ngClass]="{'bg-gradient-primary-300':  selectedSymptoms.includes(ds.field)}"
+                     [ngClass]="{'bg-gradient-primary-300':  class.selectedSymptoms.includes(ds.field)}"
                      class="p-1 mt-2 bg-white bg-opacity-100 relative rounded-lg shadow-lg card"
                   >
                      <div
-                        [ngClass]="{'text-primary-100 !text-opacity-100':  selectedSymptoms.includes(ds.field)}"
+                        [ngClass]="{'text-primary-100 !text-opacity-100':  class.selectedSymptoms.includes(ds.field)}"
                         class="card-text bottom-0 right-0 text-sm font-semibold text-dark text-opacity-70 ps-1 text-center"
                      >
                         {{ ds.title }}
@@ -63,21 +64,14 @@
          </form>
          <div class="mb-16">
             <div id="predict-btn" class="w-full flex justify-center">
-               <a
-                  routerLink="../r"
-                  type="button"
-                  class="w-1/2 scale-110 block shadow-lg text-xs font-light text-center rounded bg-blue-500 text-neutral-50 hover:bg-blue-600 hover:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] focus:bg-blue-800 focus:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] active:bg-blue-700 active:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] px-6 pb-2 pt-2.5 uppercase leading-normal transition duration-150 ease-in-out focus:outline-none focus:ring-0"
-               >
-                  <div
-                     role="status"
-                     class="inline-block h-3 w-3 mr-2 animate-spin rounded-full border-2 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
-                  >
-                     <span class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
-                        Loading...
-                     </span>
-                  </div>
-                  Predict Disease
-               </a>
+               <div class="scale-[1.1] w-1/2">
+               <form-submit-button
+                  label="Predict Disease"
+                  [waiting]="loading"
+                  [disabled]="loading"
+                  (click)="predict()"
+               ></form-submit-button>
+               </div>
             </div>
          </div>
       </div>

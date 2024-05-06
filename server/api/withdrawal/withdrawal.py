@@ -53,7 +53,6 @@ def _(user: Doctor | Patient, receiver_ep_nb: str, receiver_ep_username: str, am
         'success':                        False,
     }
 
-    print(amount, type(amount))
     nb_validator = Vld.Int()
     if nb_validator(receiver_ep_nb):
         return App.Res.frontend_error(
@@ -180,7 +179,7 @@ def _(
     a = PatientRefundTransaction()
     a.m_id = id
 
-    if not a.load(select_cols=['m_status']):
+    if not a.load(select_cols=['m_status', 'm_patient_id', 'm_amount']):
         request_response['withdrawal_not_found'] = True
 
     elif a.m_status != PatientRefundTransaction.StatusType.REQUESTED:
@@ -204,11 +203,18 @@ def _(
         a.m_trx_time = trx_time
         a.m_status = PatientRefundTransaction.StatusType.COMPLETED
 
+        p = Patient()
+        p.m_id = a.m_patient_id
+        p.m_refundable_amount = -1 * a.m_amount
+
         ss[0].save()
         a.m_ss = ss[0].uu_filename
 
         a.update()
+        p.update(set_increment_cols=['m_refundable_amount'])
+
         a.commit()
+        p.commit()
 
         request_response['withdrawal_completed'] = True
         request_response['withdrawal_current_status'] = a.m_status

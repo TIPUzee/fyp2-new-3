@@ -511,3 +511,7 @@ export interface AdminDeleteSpecializationCategoryResponse {
     specializationCategoryDoesNotExist: boolean,
     specializationCategoryDeleted: boolean,
 }
+
+export interface PredictDiseaseResponse {
+    disease: string
+}
