@@ -1,4 +1,6 @@
-Pending - Registration form should not submit until validated
+Pending - Registration form should not submit until validated (disabled login button)
 Pending - Whatsapp number on registration form - format not validated correctly
-Pending - Nouman Branch
-Done - Zeeshan Pull
+Pending - doctor suggestion in book appointment page (write specialization of doctor)
+Pending - Login form should not submit until validated (disabled login button)
+pending - book specialization doctor for disease button not working and redirect to doctors detail page
+pending - on login page and forgot password page (registration button and login button color changed into dark shade)
